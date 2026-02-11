@@ -2,7 +2,7 @@
 
 Async Python is powerful but fragmented—choosing asyncio or Trio often locks you into that ecosystem. Enter AnyIO: the compatibility layer that lets you write async code working seamlessly across both frameworks. Here's the surprise: **you probably already have it installed**.
 
-Check your environment right now. If you're using `httpx`, `starlette`, `fastapi`, `jupyter-server`, or Anthropic's MCP SDK, AnyIO is already there—quietly powering your HTTP clients, web frameworks, notebooks, and AI infrastructure. Major libraries have converged on AnyIO as their async foundation, making it one of Python's most widely deployed packages you've never directly imported.
+Check your environment right now. If you're using `httpx`, `starlette`, `fastapi`, `jupyter`, or Anthropic's MCP SDK, AnyIO is already there—quietly powering your HTTP clients, web frameworks, notebooks, and AI infrastructure. Major libraries have converged on AnyIO as their async foundation, making it one of Python's most widely deployed packages you've never directly imported.
 
 But AnyIO isn't just about compatibility. It fundamentally fixes one of asyncio's most dangerous design flaws: **edge-triggered cancellation**. While asyncio's cancellation can be silently swallowed or lost, AnyIO implements **level-triggered cancellation**—ensuring that when something is cancelled, it stays cancelled. This single design decision prevents entire classes of bugs that have plagued production async code for years.
 
