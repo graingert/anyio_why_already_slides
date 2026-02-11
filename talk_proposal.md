@@ -254,5 +254,7 @@ The cancellation discussion and result collection patterns are the heart of the 
 
 **Special note**: The level-triggered cancellation work and the task group design represent years of careful engineering and edge case handling. This talk will honor that effort by explaining not just *what* it does, but *why* it's hard to implement correctly and *how* it prevents real production bugs. The result collection patterns (`start_soon` returning None, memory streams) are deliberate design choices that enforce structured concurrency—I'll explain why these "limitations" are actually features.
 
-This will be my first PyData talk, though I have experience with technical presentations. I'm happy to provide references or answer any questions about the proposal.
+This will be my first PyData talk, and I have limited experience with technical presentations. I'm happy to provide references or answer any questions about the proposal.
+This will be my second talk ever, my first talk was a completely off the cuff live demo of how Babel.js uses a duffs device to enable async/await on IE10
 
+I'm diagnosed with schizoaffective disorder and autism spectrum disorder so would apreciate a mid-day slot (when my antipsychotics are least sedating) and some mentorship with this proposal
