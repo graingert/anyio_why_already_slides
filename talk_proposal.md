@@ -242,7 +242,7 @@ This talk bridges the gap between "I write async/await sometimes" and "I underst
 # Notes
 
 I'm flexible on format and can adapt to different time slots. The talk includes:
-- Live demonstrations with `pipdeptree -r anyio` showing the actual dependency tree
+- Live demonstrations with `pipdeptree -p anyio -r` showing the actual dependency tree
 - Real bug reproductions comparing asyncio edge cancellation vs AnyIO level cancellation
 - Side-by-side code comparisons of asyncio.gather() vs task groups with results
 - Practical examples of memory object streams for data processing
