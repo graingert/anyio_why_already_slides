@@ -241,6 +241,14 @@ This talk bridges the gap between "I write async/await sometimes" and "I underst
 
 # Notes
 
+Why Thomas is Qualified to Give This Talk
+Thomas's deep involvement in both AnyIO's implementation and CPython's async infrastructure gives him unique insight into:
+
+- The problems AnyIO solves: He's worked on the actual implementation of AnyIO level-triggered cancellation
+- The engineering challenges: Years of fixing edge cases and reference cycles in production async code
+- The broader ecosystem: Contributions across Twisted, Django, Trio, httpx ecosystem, and more
+- Real-world impact: His work is running in millions of production systems through dependencies
+
 I'm flexible on format and can adapt to different time slots. The talk includes:
 - Live demonstrations with `pipdeptree -p anyio -r` showing the actual dependency tree
 - Real bug reproductions comparing asyncio edge cancellation vs AnyIO level cancellation
