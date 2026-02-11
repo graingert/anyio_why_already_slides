@@ -265,4 +265,6 @@ The cancellation discussion and result collection patterns are the heart of the 
 This will be my first PyData talk, and I have limited experience with technical presentations. I'm happy to provide references or answer any questions about the proposal.
 This will be my second talk ever, my first talk was a completely off the cuff live demo of how Babel.js uses a duffs device to enable async/await on IE10
 
+I would like a lazer pointer to point or circle blocks of example code
+
 I'm diagnosed with schizoaffective disorder and autism spectrum disorder so would apreciate a mid-day slot (when my antipsychotics are least sedating) and some mentorship with this proposal
