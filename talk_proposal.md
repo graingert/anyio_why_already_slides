@@ -174,7 +174,7 @@ anyio==4.12.1
   - **HTTPX**: Built entirely on AnyIO streams—the modern async HTTP client
   - **Jupyter/IPython**: jupyter-client, ipykernel, and the entire Jupyter ecosystem
   - **MCP (Model Context Protocol)**: Anthropic's SDK for AI agents
-  - **And dozens more**: uvicorn, databases, encode ecosystem
+  - **And dozens more**: databases, encode ecosystem
   
 - **Migration from asyncio**
   - `asyncio.gather()` → task groups with nonlocal/streams
