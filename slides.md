@@ -25,6 +25,7 @@ https://graingert.co.uk/why-anyio-already
     * channels (memory object streams) > `asyncio.Queue`
     * `BufferedByteReceiveStream` AnyIO > Trio
     * `anyio.Path`
+    * pytest plugin built in
 * The advantages of being pip installable
 
 ---
