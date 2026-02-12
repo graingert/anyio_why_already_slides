@@ -1115,6 +1115,21 @@ async/await
 
 ------------------------------------------------------------------------
 
+# pytest plugin
+
+* AnyIO ships with a pytest plugin that it uses to test itself.
+* This means if you already depend on AnyIO you don't need pytest-asyncio as well.
+
+---
+By default the plugin runs your tests under both asyncio and Trio, so if you're still gradually migrating to AnyIO still require asyncio support you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
+
+```python
+@pytest.fixture
+def anyio_backend():
+    return 'asyncio'
+```
+---
+
 # Why AnyIO is better because it's on PyPI
 
 In python 3.13 a number of bug-fixes were applied to asyncio.TaskGroup
