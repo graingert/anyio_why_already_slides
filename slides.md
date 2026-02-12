@@ -1121,6 +1121,14 @@ async/await
 * This means if you already depend on AnyIO you don't need pytest-asyncio as well.
 
 ---
+
+```python
+@pytest.mark.anyio
+async def test_something():
+    assert await something() == "result"
+```
+
+---
 By default the plugin runs your tests under both asyncio and Trio, so if you're still gradually migrating to AnyIO still require asyncio support you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
 
 ```python
