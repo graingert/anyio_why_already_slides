@@ -61,6 +61,10 @@ https://graingert.co.uk/why-anyio-already
 
 ---
 
+For more generator tricks see also https://www.dabeaz.com/generators/ https://www.dabeaz.com/coroutines/ https://www.dabeaz.com/finalgenerator/
+
+---
+
 This means libraries like AnyIO can call either the asyncio API or the
 trio api depending on what library is currently in use:
 
