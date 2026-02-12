@@ -1,0 +1,1239 @@
+# asyncio != async/await
+
+Coroutines are generator based in Python, which means not just asyncio
+can use them because `async/await` is totally decoupled from `asyncio`,
+this means frameworks like Twisted and Trio can support async function
+interfaces while being completely unrelated to asyncio. You can even use
+`async/await` to make your own generators:
+
+::: {#cb1 .sourceCode}
+``` {.sourceCode .py}
+>>> import types
+>>> @types.coroutine
+... def _async_yield(v):
+...     return (yield v)
+...     
+>>> async def coro_fn():
+...     await _async_yield(1)
+...     await _async_yield(2)
+...     await _async_yield(3)
+...     
+>>> coro = coro_fn()
+>>> gen = coro.__await__()
+>>> list(gen)
+[1, 2, 3]
+>>> 
+```
+:::
+
+This means libraries like AnyIO can call either the asyncio API or the
+trio api depending on what library is currently in use:
+
+This is similar in approach to libraries like `six` which let you write
+code compatible with Python 2 and Python 3
+
+::: {#cb2 .sourceCode}
+``` {.sourceCode .py}
+from sniffio import current_async_library
+
+async def sleep_for_one_loop_cycle():
+    if current_async_library() == "asyncio":
+        fut = asyncio.Future()
+        asyncio.create_task(set_fut_result_soon(fut))
+        await fut  # calls fut.__await__().send(None)
+    elif current_async_library() == "trio":
+        event = trio.Event()
+        trio.lowlevel.spawn_system_task(set_event_soon, event)
+        await event  # calls _async_yield(WaitTaskRescheduled(abort_func)).__await__().send(outcome.Value(None))
+    else:  # Twisted?
+        raise RuntimeError("unsupported async framework")
+```
+:::
+
+# The Problem with `asyncio.create_task()`
+
+## It's a "go statement" - and go statements break everything
+
+------------------------------------------------------------------------
+
+## What's a "go statement"?
+
+``` python
+# asyncio
+asyncio.create_task(myfunc())  # Fire and forget!
+# Control returns immediately, myfunc() runs in background
+
+# Golang
+go myfunc()  // Same thing
+
+# Python threads  
+threading.Thread(target=myfunc).start()  # Also same
+```
+
+**Key problem:** Control flow splits with **one-way jump**
+
+-   Parent returns immediately
+-   Child jumps to myfunc and runs unsupervised
+-   No guaranteed reunion point
+
+------------------------------------------------------------------------
+
+## Problem 1: Functions Aren't Black Boxes Anymore
+
+``` python
+async def process_data(data):
+    # Does this function spawn background tasks?
+    # Are they still running after it returns?
+    # You have NO IDEA without reading all the source code!
+    await some_library_function(data)
+    # Function returned... but is it done? 🤷
+```
+
+**You can't reason locally about control flow**
+
+Every function call might secretly spawn tasks that outlive the function
+
+------------------------------------------------------------------------
+
+## Problem 2: Resource Cleanup Breaks
+
+``` python
+# This LOOKS safe...
+async with open("data.csv") as f:
+    await process_file(f)
+# File closed here... right?
+
+# But what if process_file did this:
+async def process_file(f):
+    asyncio.create_task(read_data(f))  # Background task!
+    return  # Function returns immediately
+    
+# Now: file is CLOSED while background task still uses it
+# 💥 Error! (if you're lucky)
+```
+
+**The language can't help you with automatic cleanup**
+
+------------------------------------------------------------------------
+
+## Problem 3: Error Handling Breaks
+
+``` python
+async def background_task():
+    raise ValueError("Something went wrong!")
+
+# Start background task
+task = asyncio.create_task(background_task())
+
+# Error happens... but where does it go?
+# Answer: NOWHERE! It's silently dropped!
+# (Maybe printed to console if you're lucky)
+```
+
+**Exceptions can't propagate because there's no stack to unwind**
+
+Compare to regular Python:
+
+``` python
+def my_function():
+    raise ValueError("Something went wrong!")
+    
+my_function()  # Exception propagates to caller automatically
+```
+
+------------------------------------------------------------------------
+
+## Problem 4: You Can't Tell If Code Is Finished
+
+``` python
+async def mystery_function():
+    await do_something()
+    return "done"
+
+result = await mystery_function()
+# Is mystery_function actually done?
+# Or did it spawn tasks that are still running?
+# NO WAY TO KNOW!
+```
+
+**The "return" statement lies to you**
+
+------------------------------------------------------------------------
+
+## The Root Cause: Unstructured Concurrency
+
+    asyncio.create_task() control flow:
+
+        ┌─────────────┐
+        │   Parent    │
+        │   task      │
+        └──────┬──────┘
+               │
+        create_task()
+               │
+          ┌────┴────┐
+          │         │ 
+       Parent    Child ──→ myfunc()
+       returns    (orphaned, unsupervised)
+
+**One-way jump = no guaranteed cleanup, no error propagation, no
+completion tracking**
+
+------------------------------------------------------------------------
+
+## Real-World Consequences
+
+### In asyncio programs:
+
+❌ **Backpressure problems** - Can't tell how many tasks are running\
+❌ **Resource leaks** - Files/sockets stay open because cleanup is
+manual\
+❌ **Silent failures** - Errors in background tasks get dropped\
+❌ **Shutdown hangs** - Can't wait for "done" because tasks are
+invisible\
+❌ **Race conditions** - Tasks outlive the data they operate on
+
+### In data pipelines specifically:
+
+❌ **Timeouts don't work** - Can't cancel tasks you've lost track of\
+❌ **Parallel processing breaks** - No way to collect results safely\
+❌ **Can't reason about code** - Every function is a potential landmine
+
+------------------------------------------------------------------------
+
+## The Solution: Structured Concurrency with Task Groups
+
+``` python
+# asyncio - UNSTRUCTURED (bad)
+async def unstructured():
+    asyncio.create_task(myfunc())  # Fire and forget
+    asyncio.create_task(other())   # Where do errors go?
+    return  # Are we done? Who knows!
+
+# AnyIO - STRUCTURED (good)
+async def structured():
+    async with anyio.create_task_group() as tg:
+        tg.start_soon(myfunc)
+        tg.start_soon(other)
+    # BLOCKED HERE until all tasks finish
+    # All errors propagated automatically
+    # All cleanup happens automatically
+    return  # NOW we're actually done
+```
+
+**Task groups enforce: tasks must complete before you can continue**
+
+------------------------------------------------------------------------
+
+## Dijkstra Was Right (Again)
+
+In 1968, Dijkstra showed that **goto statements break abstraction**
+
+In 2018, we learned that **go statements do the same thing**
+
+  -----------------------------------------------------------------------
+  goto (1960s)                        asyncio.create_task() (2010s)
+  ----------------------------------- -----------------------------------
+  One-way jump                        One-way jump
+
+  Breaks function boundaries          Breaks function boundaries
+
+  No automatic cleanup                No automatic cleanup
+
+  No error propagation                No error propagation
+
+  Makes code impossible to reason     Makes code impossible to reason
+  about                               about
+  -----------------------------------------------------------------------
+
+**Solution then:** Remove goto, add structured control flow
+(if/while/functions)\
+**Solution now:** Remove create_task, add structured concurrency (task
+groups)
+
+------------------------------------------------------------------------
+
+## Key Takeaway
+
+**`asyncio.create_task()` is the `goto` of concurrency**
+
+-   It's powerful
+-   It seems convenient
+-   **It breaks everything**
+
+**AnyIO task groups are the `if/while/for` of concurrency**
+
+-   They're structured
+-   They preserve abstractions
+-   They make the language features work again
+-   **They let you reason about your code**
+
+------------------------------------------------------------------------
+
+## Further Reading
+
+**Nathaniel J. Smith (Trio author):**\
+["Notes on structured concurrency, or: Go statement considered
+harmful"](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)
+
+**Original Dijkstra paper:**\
+["Go To Statement Considered Harmful"
+(1968)](https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf)
+
+# The Problem with `asyncio.create_task()` {#the-problem-with-asyncio.create_task}
+
+## It's a "go statement" - and go statements break everything {#its-a-go-statement---and-go-statements-break-everything}
+
+------------------------------------------------------------------------
+
+## What's a "go statement"? {#whats-a-go-statement}
+
+::: {#cb3 .sourceCode}
+``` {.sourceCode .python}
+# asyncio
+asyncio.create_task(myfunc())  # Fire and forget!
+# Control returns immediately, myfunc() runs in background
+
+# Golang
+go myfunc()  // Same thing
+
+# Python threads  
+threading.Thread(target=myfunc).start()  # Also same
+```
+:::
+
+**Key problem:** Control flow splits with **one-way jump** - Parent
+returns immediately - Child jumps to myfunc and runs unsupervised - No
+guaranteed reunion point
+
+------------------------------------------------------------------------
+
+## Problem 1: Functions Aren't Black Boxes Anymore {#problem-1-functions-arent-black-boxes-anymore}
+
+::: {#cb4 .sourceCode}
+``` {.sourceCode .python}
+async def process_data(data):
+    # Does this function spawn background tasks?
+    # Are they still running after it returns?
+    # You have NO IDEA without reading all the source code!
+    await some_library_function(data)
+    # Function returned... but is it done? 🤷
+```
+:::
+
+**You can't reason locally about control flow**
+
+Every function call might secretly spawn tasks that outlive the function
+
+------------------------------------------------------------------------
+
+## Problem 2: Resource Cleanup Breaks {#problem-2-resource-cleanup-breaks}
+
+::: {#cb5 .sourceCode}
+``` {.sourceCode .python}
+# This LOOKS safe...
+async with open("data.csv") as f:
+    await process_file(f)
+# File closed here... right?
+
+# But what if process_file did this:
+async def process_file(f):
+    asyncio.create_task(read_data(f))  # Background task!
+    return  # Function returns immediately
+    
+# Now: file is CLOSED while background task still uses it
+# 💥 Error! (if you're lucky)
+```
+:::
+
+**The language can't help you with automatic cleanup**
+
+------------------------------------------------------------------------
+
+## Problem 3: Error Handling Breaks {#problem-3-error-handling-breaks}
+
+::: {#cb6 .sourceCode}
+``` {.sourceCode .python}
+async def background_task():
+    raise ValueError("Something went wrong!")
+
+# Start background task
+task = asyncio.create_task(background_task())
+
+# Error happens... but where does it go?
+# Answer: NOWHERE! It's silently dropped!
+# (Maybe printed to console if you're lucky)
+```
+:::
+
+**Exceptions can't propagate because there's no stack to unwind**
+
+Compare to regular Python:
+
+::: {#cb7 .sourceCode}
+``` {.sourceCode .python}
+def my_function():
+    raise ValueError("Something went wrong!")
+    
+my_function()  # Exception propagates to caller automatically
+```
+:::
+
+------------------------------------------------------------------------
+
+## Problem 4: You Can't Tell If Code Is Finished {#problem-4-you-cant-tell-if-code-is-finished}
+
+::: {#cb8 .sourceCode}
+``` {.sourceCode .python}
+async def mystery_function():
+    await do_something()
+    return "done"
+
+result = await mystery_function()
+# Is mystery_function actually done?
+# Or did it spawn tasks that are still running?
+# NO WAY TO KNOW!
+```
+:::
+
+**The "return" statement lies to you**
+
+------------------------------------------------------------------------
+
+## The Root Cause: Unstructured Concurrency {#the-root-cause-unstructured-concurrency}
+
+    asyncio.create_task() control flow:
+
+        ┌─────────────┐
+        │   Parent    │
+        │   task      │
+        └──────┬──────┘
+               │
+        create_task()
+               │
+          ┌────┴────┐
+          │         │ 
+       Parent    Child ──→ myfunc()
+       returns    (orphaned, unsupervised)
+
+**One-way jump = no guaranteed cleanup, no error propagation, no
+completion tracking**
+
+------------------------------------------------------------------------
+
+## Real-World Consequences {#real-world-consequences}
+
+### In asyncio programs: {#in-asyncio-programs}
+
+❌ **Backpressure problems** - Can't tell how many tasks are running\
+❌ **Resource leaks** - Files/sockets stay open because cleanup is
+manual\
+❌ **Silent failures** - Errors in background tasks get dropped\
+❌ **Shutdown hangs** - Can't wait for "done" because tasks are
+invisible\
+❌ **Race conditions** - Tasks outlive the data they operate on
+
+### In data pipelines specifically: {#in-data-pipelines-specifically}
+
+❌ **Timeouts don't work** - Can't cancel tasks you've lost track of\
+❌ **Parallel processing breaks** - No way to collect results safely\
+❌ **Can't reason about code** - Every function is a potential landmine
+
+------------------------------------------------------------------------
+
+## The Solution: Structured Concurrency with Task Groups {#the-solution-structured-concurrency-with-task-groups}
+
+::: {#cb10 .sourceCode}
+``` {.sourceCode .python}
+# asyncio - UNSTRUCTURED (bad)
+async def unstructured():
+    asyncio.create_task(myfunc())  # Fire and forget
+    asyncio.create_task(other())   # Where do errors go?
+    return  # Are we done? Who knows!
+
+# AnyIO - STRUCTURED (good)
+async def structured():
+    async with anyio.create_task_group() as tg:
+        tg.start_soon(myfunc)
+        tg.start_soon(other)
+    # BLOCKED HERE until all tasks finish
+    # All errors propagated automatically
+    # All cleanup happens automatically
+    return  # NOW we're actually done
+```
+:::
+
+**Task groups enforce: tasks must complete before you can continue**
+
+------------------------------------------------------------------------
+
+## Dijkstra Was Right (Again) {#dijkstra-was-right-again}
+
+In 1968, Dijkstra showed that **goto statements break abstraction**
+
+In 2018, we learned that **go statements do the same thing**
+
+  -----------------------------------------------------------------------
+  goto (1960s)           asyncio.create_task() (2010s)
+  ---------------------- ------------------------------------------------
+  One-way jump           One-way jump
+
+  Breaks function        Breaks function boundaries
+  boundaries             
+
+  No automatic cleanup   No automatic cleanup
+
+  No error propagation   No error propagation
+
+  Makes code impossible  Makes code impossible to reason about
+  to reason about        
+  -----------------------------------------------------------------------
+
+**Solution then:** Remove goto, add structured control flow
+(if/while/functions)\
+**Solution now:** Remove create_task, add structured concurrency (task
+groups)
+
+------------------------------------------------------------------------
+
+## Key Takeaway {#key-takeaway}
+
+**`asyncio.create_task()` is the `goto` of concurrency**
+
+-   It's powerful
+-   It seems convenient
+-   **It breaks everything**
+
+**AnyIO task groups are the `if/while/for` of concurrency**
+
+-   They're structured
+-   They preserve abstractions\
+-   They make the language features work again
+-   **They let you reason about your code**
+
+------------------------------------------------------------------------
+
+## Further Reading {#further-reading}
+
+**Nathaniel J. Smith (Trio author):**\
+[\["Notes on structured concurrency, or: Go statement considered
+harmful"\](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)
+
+**Original Dijkstra paper:**\
+[\["Go To Statement Considered Harmful"
+(1968)\](https://homepages.cwi.nl/\~storm/teaching/reader/Dijkstra68.pdf)](https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf)
+
+------------------------------------------------------------------------
+
+In my personal opinion the two most important reasons to use AnyIO is
+that you can mix it with asyncio and optionally/gradually add Trio
+support, and cancellations are level triggered.
+
+with level cancellation every async operation in a CancelScope will fail
+with a CancelledError
+
+    import anyio
+
+    async def example():
+        with anyio.fail_after(0) as scope:
+            try:
+                await anyio.sleep(1)  # raises CancelledError
+            finally:
+                await anyio.sleep(1000)  # also raises CancelledError
+
+        # raises TimeoutError as you leave the scope
+
+
+    anyio.run(example)
+
+::: {#cb12 .sourceCode}
+``` {.sourceCode .python}
+import asyncio
+
+async def example():
+    async with asyncio.timeout(0):
+        try:
+            await asyncio.sleep(1)   # raises CancelledError
+        finally:
+            await asyncio.sleep(1000)  # waits 1000 seconds
+    # raises TimeoutError.... eventually
+
+
+asyncio.run(example())
+```
+:::
+
+edge cancellation can result in deadlocks on asyncio for example the
+following program hangs
+
+::: {#cb13 .sourceCode}
+``` {.sourceCode .python}
+import asyncio
+
+
+async def main():
+    never = asyncio.Future()
+
+    async def task_with_finally():
+        try:
+            print("task_with_finally running")
+            await asyncio.sleep(10)
+        finally:
+            print("task_with_finally in finally")
+            print("awaiting never-completing future (WILL HANG)")
+            # This is a bit of an unfair example but it used to be that StreamWriter.wait_close()
+            # hung in this case, but that's fixed on Python 3.13+, but it's not fixed for
+            # async websockets. https://github.com/python/cpython/issues/104344
+            await never
+            print("never reached")
+
+    async def crash_soon():
+        await asyncio.sleep(1)
+        print("crash_soon raising")
+        raise RuntimeError("boom")
+
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(task_with_finally())
+        tg.create_task(crash_soon())
+
+
+asyncio.run(main())
+```
+:::
+
+output:
+
+    task_with_finally running
+    crash_soon raising
+    task_with_finally in finally
+    awaiting never-completing future (WILL HANG)
+
+---
+
+After hitting Ctrl+c a few times:
+
+    task_with_finally running
+    crash_soon raising
+    task_with_finally in finally
+    awaiting never-completing future (WILL HANG)
+    ^C^Cunhandled exception during asyncio.run() shutdown
+    task: <Task finished name='Task-1' coro=<main() done, defined at /home/graingert/projects/django/demo.py:4> exception=ExceptionGroup('unhandled errors in a TaskGroup', [RuntimeError('boom')])>
+      + Exception Group Traceback (most recent call last):
+      |   File "/home/graingert/projects/django/demo.py", line 22, in main
+      |     async with asyncio.TaskGroup() as tg:
+      |   File "/usr/lib/python3.12/asyncio/taskgroups.py", line 145, in __aexit__
+      |     raise me from None
+      | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+      +-+---------------- 1 ----------------
+        | Traceback (most recent call last):
+        |   File "/home/graingert/projects/django/demo.py", line 20, in crash_soon
+        |     raise RuntimeError("boom")
+        | RuntimeError: boom
+        +------------------------------------
+    Traceback (most recent call last):
+      File "/home/graingert/projects/django/demo.py", line 27, in <module>
+        asyncio.run(main())
+      File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+        return runner.run(main)
+               ^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+        return self._loop.run_until_complete(task)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+        self.run_forever()
+      File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+        self._run_once()
+      File "/usr/lib/python3.12/asyncio/base_events.py", line 1949, in _run_once
+        event_list = self._selector.select(timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.12/selectors.py", line 468, in select
+        fd_event_list = self._selector.poll(timeout, max_ev)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.12/asyncio/runners.py", line 157, in _on_sigint
+        raise KeyboardInterrupt()
+    KeyboardInterrupt
+
+::: {#cb15 .sourceCode}
+``` {.sourceCode .python}
+import asyncio
+import anyio
+
+async def main():
+    never = asyncio.Future()
+
+    async def task_with_finally():
+        try:
+            print("task_with_finally running")
+            await asyncio.sleep(10)
+        finally:
+            print("task_with_finally in finally")
+            print("awaiting never-completing future (WILL HANG)")
+            await never
+            print("never reached")
+
+    async def crash_soon():
+        await asyncio.sleep(1)
+        print("crash_soon raising")
+        raise RuntimeError("boom")
+
+    async with anyio.create_task_group() as tg:
+        tg.start_soon(task_with_finally)
+        tg.start_soon(crash_soon)
+
+
+asyncio.run(main())
+```
+:::
+
+---
+
+output:
+
+    task_with_finally running
+    crash_soon raising
+    task_with_finally in finally
+    awaiting never-completing future (WILL NOT HANG)
+      + Exception Group Traceback (most recent call last):
+      |   File "/home/graingert/projects/django/demo.py", line 27, in <module>
+      |     asyncio.run(main())
+      |   File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+      |     return runner.run(main)
+      |            ^^^^^^^^^^^^^^^^
+      |   File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+      |     return self._loop.run_until_complete(task)
+      |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |   File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+      |     return future.result()
+      |            ^^^^^^^^^^^^^^^
+      |   File "/home/graingert/projects/django/demo.py", line 22, in main
+      |     async with anyio.create_task_group() as tg:
+      |   File "/home/graingert/.virtualenvs/anyio_pipdeptree/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 783, in __aexit__
+      |     raise BaseExceptionGroup(
+      | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+      +-+---------------- 1 ----------------
+        | Traceback (most recent call last):
+        |   File "/home/graingert/projects/django/demo.py", line 20, in crash_soon
+        |     raise RuntimeError("boom")
+        | RuntimeError: boom
+        +------------------------------------
+
+This is still a problem when using websockets over TLS
+
+::: {#cb17 .sourceCode}
+``` {.sourceCode .python}
+async def consume_ws():
+    async with await connect_ws("wss://example.com/news") as ws:
+        async for message in ws:
+            await process(message)  # cancellation happens here
+     # cancellation doesn't happen as we `__aexit__()` the context manager
+
+async def example():
+    async with asyncio.timeout(10):
+        await consume_ws()  # could hang forever
+```
+:::
+
+------------------------------------------------------------------------
+
+# Backpressure by Default. Structured. Composable.
+
+AnyIO provides `MemoryObjectSendStream` and `MemoryObjectReceiveStream`
+instead of Queues, but you don't need to keep a count of how many Queue
+producer/consumers you have you just make a clone for each
+producer/consumer and use a `with` or `async with` to close the clones.
+Once all the clones of one end of the memory object stream are closed
+iterating the other end will raise StopAsyncIteration.
+
+::: {#cb18 .sourceCode}
+``` {.sourceCode .python}
+import anyio
+
+async def consume_ws(url, stream):
+    async with stream, await connect_ws(url) as ws:
+        async for msg in ws:
+            await stream.send(msg)
+
+async def news_and_weather():
+    tx, rx = anyio.create_memory_object_stream[bytes]()  # default buffer size = 0
+    async with tx, rx, anyio.create_task_group() as tg:
+        tg.start_soon(consume_ws, "ws://example.com/news", tx.clone())
+        tg.start_soon(consume_ws, "ws://example.com/weather", tx.clone())
+        tx.close()
+        async for item in rx:
+            print(item)
+
+anyio.run(main)
+```
+:::
+
+### Key properties
+
+-   ✅ **Buffer size defaults to 0** → automatic backpressure
+
+-   ✅ `async for` works naturally
+
+-   ✅ `aclose()` signals end-of-stream
+
+-   ✅ `clone()` enables multiple consumers safely
+
+-   ✅ Structured shutdown
+
+---
+
+# asyncio.Queue Comparison
+
+::: {#cb19 .sourceCode}
+``` {.sourceCode .python}
+import asyncio
+
+async def main():
+    q = asyncio.Queue()  # unbounded by default (!)
+
+    async def producer():
+        for i in range(3):
+            print("put", i)
+            await q.put(i)
+        # How do we signal completion?
+
+    async def consumer():
+        while True:
+            item = await q.get()
+            print("got", item)
+```
+:::
+
+### Problems
+
+-   ❌ Unbounded by default (no backpressure)
+
+-   ❌ No async iteration
+
+-   ❌ No built-in structured close (historically)
+
+-   ❌ No clone()
+
+-   ❌ Requires sentinel values or custom shutdown logic
+
+------------------------------------------------------------------------
+
+# asyncio.Queue.shutdown() (3.13+)
+
+Python 3.13 introduces:
+
+::: {#cb20 .sourceCode}
+``` {.sourceCode .python}
+await q.shutdown()
+```
+:::
+
+But:
+
+-   Only on *new* Python
+
+-   Not widely deployed yet
+
+-   Still no cloning
+
+-   Still no structured fan-out
+
+------------------------------------------------------------------------
+# Conceptual Comparison
+
+  Feature                  AnyIO Stream    asyncio.Queue
+  ------------------------ --------------- ----------------
+  Default backpressure     ✅ (buffer=0)   ❌ (unbounded)
+  Async iteration          ✅              ❌
+  Structured close         ✅              ⚠️ (3.13+)
+  Clone receivers          ✅              ❌
+  Cancellation semantics   Level           Edge
+  Trio-compatible          ✅              ❌
+
+AnyIO streams compose with structured concurrency. `asyncio.Queue`
+predates it.
+
+------------------------------------------------------------------------
+
+citation:
+
+-   https://github.com/python-trio/trio/issues/796
+-   https://github.com/groove-x/trio-util/issues/22
+-   https://github.com/python-trio/trio/issues/562
+
+Excellent --- this is a very strong positioning moment in a talk.
+
+Most people assume:
+
+> "If I'm already using Trio, I don't need AnyIO."
+
+But AnyIO adds real value even on the Trio backend.
+
+Below are two ready-to-use slide sections:
+
+------------------------------------------------------------------------
+
+# Why Use AnyIO If You're Already Using Trio?
+
+## Trio gives you structured concurrency.
+
+## AnyIO gives you portability + batteries.
+
+### What AnyIO adds on top of Trio
+
+-   ✅ Backend portability (asyncio, Trio)
+
+-   ✅ A stable public API for libraries
+
+-   ✅ High-level stream utilities
+
+-   ✅ Memory object streams
+
+-   ✅ Buffered byte streams
+
+-   ✅ Stapled streams
+
+-   ✅ Thread/subprocess helpers
+
+-   ✅ Ecosystem compatibility (FastAPI, httpx, etc.)
+
+------------------------------------------------------------------------
+
+### The key idea
+
+> Trio is a runtime.
+>
+> AnyIO is a portability + abstraction layer with extra primitives.
+
+If you write a library directly against Trio:
+
+-   You lock out asyncio users.
+
+If you write against AnyIO:
+
+-   Trio users still get full Trio semantics.
+
+-   asyncio users can adopt you incrementally.
+
+------------------------------------------------------------------------
+
+### The practical takeaway
+
+If you're building:
+
+-   A framework
+
+-   A reusable library
+
+-   Infrastructure code
+
+You should strongly prefer **AnyIO APIs**, even when running on Trio.
+
+------------------------------------------------------------------------
+
+# Buffered Byte Streams (AnyIO Feature Trio Lacks)
+
+Trio provides `SendStream` / `ReceiveStream`.
+
+But it does **not** provide:
+
+-   Buffered reads
+
+-   `receive_exactly(n)`
+
+-   `receive_until(delimiter)`
+
+-   Automatic read buffering
+
+AnyIO does.
+
+------------------------------------------------------------------------
+
+# Demo --- AnyIO Buffered Byte Streams
+
+From:\
+<https://anyio.readthedocs.io/en/stable/streams.html#buffered-byte-streams>
+
+::: {#cb21 .sourceCode}
+``` {.sourceCode .python}
+import anyio
+
+async def main():
+    send, receive = anyio.create_memory_object_stream
+
+    async def producer():
+        await send.send(b"hello\nworld\n")
+        await send.aclose()
+
+    async def consumer():
+        buffered = anyio.streams.buffered.BufferedByteReceiveStream(receive)
+
+        line1 = await buffered.receive_until(b"\n")
+        print("line1:", line1)
+
+        line2 = await buffered.receive_until(b"\n")
+        print("line2:", line2)
+
+    async with anyio.create_task_group() as tg:
+        tg.start_soon(producer)
+        tg.start_soon(consumer)
+
+anyio.run(main)
+```
+:::
+
+### Output
+
+    line1: b'hello\n'
+    line2: b'world\n'
+
+------------------------------------------------------------------------
+
+### What Just Happened?
+
+-   The producer sent both lines in one chunk.
+
+-   The consumer parsed them cleanly by delimiter.
+
+-   No manual buffering.
+
+-   No partial read bookkeeping.
+
+------------------------------------------------------------------------
+
+# How You'd Do This in Trio
+
+Trio gives you raw receive:
+
+::: {#cb22 .sourceCode}
+``` {.sourceCode .py}
+data = await stream.receive_some(1024)
+```
+:::
+
+But you must manually:
+
+-   Accumulate into a buffer
+
+-   Search for delimiters
+
+-   Slice the buffer
+
+-   Handle partial frames
+
+-   Handle EOF correctly
+
+Example (simplified):
+
+I'm not even sure how to do it correctly but I asked ChatGPT and it gave
+me this, and I'm pretty ure it' wrong or inefficient.
+
+::: {#cb23 .sourceCode}
+``` {.sourceCode .py}
+buffer = bytearray()
+
+while True:
+    chunk = await stream.receive_some(1024)
+    if not chunk:
+        break
+    buffer.extend(chunk)
+
+    while b"\n" in buffer:
+        line, _, rest = buffer.partition(b"\n")
+        print(line + b"\n")
+        buffer = bytearray(rest)
+```
+:::
+
+That logic is boilerplate.\
+And easy to get subtly wrong.
+
+------------------------------------------------------------------------
+
+# What AnyIO Adds Here
+
+`BufferedByteReceiveStream` gives you:
+
+-   `receive_exactly(n)`
+
+-   `receive_until(delimiter)`
+
+-   Proper EOF semantics
+
+-   Efficient internal buffering
+
+-   Works on both Trio and asyncio backends
+
+This is a real ergonomic upgrade.
+
+# Strong Closing Line
+
+> Trio gives you safety.
+>
+> AnyIO gives you safety **plus portability and higher-level
+> primitives.**
+
+------------------------------------------------------------------------
+
+If you'd like, I can also give you:
+
+-   A live TCP demo using `BufferedByteReceiveStream`
+
+-   A demo showing `receive_exactly()` for protocol framing
+
+-   A slide comparing AnyIO streams to asyncio's StreamReader
+
+-   Or a visual diagram slide explaining how buffered streams sit on top
+    of raw streams
+
+------------------------------------------------------------------------
+
+# anyio.Path: Truly Async File Operations
+
+## The Problem with pathlib
+
+::: {#cb24 .sourceCode}
+``` {.sourceCode .python}
+from pathlib import Path
+
+# ⚠️ These all BLOCK the event loop!
+path = Path("data.txt")
+path.write_text("Hello!")      # Blocks
+content = path.read_text()     # Blocks
+exists = path.exists()         # Blocks
+```
+:::
+
+## The Solution: anyio.Path
+
+::: {#cb25 .sourceCode}
+``` {.sourceCode .python}
+# ✅ All truly async - doesn't block!
+path = anyio.Path("data.txt")
+await path.write_text("Hello!")    # Async
+content = await path.read_text()  # Async
+exists = await path.exists()      # Async
+```
+:::
+
+### Same API as pathlib, but async-native
+
+------------------------------------------------------------------------
+
+## Real Power: Parallel File Operations
+
+::: {#cb26 .sourceCode}
+``` {.sourceCode .python}
+# Process multiple files in parallel
+data_dir = anyio.Path("training_data")
+
+results = []
+
+async with anyio.create_task_group() as tg:
+    async for path in data_dir.iterdir():
+        if await path.is_file() and path.suffix == '.csv':
+            async def process_and_append(p):
+                content = await p.read_text()
+                results.append(parse_csv(content))
+            tg.start_soon(process_and_append, path)
+
+# All files processed concurrently!
+```
+:::
+
+------------------------------------------------------------------------
+
+## Key Features
+
+  Feature               pathlib         anyio.Path
+  --------------------- --------------- ---------------------------
+  Async operations      ❌ Blocks       ✅ async with threads
+  Parallel I/O          ❌ Sequential   ✅ Works with task groups
+  Event loop friendly   ❌ Blocks       ✅ Non-blocking
+  API compatibility     ✅ Standard     ✅ Same interface
+  Type hints            ✅ Yes          ✅ Yes
+
+**Key Takeaway:** Drop-in replacement for pathlib that actually respects
+async/await
+
+------------------------------------------------------------------------
+
+# Why AnyIO is better because it's on PyPI
+
+In python 3.13 a number of bug-fixes were applied to asyncio.TaskGroup
+but they were considered breaking changes so were not backported to 3.11
+or 3.12:
+
+https://docs.python.org/3/whatsnew/3.13.html#asyncio
+
+> Improve the behavior of
+> [TaskGroup](https://docs.python.org/3/library/asyncio-task.html#asyncio.TaskGroup)
+> when an external cancellation collides with an internal cancellation.
+> For example, when two task groups are nested and both experience an
+> exception in a child task simultaneously, it was possible that the
+> outer task group would hang, because its internal cancellation was
+> swallowed by the inner task group.
+
+this means to use structured concurrency with asyncio reliably you need
+to be on the latest python version. Because AnyIO is hosted on PyPI you
+can get bugfixes on all supported python versions, in fact AnyIO is
+currently still supporting the EOL Python 3.9
+
+------------------------------------------------------------------------
+
+Normally at this stage of my talk I'd ask you to go run
+
+# ~~pip install anyio~~
+
+but if you're in this room you probably already have it in your virtual
+environments! Watch the tree unfold: dozens of packages you use daily
+depend on AnyIO
+
+::: {#cb27 .sourceCode}
+``` {.sourceCode .sh}
+pip install httpx starlette jupyter mcp pipdeptree
+pipdeptree -p anyio -r  # reverse dependencies (dependants) of anyio
+anyio==4.12.1
+├── starlette==0.52.1 [requires: anyio>=3.6.2,<5]
+│   ├── mcp==1.26.0 [requires: starlette>=0.27]
+│   └── sse-starlette==3.2.0 [requires: starlette>=0.49.1]
+│       └── mcp==1.26.0 [requires: sse-starlette>=1.6.1]
+├── httpx==0.28.1 [requires: anyio]
+│   ├── mcp==1.26.0 [requires: httpx>=0.27.1]
+│   └── jupyterlab==4.5.4 [requires: httpx>=0.25.0,<1]
+│       ├── notebook==7.5.3 [requires: jupyterlab>=4.5.3,<4.6]
+│       │   └── jupyter==1.1.1 [requires: notebook]
+│       └── jupyter==1.1.1 [requires: jupyterlab]
+├── mcp==1.26.0 [requires: anyio>=4.5]
+├── sse-starlette==3.2.0 [requires: anyio>=4.7.0]
+│   └── mcp==1.26.0 [requires: sse-starlette>=1.6.1]
+└── jupyter_server==2.17.0 [requires: anyio>=3.1.0]
+    ├── notebook==7.5.3 [requires: jupyter_server>=2.4.0,<3]
+    │   └── jupyter==1.1.1 [requires: notebook]
+    ├── jupyter-lsp==2.3.0 [requires: jupyter_server>=1.1.2]
+    │   └── jupyterlab==4.5.4 [requires: jupyter-lsp>=2.0.0]
+    │       ├── notebook==7.5.3 [requires: jupyterlab>=4.5.3,<4.6]
+    │       │   └── jupyter==1.1.1 [requires: notebook]
+    │       └── jupyter==1.1.1 [requires: jupyterlab]
+    ├── jupyterlab==4.5.4 [requires: jupyter_server>=2.4.0,<3]
+    │   ├── notebook==7.5.3 [requires: jupyterlab>=4.5.3,<4.6]
+    │   │   └── jupyter==1.1.1 [requires: notebook]
+    │   └── jupyter==1.1.1 [requires: jupyterlab]
+    ├── jupyterlab_server==2.28.0 [requires: jupyter_server>=1.21,<3]
+    │   ├── notebook==7.5.3 [requires: jupyterlab_server>=2.28.0,<3]
+    │   │   └── jupyter==1.1.1 [requires: notebook]
+    │   └── jupyterlab==4.5.4 [requires: jupyterlab_server>=2.28.0,<3]
+    │       ├── notebook==7.5.3 [requires: jupyterlab>=4.5.3,<4.6]
+    │       │   └── jupyter==1.1.1 [requires: notebook]
+    │       └── jupyter==1.1.1 [requires: jupyterlab]
+    └── notebook_shim==0.2.4 [requires: jupyter_server>=1.8,<3]
+        ├── notebook==7.5.3 [requires: notebook_shim>=0.2,<0.3]
+        │   └── jupyter==1.1.1 [requires: notebook]
+        └── jupyterlab==4.5.4 [requires: notebook_shim>=0.2]
+            ├── notebook==7.5.3 [requires: jupyterlab>=4.5.3,<4.6]
+            │   └── jupyter==1.1.1 [requires: notebook]
+            └── jupyter==1.1.1 [requires: jupyterlab]
+```
+:::
+
+------------------------------------------------------------------------
+
+# Any questions?
