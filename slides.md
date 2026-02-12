@@ -17,13 +17,23 @@ https://graingert.co.uk/why-anyio-already
 
 ---
 
+* misconception: `asyncio` == `async`/`await`
+* the problems with `asyncio.create_task`
+* why you should use structured concurrency
+* edge cancellation vs level cancellation
+* anyio features
+    * channels (memory object streams) > `asyncio.Queue`
+    * `BufferedByteReceiveStream` AnyIO > Trio
+    * `anyio.Path`
+* The advantages of being pip installable
+
 ---
 
 
 # asyncio != async/await
 
 - Coroutines are generator based in Python
-- not just asyncio can use them because `async/await` is totally decoupled from `asyncio`,
+- not just asyncio can use them because `async`/`await` is totally decoupled from `asyncio`,
 - Twisted, Trio and Good Curio! can support async functions while being completely unrelated to asyncio.
 - You can even use
 `async/await` to make your own generators:
@@ -281,7 +291,7 @@ In 2018, we learned that **go statements do the same thing**
 ---
 
 * **Solution then:** Remove goto, add structured control flow
-(if/while/functions)\
+(if/while/functions)
 * **Solution now:** Remove create_task, add structured concurrency (task
 groups)
 
@@ -304,41 +314,9 @@ groups)
 
 ------------------------------------------------------------------------
 
-## Further Reading
-
-**Nathaniel J. Smith (Trio author):**\
-["Notes on structured concurrency, or: Go statement considered
-harmful"](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)
-
-**Original Dijkstra paper:**\
-["Go To Statement Considered Harmful"
-(1968)](https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf)
-
 # The Problem with `asyncio.create_task()` 
 
 ## It's a "go statement" - and go statements break everything 
-
-------------------------------------------------------------------------
-
-## What's a "go statement"? 
-
-```python
-# asyncio
-asyncio.create_task(myfunc())  # Fire and forget!
-# Control returns immediately, myfunc() runs in background
-
-# Golang
-go myfunc()  // Same thing
-
-# Python threads  
-threading.Thread(target=myfunc).start()  # Also same
-```
----
-
-* **Key problem:** Control flow splits with **one-way jump**
-* Parent returns immediately
-* Child jumps to myfunc and runs unsupervised
-* No guaranteed reunion point
 
 ------------------------------------------------------------------------
 
@@ -764,12 +742,13 @@ async def example():
 
 # Backpressure by Default. Structured. Composable.
 
-AnyIO provides `MemoryObjectSendStream` and `MemoryObjectReceiveStream`
-instead of Queues, but you don't need to keep a count of how many Queue
-producer/consumers you have you just make a clone for each
-producer/consumer and use a `with` or `async with` to close the clones.
-Once all the clones of one end of the memory object stream are closed
-iterating the other end will raise StopAsyncIteration.
+* AnyIO provides `MemoryObjectSendStream` and `MemoryObjectReceiveStream`
+* like `asyncio.Queue` but you don't need to keep a count of how many
+producer/consumers you have
+  * you just make a clone for each producer/consumer
+  * use a `with` or `async with` to close the clones.
+  * Once all the clones of one end of the memory object stream are closed
+  iterating the other end will raise StopAsyncIteration.
 
 ---
 
@@ -839,9 +818,7 @@ async def main():
 
 -   ❌ No built-in structured close (historically)
 
--   ❌ No clone()
-
--   ❌ Requires sentinel values or custom shutdown logic
+-   ❌ No clone() so requires sentinel values or custom shutdown logic
 
 ------------------------------------------------------------------------
 
@@ -885,12 +862,8 @@ Most people assume:
 
 But AnyIO adds real value even on the Trio backend.
 
-------------------------------------------------------------------------
-
-# Why Use AnyIO If You're Already Using Trio?
-
 - Trio gives you structured concurrency.
-- AnyIO gives you portability + batteries.
+- AnyIO gives you portability + batteries included.
 
 ---
 
@@ -916,7 +889,8 @@ But AnyIO adds real value even on the Trio backend.
 
 # Trio vs AnyIO
 
-- Trio is a minimal framework.
+- Trio is a minimal framework
+    - only gives you what is mandatory of a network framework
 - AnyIO is a portability + abstraction layer with batteries included.
 
 ---
@@ -932,19 +906,7 @@ If you write against AnyIO:
 -   asyncio users can adopt you into their program incrementally adopt
     level cancellation or structured concurrency.
 
-------------------------------------------------------------------------
-
-### The practical takeaway
-
-If you're building:
-
--   A framework
-
--   A reusable library
-
--   Infrastructure code
-
-You should strongly prefer **AnyIO APIs**, even when running on Trio.
+-   You get a bunch of cool extra tools
 
 ------------------------------------------------------------------------
 
@@ -968,34 +930,27 @@ AnyIO does.
 
 # Demo --- AnyIO Buffered Byte Streams
 
-From:\
-<https://anyio.readthedocs.io/en/stable/streams.html#buffered-byte-streams>
-
 ```python
 import anyio
-
 async def main():
     send, receive = anyio.create_memory_object_stream[bytes]()
-
     async def producer():
         await send.send(b"hello\nworld\n")
         await send.aclose()
-
     async def consumer():
         buffered = anyio.streams.buffered.BufferedByteReceiveStream(receive)
-
         line1 = await buffered.receive_until(b"\n")
         print("line1:", line1)
-
         line2 = await buffered.receive_until(b"\n")
         print("line2:", line2)
-
     async with anyio.create_task_group() as tg:
         tg.start_soon(producer)
         tg.start_soon(consumer)
 
 anyio.run(main)
 ```
+
+---
 
 ### Output
 
@@ -1043,8 +998,7 @@ But you must manually:
 ---
 Example (simplified):
 
-I'm not even sure how to do it correctly but I asked ChatGPT and it gave
-me this, and I'm pretty ure it' wrong or inefficient.
+I asked ChatGPT and it gave me this, and I'm pretty sure it's wrong or inefficient.
 
 ```python
 buffer = bytearray()
@@ -1059,7 +1013,7 @@ while True:
         buffer = bytearray(rest)
 ```
 
-That logic is boilerplate.\
+That logic is boilerplate.
 And easy to get subtly wrong.
 
 ------------------------------------------------------------------------
@@ -1094,7 +1048,7 @@ citation:
 
 ------------------------------------------------------------------------
 
-# anyio.Path: Truly Async File Operations
+# anyio.Path: Async File Operations
 
 ## The Problem with pathlib
 
@@ -1134,11 +1088,9 @@ async def amain():
 # Process multiple files in parallel
 data_dir = anyio.Path("training_data")
 results = []
-
 async def process_and_append(p):
     content = await p.read_text()
     results.append(parse_csv(content))
-
 async with anyio.create_task_group() as tg:
     async for path in data_dir.iterdir():
         if await path.is_file() and path.suffix == '.csv':
