@@ -1200,5 +1200,10 @@ anyio==4.12.1
 ```
 
 ------------------------------------------------------------------------
+* I've given you a whistle stop tour of some of my favourite features, there's loads more
+   * and more being added all the time
+* I hope I've persuaded you to give AnyIO a try
+* you might as well give it a go if you already have it installed
+---
 
 # Any questions?
