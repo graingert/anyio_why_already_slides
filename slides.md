@@ -1186,7 +1186,7 @@ Normally at this stage of my talk I'd ask you to go run
 # ~~pip install anyio~~
 
 but if you're in this room you probably already have it in your virtual
-environments! Watch the tree unfold: dozens of packages you use daily
+environments! Watch the tree unfold: loads of packages you use daily
 depend on AnyIO
 
 ---
