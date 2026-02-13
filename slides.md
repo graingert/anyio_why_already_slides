@@ -1164,7 +1164,20 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 ---
 
 * you need to use the latest version of python for fixed asyncio
-* Because AnyIO is hosted on PyPI you get bugfixes on all supported python versions AnyIO is currently still supporting the EOL Python 3.9
+* Because AnyIO is hosted on PyPI you get bugfixes on all supported python versions
+* AnyIO is currently still supporting the EOL Python 3.9
+
+---
+
+# Asyncio is not bad
+
+* it's better than Twisted (I spent a week fixing a missing `six` call
+  that wouldn't have happened on Python 3.6 with asyncio)
+* but try making an LDAP server without Twisted!
+* *some* of the mistakes Twisted made were copied into asyncio
+* Good Curio! is good unfortuneately it's archived
+* Trio isn't perfect: it's slower than asyncio especially uvloop
+* AnyIO gives you options and batteries to play with
 
 ------------------------------------------------------------------------
 
