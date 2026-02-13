@@ -1192,7 +1192,7 @@ depend on AnyIO
 ---
 
 ```sh
-$ pip install httpx starlette jupyter mcp pipdeptree
+$ pip install httpx fastapi jupyter mcp pipdeptree
 $ pipdeptree -p anyio -r  # reverse dependencies (dependants) of anyio
 ```
 ---
@@ -1200,6 +1200,7 @@ output:
 ```
 anyio==4.12.1
 ├── starlette==0.52.1 [requires: anyio>=3.6.2,<5]
+│   ├── fastapi==0.129.0 [requires: starlette>=0.40.0,<1.0.0]
 │   ├── mcp==1.26.0 [requires: starlette>=0.27]
 │   └── sse-starlette==3.2.0 [requires: starlette>=0.49.1]
 │       └── mcp==1.26.0 [requires: sse-starlette>=1.6.1]
