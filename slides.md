@@ -93,7 +93,7 @@ async def sleep_for_one_loop_cycle():
                     WaitTaskRescheduled(abort_func)
                 )
                 .__await__()
-                .send(outcome.Value(None)
+                .send(outcome.Value(None))
             )
         """
     else:  # Twisted?
@@ -320,95 +320,6 @@ groups)
 
 ------------------------------------------------------------------------
 
-# The Problem with `asyncio.create_task()` 
-
-## It's a "go statement" - and go statements break everything 
-
-------------------------------------------------------------------------
-
-## Problem 1: Functions Aren't Black Boxes Anymore 
-
-
-```python
-async def process_data(data):
-    # Does this function spawn background tasks?
-    # Are they still running after it returns?
-    # You have NO IDEA without reading all the source code!
-    await some_library_function(data)
-    # Function returned... but is it done? 🤷
-```
-
-**You can't reason locally about control flow**
-
-Every function call might secretly spawn tasks that outlive the function
-
-------------------------------------------------------------------------
-
-## Problem 2: Resource Cleanup Breaks
-
-```python
-# This LOOKS safe...
-async with await anyio.open_file("data.csv") as f:
-    await process_file(f)
-# File closed here... right?
-
-# But what if process_file did this:
-async def process_file(f):
-    asyncio.create_task(read_data(f))  # Background task!
-    return  # Function returns immediately
-    
-# Now: file is CLOSED while background task still uses it
-# 💥 Error! (if you're lucky)
-```
-
-**The language can't help you with automatic cleanup**
-
-------------------------------------------------------------------------
-
-## Problem 3: Error Handling Breaks
-
-```python
-async def background_task():
-    raise ValueError("Something went wrong!")
-
-# Start background task
-task = asyncio.create_task(background_task())
-
-# Error happens... but where does it go?
-# Answer: NOWHERE! It's silently dropped!
-# (Maybe printed to console if you're lucky)
-```
-
----
-
-**Exceptions can't propagate because there's no stack to unwind**
-
-Compare to regular Python:
-
-```python
-def my_function():
-    raise ValueError("Something went wrong!")
-my_function()  # Exception propagates to caller automatically
-```
-
-------------------------------------------------------------------------
-
-## Problem 4: You Can't Tell If Code Is Finished
-
-```python
-async def mystery_function():
-    await do_something()
-    return "done"
-
-result = await mystery_function()
-# Is mystery_function actually done?
-# Or did it spawn tasks that are still running?
-# NO WAY TO KNOW!
-```
-
-**The "return" statement lies to you**
-
-------------------------------------------------------------------------
 
 ## The Root Cause: Unstructured Concurrency
 
