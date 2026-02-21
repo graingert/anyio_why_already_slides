@@ -216,19 +216,7 @@ result = await mystery_function()
 
 ## The Root Cause: Unstructured Concurrency
 
-    asyncio.create_task() control flow:
-
-        ┌─────────────┐
-        │   Parent    │
-        │   task      │
-        └──────┬──────┘
-               │
-        create_task()
-               │
-          ┌────┴────┐
-          │         │ 
-       Parent    Child ──→ myfunc()
-       returns    (orphaned, unsupervised)
+![create_task running off on its own](https://private-user-images.githubusercontent.com/413772/552998982-a6f77252-c14e-4cc1-8327-335ce97b7be1.svg?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NzE2Njk4MDgsIm5iZiI6MTc3MTY2OTUwOCwicGF0aCI6Ii80MTM3NzIvNTUyOTk4OTgyLWE2Zjc3MjUyLWMxNGUtNGNjMS04MzI3LTMzNWNlOTdiN2JlMS5zdmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwMjIxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDIyMVQxMDI1MDhaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1mZDBlY2EyYmExODFkMmQ5NjA2MDk0MWQ5NTkyYzMwMzZlYTVkMmI5NmRkZTQ0ZTcwMzJhODczN2JmOTI1ZDkwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.GP5LsaxYbiqu_NrHQ19C3J7hEF7X27oqv2XwborWUYs)
 
 **One-way jump = no guaranteed cleanup, no error propagation, no
 completion tracking**
