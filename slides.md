@@ -805,7 +805,7 @@ But you must manually:
 ---
 Example (simplified):
 
-I asked ChatGPT and it gave me this, and I'm pretty sure it's wrong or inefficient.
+I asked ChatGPT and it gave me this, can you spot the bug?
 
 ```python
 buffer = bytearray()
@@ -819,10 +819,6 @@ while True:
         print(line + b"\n")
         buffer = bytearray(rest)
 ```
-
-That logic is boilerplate.
-And easy to get subtly wrong:
-
 ---
 
 Quadratic performance in the inner loop
@@ -974,7 +970,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 
 * you need to use the latest version of python for fixed asyncio
 * Because AnyIO is hosted on PyPI you get bugfixes on all supported python versions
-* AnyIO is currently still supporting the EOL Python 3.9
+* AnyIO is currently still supporting the EOL Python 3.9 (as of v4.12.1)
 
 ---
 
