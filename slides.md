@@ -659,7 +659,6 @@ But:
 | Async iteration | ✅ | ❌ |
 | Structured close | ✅ | ⚠️ (3.13+) |
 | Clone receivers | ✅ | ❌ |
-| Cancellation semantics | Level | Edge |
 | Trio-compatible | ✅ | ❌ |
 
 AnyIO streams compose with structured concurrency. `asyncio.Queue`
