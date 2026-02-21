@@ -821,7 +821,14 @@ while True:
 ```
 
 That logic is boilerplate.
-And easy to get subtly wrong.
+And easy to get subtly wrong:
+
+---
+
+Quadratic performance in the inner loop
+Every iteration of while b"\n" in buffer does buffer = bytearray(rest)
+copying the remaining data each time. If you receive a chunk with many
+newlines, this is O(n²) in the number of bytes.
 
 ------------------------------------------------------------------------
 
