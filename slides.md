@@ -22,7 +22,8 @@ https://graingert.co.uk/why-anyio-already
 * the problems with `asyncio.create_task`
 * why you should use structured concurrency
 * edge cancellation vs level cancellation
-* anyio features
+* `asyncio.shield` vs shielded CancelScopes
+* more anyio features
     * channels (memory object streams) > `asyncio.Queue`
     * `BufferedByteReceiveStream` AnyIO > Trio
     * `anyio.Path`
@@ -538,6 +539,109 @@ async def example():
     async with asyncio.timeout(10):
         await consume_ws()  # could hang forever
 ```
+
+---
+
+# Shielding from Cancellation
+
+## When you *can't* cancel — even if you want to
+
+Some I/O operations are **uncancellable by nature**:
+
+- Waiting for a thread to finish (`loop.run_in_executor`, `anyio.to_thread.run_sync`)
+- Sending data that's already been handed to the OS kernel
+- Third-party blocking calls that ignore signals
+
+The async framework can raise `CancelledError` in your coroutine, but the **underlying thread keeps running**.
+
+You're not cancelling the work — you're just *abandoning* the future that was watching it. 👻
+
+---
+
+# `asyncio.shield` — The Duct-Tape Approach
+
+```python
+async def save_to_db(data):
+    # We don't want cancellation to interrupt this
+    await asyncio.shield(db.execute(INSERT, data))
+    # ⚠️ If cancelled, shield absorbs the cancel...
+    # ... but db.execute() keeps running as an orphaned task
+    # ⚠️ Edge cancellation means the *next* await might
+    # succeed even though we're "cancelled"
+```
+
+### Problems
+
+❌ **Edge-triggered**: a `CancelledError` sneaks through on the *next* checkpoint after the shield exits  
+❌ **Orphaned inner task**: the shielded work keeps running with no owner  
+❌ **No scope**: shield applies to one `await`, not a logical block of work  
+❌ **Thread can't be shielded**: `run_in_executor` inside a shield still abandons the thread
+
+---
+
+# AnyIO Shielded Cancel Scopes — The Structured Approach
+
+```python
+async def save_to_db(data):
+    # Level-triggered: cancellation is *held* until we exit the shield
+    with anyio.CancelScope(shield=True):
+        await anyio.to_thread.run_sync(db_blocking_write, data)
+        # Thread runs to completion — no orphan, no abandonment
+        await anyio.to_thread.run_sync(db_blocking_flush, data)
+        # Still shielded — the *whole scope* is protected
+    # Pending cancellation is re-raised here, reliably
+
+# Works correctly even when called inside a task group under timeout:
+async def example():
+    with anyio.fail_after(5):
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(save_to_db, important_data)
+```
+
+### Why it works
+
+✅ **Level-triggered**: cancellation is *deferred*, not lost — re-fires when you leave the scope  
+✅ **Thread-aware**: `run_sync` joins the thread; the shield keeps the join alive  
+✅ **Scoped**: protect a whole logical block, not just one `await`  
+✅ **No orphans**: structured concurrency means every task has an owner
+
+---
+
+# The Thread Problem in Detail
+
+```
+asyncio.shield + run_in_executor          anyio CancelScope(shield=True)
+                                          + to_thread.run_sync
+─────────────────────────────────         ──────────────────────────────
+coroutine  ──shield──► Future             coroutine ──shield scope──►
+               │                                         │
+           cancelled ✗◄── outer cancel              outer cancel
+               │           arrives                   arrives
+           executor │                                    │
+           thread   │◄─── still running!            deferred ⏸
+           (orphan) ▼     nobody waiting             thread   │
+                  result                             finishes ▼
+                  → void  (lost!)                   result delivered ✓
+                                                    cancel re-raised ✓
+```
+
+**asyncio.shield is a one-way valve. AnyIO's shield is a pressure vessel** — it holds the cancellation until you're ready to handle it safely.
+
+---
+
+# Comparison
+
+| | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
+|---|---|---|
+| Cancellation model | Edge (one-shot) | Level (persistent, deferred) |
+| Scope | Single `await` | Entire `with` block |
+| Thread safety | ❌ Abandons thread | ✅ Joins thread to completion |
+| Cancellation after exit | ⚠️ Maybe (edge, unreliable) | ✅ Always re-raised |
+| Orphaned tasks | ❌ Yes | ✅ Never |
+| Composable | ❌ Not really | ✅ Nests with task groups |
+
+> If `asyncio.shield` is a raincoat with holes,  
+> `CancelScope(shield=True)` is a proper airlock. 🚀
 
 ------------------------------------------------------------------------
 
