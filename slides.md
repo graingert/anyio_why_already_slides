@@ -570,6 +570,8 @@ async def save_to_db(data):
     # succeed even though we're "cancelled"
 ```
 
+---
+
 ### Problems
 
 ❌ **Edge-triggered**: a `CancelledError` sneaks through on the *next* checkpoint after the shield exits  
@@ -598,6 +600,8 @@ async def example():
             tg.start_soon(save_to_db, important_data)
 ```
 
+---
+
 ### Why it works
 
 ✅ **Level-triggered**: cancellation is *deferred*, not lost — re-fires when you leave the scope  
@@ -607,12 +611,15 @@ async def example():
 
 ---
 
-# The Thread Problem in Detail
-
-![asyncio.shield()](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/65582c063d39717daf957ac203f7bdc54efd841a/asyncio_shield.svg)
+# The shielding in Detail
 
 ---
 
+## asyncio.shield
+![asyncio.shield()](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/65582c063d39717daf957ac203f7bdc54efd841a/asyncio_shield.svg)
+
+---
+## CancelScope(shield=True)
 ![CancelScope(shield=True)](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/65582c063d39717daf957ac203f7bdc54efd841a/anyio_shield.svg)
 
 ---
@@ -632,10 +639,11 @@ async def example():
 | Orphaned tasks | ❌ Yes | ✅ Never |
 | Composable | ❌ Not really | ✅ Nests with task groups |
 
-> If `asyncio.shield` is a raincoat with holes,  
-> `CancelScope(shield=True)` is a proper airlock. 🚀
-
 ------------------------------------------------------------------------
+
+# More AnyIO Features
+
+---
 
 # Backpressure by Default. Structured. Composable.
 
