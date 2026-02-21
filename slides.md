@@ -28,6 +28,7 @@ https://graingert.co.uk/why-anyio-already
     * `anyio.Path`
     * pytest plugin built in
 * The advantages of being pip installable
+* why you already have AnyIO installed
 
 ---
 
