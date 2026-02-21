@@ -692,8 +692,6 @@ But AnyIO adds real value even on the Trio backend.
 
 -   ✅ Thread/subprocess helpers
 
--   ✅ Ecosystem compatibility (FastAPI, httpx, etc.)
-
 ------------------------------------------------------------------------
 
 # Trio vs AnyIO
