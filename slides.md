@@ -217,7 +217,6 @@ result = await mystery_function()
 ## The Root Cause: Unstructured Concurrency
 
 ![create_task running off on its own](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/6c6ab6845286b6353242edd194cf2e68a2e3bd3f/asyncio_create_task.svg)
-
 **One-way jump = no guaranteed cleanup, no error propagation, no
 completion tracking**
 
@@ -266,6 +265,10 @@ async def structured():
 ```
 
 **Task groups enforce: tasks must complete before you can continue**
+
+---
+
+![anyio create task group](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/f613be233c079ba88ae65632da95777a55d0b362/anyio_create_task_group.svg)
 
 ------------------------------------------------------------------------
 
