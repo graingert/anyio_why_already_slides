@@ -609,21 +609,13 @@ async def example():
 
 # The Thread Problem in Detail
 
-```
-asyncio.shield + run_in_executor          anyio CancelScope(shield=True)
-                                          + to_thread.run_sync
-─────────────────────────────────         ──────────────────────────────
-coroutine  ──shield──► Future             coroutine ──shield scope──►
-               │                                         │
-           cancelled ✗◄── outer cancel              outer cancel
-               │           arrives                   arrives
-           executor │                                    │
-           thread   │◄─── still running!            deferred ⏸
-           (orphan) ▼     nobody waiting             thread   │
-                  result                             finishes ▼
-                  → void  (lost!)                   result delivered ✓
-                                                    cancel re-raised ✓
-```
+![asyncio.shield()](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/65582c063d39717daf957ac203f7bdc54efd841a/asyncio_shield.svg)
+
+---
+
+![CancelScope(shield=True)](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/65582c063d39717daf957ac203f7bdc54efd841a/anyio_shield.svg)
+
+---
 
 **asyncio.shield is a one-way valve. AnyIO's shield is a pressure vessel** — it holds the cancellation until you're ready to handle it safely.
 
