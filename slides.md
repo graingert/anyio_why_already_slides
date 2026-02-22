@@ -614,7 +614,7 @@ async def example():
 
 ---
 
-# The Shielding in Detail
+# Shielding in Detail
 
 ---
 
