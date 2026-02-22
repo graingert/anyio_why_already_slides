@@ -64,7 +64,11 @@ https://graingert.co.uk/why-anyio-already
 
 ---
 
-For more generator tricks see also https://www.dabeaz.com/generators/ https://www.dabeaz.com/coroutines/ https://www.dabeaz.com/finalgenerator/
+For more generator tricks see also:
+
+- `graingert.co.uk/dabeaz-generators`
+- `graingert.co.uk/dabeaz-coroutines`
+- `graingert.co.uk/dabeaz-finalgenerator`
 
 ---
 
@@ -308,10 +312,12 @@ groups)
 ## Further Reading 
 
 **Nathaniel J. Smith (Trio author):**\
-["Notes on structured concurrency, or: Go statement considered harmful"](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)
+["Notes on structured concurrency, or: Go statement considered harmful"](https://graingert.co.uk/trio-sc)\
+`graingert.co.uk/trio-sc`
 
 **Original Dijkstra paper:**\
-["Go To Statement Considered Harmful" (1968)](https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf)
+["Go To Statement Considered Harmful" (1968)](https://graingert.co.uk/dijkstra68)\
+`graingert.co.uk/dijkstra68`
 
 ------------------------------------------------------------------------
 
