@@ -36,7 +36,7 @@ https://graingert.co.uk/why-anyio-already
 
 # asyncio != async/await
 
-- Coroutines are generator based in Python
+- Coroutines are generator-based in Python
 - not just asyncio can use them because `async`/`await` is totally decoupled from `asyncio`,
 - Twisted, Trio and Good Curio! can support async functions while being completely unrelated to asyncio.
 - You can even use
@@ -614,7 +614,7 @@ async def example():
 
 ---
 
-# The shielding in Detail
+# The Shielding in Detail
 
 ---
 
@@ -808,7 +808,7 @@ If you write against AnyIO:
 
 -   Trio users still get full Trio semantics.
 
--   asyncio users can adopt you into their program incrementally adopt
+-   asyncio users can incrementally adopt
     level cancellation or structured concurrency.
 
 -   You get a bunch of cool extra tools
@@ -1037,7 +1037,7 @@ async def test_something():
 ```
 
 ---
-By default the plugin runs your tests under both asyncio and Trio, so if you're still gradually migrating to AnyIO still require asyncio support you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
+By default the plugin runs your tests under both asyncio and Trio, so if you're still gradually migrating to AnyIO and still require asyncio support you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
 
 ```python
 @pytest.fixture
@@ -1048,7 +1048,7 @@ def anyio_backend():
 
 # Why AnyIO is better because it's on PyPI
 
-In python 3.13 a number of bug-fixes were applied to asyncio.TaskGroup
+In Python 3.13 a number of bug-fixes were applied to asyncio.TaskGroup
 but they were considered breaking changes so were not backported to 3.11
 or 3.12:
 
@@ -1066,7 +1066,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 
 ---
 
-* you need to use the latest version of python for fixed asyncio
+* you need to use the latest version of Python for fixed asyncio
 * Because AnyIO is hosted on PyPI you get bugfixes on all supported python versions
 * AnyIO is currently still supporting the EOL Python 3.9 (as of v4.12.1)
 
@@ -1078,7 +1078,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
   that wouldn't have happened on Python 3.6 with asyncio)
 * but try making an LDAP server without Twisted!
 * *some* of the mistakes Twisted made were copied into asyncio
-* Good Curio! is good unfortuneately it's archived
+* Good Curio! is good unfortunately it's archived
 * Trio isn't perfect: it's slower than asyncio especially uvloop
 * AnyIO gives you options and batteries to play with
 
