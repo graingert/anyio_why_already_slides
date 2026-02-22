@@ -14,7 +14,7 @@ https://graingert.co.uk/why-anyio-already
 - I am a core developer of AnyIO, Twisted and Trio (and a few non-async libraries)
 - I have made contributions to the asyncio happy eyeballs support and fixes to
   TaskGroup
-- Years of teaching async experience, never actually deployed anything myself personally 
+- Years of teaching async experience, never actually deployed anything myself
 
 ---
 
@@ -39,8 +39,7 @@ https://graingert.co.uk/why-anyio-already
 - Coroutines are generator-based in Python
 - not just asyncio can use them because `async`/`await` is totally decoupled from `asyncio`.
 - Twisted, Trio, and Curio can support async functions while being completely unrelated to asyncio.
-- You can even use
-`async/await` to make your own generators:
+- You can even use `async`/`await` to make your own generators:
 
 ---
 
@@ -91,7 +90,7 @@ async def sleep_for_one_loop_cycle():
         event = trio.Event()
         trio.lowlevel.spawn_system_task(set_event_soon, event)
         await event
-        """"
+        """
         this call calls
             (
                 _async_yield(
@@ -334,7 +333,7 @@ with a CancelledError
 ```python
 import anyio
 async def example():
-    with anyio.fail_after(0) as scope:
+    with anyio.fail_after(0):
         try:
             await anyio.sleep(1)  # raises CancelledError
         finally:
@@ -360,7 +359,9 @@ asyncio.run(example())
 
 ---
 
-* edge cancellation can result in deadlocks on asyncio — for example the following program hangs
+## Edge cancellation can result in deadlocks on asyncio
+
+For example, the following program hangs:
 
 ---
 
@@ -552,7 +553,7 @@ try:
 finally:
     # if write_buffer_to_socket is cancelled and we don't wait for the cancel
     # signal the OS could still be using the buffer and we send undefined
-    # bytes to to the socket.
+    # bytes to the socket.
     clear(buffer)
 ```
 
@@ -647,8 +648,7 @@ async def example():
 # Backpressure by Default. Structured. Composable.
 
 * AnyIO provides `MemoryObjectSendStream` and `MemoryObjectReceiveStream`
-* like `asyncio.Queue` but you don't need to keep a count of how many
-producer/consumers you have
+* like `asyncio.Queue` but you don't need to keep a count of how many producer/consumers you have
   * you just make a clone for each producer/consumer
   * use a `with` or `async with` to close the clones.
   * Once all the clones of one end of the memory object stream are closed
@@ -725,7 +725,7 @@ async def main():
 Python 3.13 introduces:
 
 ```python
-await q.shutdown()
+q.shutdown()
 ```
 
 But:
@@ -755,7 +755,7 @@ predates it.
 ------------------------------------------------------------------------
 # "If I'm already using Trio, I don't need AnyIO."
 
-Most people assume:
+Most people assume this.
 
 But AnyIO adds real value even on the Trio backend.
 
@@ -908,8 +908,9 @@ while True:
 ```
 ---
 
-Quadratic performance in the inner loop
-Every iteration of while b"\n" in buffer does buffer = bytearray(rest)
+## Quadratic performance in the inner loop
+
+Every iteration of `while b"\n" in buffer` does `buffer = bytearray(rest)`,
 copying the remaining data each time. If you receive a chunk with many
 newlines, this is O(n²) in the number of bytes.
 
@@ -1033,7 +1034,7 @@ def anyio_backend():
 ```
 ---
 
-# Why AnyIO is better because it's on PyPI
+# The Advantage of Being on PyPI
 
 In Python 3.13, a number of bug-fixes were applied to asyncio.TaskGroup
 but they were considered breaking changes so were not backported to 3.11
@@ -1065,7 +1066,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
   that wouldn't have happened on Python 3.6 with asyncio)
 * but try making an LDAP server without Twisted!
 * *some* of the mistakes Twisted made were copied into asyncio
-* Good Curio! is good unfortunately it's archived
+* Curio is good! Unfortunately it's archived
 * Trio isn't perfect: it's slower than asyncio, especially with uvloop
 * AnyIO gives you options and batteries to play with
 
