@@ -372,7 +372,8 @@ asyncio.run(example())
 ---
 
 * edge cancellation can result in deadlocks on asyncio for example the
-following program hangs
+  following program hangs
+
 ---
 
 ```python
@@ -459,7 +460,9 @@ KeyboardInterrupt
 ```
 
 ---
+
 example with anyio
+
 ```python
 import asyncio
 import anyio
@@ -1095,7 +1098,9 @@ depend on AnyIO
 $ pip install httpx fastapi jupyter mcp pipdeptree
 $ pipdeptree -p anyio -r  # reverse dependencies (dependants) of anyio
 ```
+
 ---
+
 output:
 ```
 anyio==4.12.1
@@ -1142,6 +1147,7 @@ anyio==4.12.1
 ```
 
 ------------------------------------------------------------------------
+
 * I've given you a whistle stop tour of some of my favourite features, there's loads more
    * and more being added all the time
 * I hope I've persuaded you to give AnyIO a try
