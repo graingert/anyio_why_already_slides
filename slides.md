@@ -524,13 +524,17 @@ async def example():
 
 ## When you *can't* cancel — even if you want to
 
-Some I/O operations are **uncancellable by nature**:
+Some I/O operations are **uncancellable by nature**, or you must wait for the
+cancel to be processed by the OS:
 
 - Waiting for a thread to finish (`loop.run_in_executor`, `anyio.to_thread.run_sync`)
-- Sending data that's already been handed to the OS kernel
-- Third-party blocking calls that ignore signals
+- On Windows IOCP (Proactor)
+  - To cancel pending I/O operations in an IOCP (I/O Completion Port) server, use CancelIoEx to target specific operations, orclosesocket(handle)
+    to cancel all pending I/O on a socket. Canceled operations complete with `ERROR_OPERATION_ABORTED`, and you must wait for the completion packet before freeing memory.
 
-The async framework can raise `CancelledError` in your coroutine, but the **underlying thread keeps running**.
+---
+
+The async framework can raise `CancelledError` in your coroutine, but the **underlying thread keeps running** or **something still needs to wait to be able to clear memory**
 
 You're not cancelling the work — you're just *abandoning* the future that was watching it. 👻
 
@@ -1054,8 +1058,7 @@ Normally at this stage of my talk I'd ask you to go run
 # ~~pip install anyio~~
 
 but if you're in this room you probably already have it in your virtual
-environments! Watch the tree unfold: loads of packages you use daily
-depend on AnyIO
+environments!
 
 ---
 
@@ -1063,6 +1066,8 @@ depend on AnyIO
 $ pip install httpx fastapi jupyter mcp pipdeptree
 $ pipdeptree -p anyio -r  # reverse dependencies (dependants) of anyio
 ```
+
+Watch the tree unfold: loads of packages you use daily depend on AnyIO
 
 ---
 
