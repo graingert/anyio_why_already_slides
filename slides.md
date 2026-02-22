@@ -37,8 +37,8 @@ https://graingert.co.uk/why-anyio-already
 # asyncio != async/await
 
 - Coroutines are generator-based in Python
-- not just asyncio can use them because `async`/`await` is totally decoupled from `asyncio`,
-- Twisted, Trio and Good Curio! can support async functions while being completely unrelated to asyncio.
+- not just asyncio can use them because `async`/`await` is totally decoupled from `asyncio`.
+- Twisted, Trio, and Curio can support async functions while being completely unrelated to asyncio.
 - You can even use
 `async/await` to make your own generators:
 
@@ -69,7 +69,7 @@ For more generator tricks see also https://www.dabeaz.com/generators/ https://ww
 ---
 
 This means libraries like AnyIO can call either the asyncio API or the
-trio api depending on what library is currently in use:
+Trio API depending on what library is currently in use:
 
 This is similar in approach to libraries like `six` which let you write
 code compatible with Python 2 and Python 3
@@ -308,19 +308,17 @@ groups)
 ## Further Reading 
 
 **Nathaniel J. Smith (Trio author):**\
-[\["Notes on structured concurrency, or: Go statement considered
-harmful"\](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)
+["Notes on structured concurrency, or: Go statement considered harmful"](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)
 
 **Original Dijkstra paper:**\
-[\["Go To Statement Considered Harmful"
-(1968)\](https://homepages.cwi.nl/\~storm/teaching/reader/Dijkstra68.pdf)](https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf)
+["Go To Statement Considered Harmful" (1968)](https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf)
 
 ------------------------------------------------------------------------
 
-# two most important reasons to use AnyIO
+# Two most important reasons to use AnyIO
 * you can mix it with asyncio and optionally/incrementally add Trio
 support
-* cancellations are level triggered.
+* cancellations are level-triggered.
 
 ---
 
@@ -397,7 +395,7 @@ awaiting never-completing future (WILL HANG)
 
 ---
 
-After hitting Ctrl+c a few times:
+After hitting Ctrl+C a few times:
 ```sh
 task_with_finally running
 crash_soon raising
@@ -505,7 +503,7 @@ awaiting never-completing future (WILL NOT HANG)
 
 ---
 
-This is still a problem when using websockets over TLS
+This is still a problem when using WebSockets over TLS
 
 ```python
 async def consume_ws():
@@ -529,7 +527,7 @@ cancel to be processed by the OS:
 
 - Waiting for a thread to finish (`loop.run_in_executor`, `anyio.to_thread.run_sync`)
 - On Windows IOCP (Proactor)
-  - To cancel pending I/O operations in an IOCP (I/O Completion Port) server, use CancelIoEx to target specific operations, orclosesocket(handle)
+    - To cancel pending I/O operations in an IOCP (I/O Completion Port) server, use `CancelIoEx` to target specific operations, or `closesocket(handle)`
     to cancel all pending I/O on a socket. Canceled operations complete with `ERROR_OPERATION_ABORTED`, and you must wait for the completion packet before freeing memory.
 
 ---
@@ -652,7 +650,7 @@ async def news_and_weather():
         tx.close()
         async for item in rx:
             print(item)
-anyio.run(main)
+anyio.run(news_and_weather)
 ```
 
 ---
@@ -816,9 +814,9 @@ async def main():
         await send.aclose()
     async def consumer():
         buffered = anyio.streams.buffered.BufferedByteReceiveStream(receive)
-        line1 = await buffered.receive_until(b"\n")
+        line1 = await buffered.receive_until(b"\n", 4096)
         print("line1:", line1)
-        line2 = await buffered.receive_until(b"\n")
+        line2 = await buffered.receive_until(b"\n", 4096)
         print("line2:", line2)
     async with anyio.create_task_group() as tg:
         tg.start_soon(producer)
@@ -832,8 +830,8 @@ anyio.run(main)
 
 ```sh
 $ python demo_buffered_bytes.py
-line1: b'hello\n'
-line2: b'world\n'
+line1: b'hello'
+line2: b'world'
 ```
 
 ------------------------------------------------------------------------
@@ -1006,7 +1004,7 @@ async def test_something():
 ```
 
 ---
-By default the plugin runs your tests under both asyncio and Trio, so if you're still gradually migrating to AnyIO and still require asyncio support you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
+By default the plugin runs your tests under both asyncio and Trio, so if you're still gradually migrating to AnyIO and still require asyncio support, you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
 
 ```python
 @pytest.fixture
@@ -1017,7 +1015,7 @@ def anyio_backend():
 
 # Why AnyIO is better because it's on PyPI
 
-In Python 3.13 a number of bug-fixes were applied to asyncio.TaskGroup
+In Python 3.13, a number of bug-fixes were applied to asyncio.TaskGroup
 but they were considered breaking changes so were not backported to 3.11
 or 3.12:
 
@@ -1048,7 +1046,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 * but try making an LDAP server without Twisted!
 * *some* of the mistakes Twisted made were copied into asyncio
 * Good Curio! is good unfortunately it's archived
-* Trio isn't perfect: it's slower than asyncio especially uvloop
+* Trio isn't perfect: it's slower than asyncio, especially with uvloop
 * AnyIO gives you options and batteries to play with
 
 ------------------------------------------------------------------------
@@ -1118,7 +1116,7 @@ anyio==4.12.1
 
 ------------------------------------------------------------------------
 
-* I've given you a whistle stop tour of some of my favourite features, there's loads more
+* I've given you a whistle-stop tour of some of my favourite features, there's loads more
    * and more being added all the time
 * I hope I've persuaded you to give AnyIO a try
 * you might as well give it a go if you already have it installed
