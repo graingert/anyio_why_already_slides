@@ -371,8 +371,7 @@ asyncio.run(example())
 
 ---
 
-* edge cancellation can result in deadlocks on asyncio for example the
-  following program hangs
+* edge cancellation can result in deadlocks on asyncio — for example the following program hangs
 
 ---
 
