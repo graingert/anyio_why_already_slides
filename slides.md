@@ -66,9 +66,9 @@ https://graingert.co.uk/why-anyio-already
 
 For more generator tricks see also:
 
-- [Generator Tricks for Systems Programmers](https://graingert.co.uk/dabeaz-generators) — `graingert.co.uk/dabeaz-generators`
-- [A Curious Course on Coroutines and Concurrency](https://graingert.co.uk/dabeaz-coroutines) — `graingert.co.uk/dabeaz-coroutines`
-- [Generators: The Final Frontier](https://graingert.co.uk/dabeaz-finalgenerator) — `graingert.co.uk/dabeaz-finalgenerator`
+- [Generator Tricks for Systems Programmers](https://graingert.co.uk/dabeaz-gen) — `graingert.co.uk/dabeaz-gen`
+- [A Curious Course on Coroutines and Concurrency](https://graingert.co.uk/dabeaz-coro) — `graingert.co.uk/dabeaz-coro`
+- [Generators: The Final Frontier](https://graingert.co.uk/dabeaz-final) — `graingert.co.uk/dabeaz-final`
 
 ---
 
