@@ -78,7 +78,6 @@ code compatible with Python 2 and Python 3
 
 ```python
 from sniffio import current_async_library
-
 async def sleep_for_one_loop_cycle():
     if current_async_library() == "asyncio":
         fut = asyncio.Future()
@@ -115,10 +114,8 @@ async def sleep_for_one_loop_cycle():
 # asyncio
 asyncio.create_task(myfunc())  # Fire and forget!
 # Control returns immediately, myfunc() runs in background
-
 # Golang
 go myfunc()  // Same thing
-
 # Python threads  
 threading.Thread(target=myfunc).start()  # Also same
 ```
@@ -155,12 +152,10 @@ Every function call might secretly spawn tasks that outlive the function
 async with open("data.csv") as f:
     await process_file(f)
 # File closed here... right?
-
 # But what if process_file did this:
 async def process_file(f):
     asyncio.create_task(read_data(f))  # Background task!
     return  # Function returns immediately
-    
 # Now: file is CLOSED while background task still uses it
 # 💥 Error! (if you're lucky)
 ```
@@ -174,10 +169,8 @@ async def process_file(f):
 ```python
 async def background_task():
     raise ValueError("Something went wrong!")
-
 # Start background task
 task = asyncio.create_task(background_task())
-
 # Error happens... but where does it go?
 # Answer: NOWHERE! It's silently dropped!
 # (Maybe printed to console if you're lucky)
@@ -192,7 +185,6 @@ Compare to regular Python:
 ```python
 def my_function():
     raise ValueError("Something went wrong!")
-
 my_function()  # Exception propagates to caller automatically
 ```
 
@@ -337,17 +329,13 @@ with a CancelledError
 
 ```python
 import anyio
-
 async def example():
     with anyio.fail_after(0) as scope:
         try:
             await anyio.sleep(1)  # raises CancelledError
         finally:
             await anyio.sleep(1000)  # also raises CancelledError
-
     # raises TimeoutError as you leave the scope
-
-
 anyio.run(example)
 ```
 
@@ -356,7 +344,6 @@ anyio.run(example)
 # in asyncio
 ```python
 import asyncio
-
 async def example():
     async with asyncio.timeout(0):
         try:
@@ -364,8 +351,6 @@ async def example():
         finally:
             await asyncio.sleep(1000)  # waits 1000 seconds
     # raises TimeoutError.... eventually
-
-
 asyncio.run(example())
 ```
 
@@ -395,8 +380,6 @@ async def main():
     async with asyncio.TaskGroup() as tg:
         tg.create_task(task_with_finally())
         tg.create_task(crash_soon())
-
-
 asyncio.run(main())
 ```
 
@@ -465,10 +448,8 @@ example with anyio
 ```python
 import asyncio
 import anyio
-
 async def main():
     never = asyncio.Future()
-
     async def task_with_finally():
         try:
             print("task_with_finally running")
@@ -478,17 +459,13 @@ async def main():
             print("awaiting never-completing future (WILL HANG)")
             await never
             print("never reached")
-
     async def crash_soon():
         await asyncio.sleep(1)
         print("crash_soon raising")
         raise RuntimeError("boom")
-
     async with anyio.create_task_group() as tg:
         tg.start_soon(task_with_finally)
         tg.start_soon(crash_soon)
-
-
 asyncio.run(main())
 ```
 
@@ -536,7 +513,6 @@ async def consume_ws():
         async for message in ws:
             await process(message)  # cancellation happens here
      # cancellation doesn't happen as we `__aexit__()` the context manager
-
 async def example():
     async with asyncio.timeout(10):
         await consume_ws()  # could hang forever
@@ -594,7 +570,6 @@ async def save_to_db(data):
         await anyio.to_thread.run_sync(db_blocking_flush, data)
         # Still shielded — the *whole scope* is protected
     # Pending cancellation is re-raised here, reliably
-
 # Works correctly even when called inside a task group under timeout:
 async def example():
     with anyio.fail_after(5):
@@ -661,12 +636,10 @@ producer/consumers you have
 
 ```python
 import anyio
-
 async def consume_ws(url, stream):
     async with stream, await connect_ws(url) as ws:
         async for msg in ws:
             await stream.send(msg)
-
 async def news_and_weather():
     tx, rx = anyio.create_memory_object_stream[bytes]()  # default buffer size = 0
     async with tx, rx, anyio.create_task_group() as tg:
@@ -675,7 +648,6 @@ async def news_and_weather():
         tx.close()
         async for item in rx:
             print(item)
-
 anyio.run(main)
 ```
 
@@ -699,16 +671,13 @@ anyio.run(main)
 
 ```python
 import asyncio
-
 async def main():
     q = asyncio.Queue()  # unbounded by default (!)
-
     async def producer():
         for i in range(3):
             print("put", i)
             await q.put(i)
         # How do we signal completion?
-
     async def consumer():
         while True:
             item = await q.get()
@@ -850,7 +819,6 @@ async def main():
     async with anyio.create_task_group() as tg:
         tg.start_soon(producer)
         tg.start_soon(consumer)
-
 anyio.run(main)
 ```
 
@@ -961,7 +929,6 @@ citation:
 
 ```python
 from pathlib import Path
-
 async def amain():
     # ⚠️ These all BLOCK the event loop!
     path = Path("data.txt")
@@ -976,7 +943,6 @@ async def amain():
 
 ```python
 import anyio
-
 async def amain():
     # ✅ All truly async - doesn't block!
     path = anyio.Path("data.txt")
