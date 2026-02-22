@@ -1016,8 +1016,6 @@ async/await
 * AnyIO ships with a pytest plugin that it uses to test itself.
 * This means if you already depend on AnyIO you don't need pytest-asyncio as well.
 
----
-
 ```python
 @pytest.mark.anyio
 async def test_something():
