@@ -544,6 +544,20 @@ You're not cancelling the work — you're just *abandoning* the future that was 
 
 ---
 
+```python
+# IOCP
+buffer = allocate_buffer(1024)
+try:
+    await write_buffer_to_socket(buffer, socket)
+finally:
+    # if write_buffer_to_socket is cancelled and we don't wait for the cancel
+    # signal the OS could still be using the buffer and we send undefined
+    # bytes to to the socket.
+    clear(buffer)
+```
+
+---
+
 # `asyncio.shield` — The Duct-Tape Approach
 
 ```python
