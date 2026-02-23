@@ -264,7 +264,7 @@ async def structured():
 
 ---
 
-![anyio create task group](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/f613be233c079ba88ae65632da95777a55d0b362/anyio_create_task_group.svg)
+![anyio create task group](https://raw.githubusercontent.com/gist/graingert/cd70c6233d03f5c84c9c8d84a25795d0/raw/fc99a684e55e738e6cdc9eb62dc80cbafab51f5c/anyio_create_task_group.svg)
 
 ------------------------------------------------------------------------
 
