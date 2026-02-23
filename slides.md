@@ -361,6 +361,8 @@ asyncio.run(example())
 
 For example, the following program hangs:
 
+---
+
 ```python
 import asyncio
 async def main():
