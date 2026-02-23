@@ -622,8 +622,6 @@ async def example():
 
 ---
 
-**asyncio.shield is a one-way valve. AnyIO's shield is a pressure vessel** — it holds the cancellation until you're ready to handle it safely.
-
 ## Comparison
 
 | | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
@@ -892,6 +890,8 @@ while True:
 Every iteration of `while b"\n" in buffer` does `buffer = bytearray(rest)`,
 copying the remaining data each time. If you receive a chunk with many
 newlines, this is O(n²) in the number of bytes.
+
+---
 
 # What AnyIO Adds Here
 
