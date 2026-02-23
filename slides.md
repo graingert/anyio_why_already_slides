@@ -14,7 +14,7 @@ https://graingert.co.uk/why-anyio-already
 - I am a core developer of AnyIO, Twisted and Trio (and a few non-async libraries)
 - I have made contributions to the asyncio happy eyeballs support and fixes to
   TaskGroup
-- Years of teaching async experience, never actually deployed anything myself
+- Years of teaching async, never actually deployed anything myself
 
 ---
 
@@ -151,8 +151,8 @@ Every function call might secretly spawn tasks that outlive the function
 ## Problem 2: Resource Cleanup Breaks
 
 ```python
-# This LOOKS safe...
-async with open("data.csv") as f:
+# This LOOKS safe... (pseudocode)
+async with aopen("data.csv") as f:
     await process_file(f)
 # File closed here... right?
 # But what if process_file did this:
@@ -229,8 +229,6 @@ manual\
 ❌ **Shutdown hangs** - Can't wait for "done" because tasks are
 invisible\
 ❌ **Race conditions** - Tasks outlive the data they operate on
-
----
 
 ### In data pipelines specifically:
 
@@ -363,8 +361,6 @@ asyncio.run(example())
 
 For example, the following program hangs:
 
----
-
 ```python
 import asyncio
 async def main():
@@ -390,7 +386,7 @@ asyncio.run(main())
 
 ---
 
-output:
+output + after hitting Ctrl+C a few times:
 
 ```sh
 $ python demo.py
@@ -626,9 +622,7 @@ async def example():
 
 **asyncio.shield is a one-way valve. AnyIO's shield is a pressure vessel** — it holds the cancellation until you're ready to handle it safely.
 
----
-
-# Comparison
+## Comparison
 
 | | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
 |---|---|---|
@@ -755,14 +749,7 @@ predates it.
 ------------------------------------------------------------------------
 # "If I'm already using Trio, I don't need AnyIO."
 
-Most people assume this.
-
-But AnyIO adds real value even on the Trio backend.
-
-- Trio gives you structured concurrency.
-- AnyIO gives you portability + batteries included.
-
----
+Most people assume this. But AnyIO adds real value even on the Trio backend.
 
 ### What AnyIO adds on top of Trio
 
@@ -784,11 +771,8 @@ But AnyIO adds real value even on the Trio backend.
 
 # Trio vs AnyIO
 
-- Trio is a minimal framework
-    - only gives you what is mandatory of a network framework
+- Trio is a minimal framework — only gives you what is mandatory of a network framework
 - AnyIO is a portability + abstraction layer with batteries included.
-
----
 
 If you write a library directly against Trio:
 
@@ -846,7 +830,7 @@ anyio.run(main)
 
 ---
 
-### Output
+### Output + What Just Happened
 
 ```sh
 $ python demo_buffered_bytes.py
@@ -854,17 +838,9 @@ line1: b'hello'
 line2: b'world'
 ```
 
-------------------------------------------------------------------------
-
-### What Just Happened?
-
 -   The producer sent both lines in one chunk.
-
 -   The consumer parsed them cleanly by delimiter.
-
--   No manual buffering.
-
--   No partial read bookkeeping.
+-   No manual buffering. No partial read bookkeeping.
 
 ------------------------------------------------------------------------
 
@@ -892,7 +868,7 @@ But you must manually:
 ---
 Example (simplified):
 
-I asked ChatGPT and it gave me this, can you spot the bug?
+I asked ChatGPT and it gave me this — can you spot the bug?
 
 ```python
 buffer = bytearray()
@@ -906,6 +882,7 @@ while True:
         print(line + b"\n")
         buffer = bytearray(rest)
 ```
+
 ---
 
 ## Quadratic performance in the inner loop
@@ -913,8 +890,6 @@ while True:
 Every iteration of `while b"\n" in buffer` does `buffer = bytearray(rest)`,
 copying the remaining data each time. If you receive a chunk with many
 newlines, this is O(n²) in the number of bytes.
-
-------------------------------------------------------------------------
 
 # What AnyIO Adds Here
 
@@ -1038,8 +1013,6 @@ In Python 3.13, a number of bug-fixes were applied to asyncio.TaskGroup
 but they were considered breaking changes so were not backported to 3.11
 or 3.12:
 
----
-
 https://docs.python.org/3/whatsnew/3.13.html#asyncio
 
 > Improve the behavior of
@@ -1060,8 +1033,8 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 
 # Asyncio is not bad
 
-* it's better than Twisted (I spent a week fixing a missing `six` call
-  that wouldn't have happened on Python 3.6 with asyncio)
+* it's better than Twisted (I once spent a week fixing a missing `six` call
+  — a whole class of bug that doesn't exist with asyncio)
 * but try making an LDAP server without Twisted!
 * *some* of the mistakes Twisted made were copied into asyncio
 * Curio is good! Unfortunately it's archived
