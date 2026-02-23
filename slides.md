@@ -222,18 +222,16 @@ completion tracking**
 
 ### In asyncio programs:
 
-❌ **Backpressure problems** - Can't tell how many tasks are running\
 ❌ **Resource leaks** - Files/sockets stay open because cleanup is
 manual\
 ❌ **Silent failures** - Errors in background tasks get dropped\
 ❌ **Shutdown hangs** - Can't wait for "done" because tasks are
 invisible\
-❌ **Race conditions** - Tasks outlive the data they operate on
+❌ **Operations on closed files** - Tasks outlive the data they operate on
 
 ### In data pipelines specifically:
 
 ❌ **Timeouts don't work** - Can't cancel tasks you've lost track of\
-❌ **Parallel processing breaks** - No way to collect results safely\
 ❌ **Can't reason about code** - Every function is a potential landmine
 
 ------------------------------------------------------------------------
