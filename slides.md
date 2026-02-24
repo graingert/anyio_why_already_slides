@@ -17,17 +17,18 @@ https://graingert.co.uk/why-anyio-already
 - Years of teaching async, never actually deployed anything myself
 
 ---
-
+<style scoped>section{font-size:22px;}</style>
 * misconception: `asyncio` == `async`/`await`
 * the problems with `asyncio.create_task`
 * why you should use structured concurrency
 * edge cancellation vs level cancellation
 * `asyncio.shield` vs shielded CancelScopes
-* more anyio features
+* some of my favourite anyio features
     * channels (memory object streams) > `asyncio.Queue`
     * `BufferedByteReceiveStream` AnyIO > Trio
     * `anyio.Path`
     * pytest plugin built in
+    * summary of features not covered so far
 * The advantages of being pip installable
 * why you already have AnyIO installed
 
@@ -1005,6 +1006,38 @@ By default the plugin runs your tests under both asyncio and Trio, so if you're 
 def anyio_backend():
     return 'asyncio'
 ```
+---
+
+# But `await` there's more! — Networking & I/O
+
+| Feature | Benefit |
+|---|---|
+| **TCP/UDP/UNIX sockets** | Happy Eyeballs built in; async/await UDP (no Transports/Protocols) |
+| **TLS streams** | `TLSStream` wraps any byte stream with TLS, not just sockets |
+| **Subprocesses** | `run_process()` / `open_process()` with async stream I/O on stdin/stdout/stderr |
+| **Signal handling** | `open_signal_receiver()` — async iterator over OS signals |
+
+---
+
+# But `await` there's more! — Streams & Concurrency
+
+| Feature | Benefit |
+|---|---|
+| **`TextReceiveStream`** | Incremental UTF-8 decoding over any byte stream |
+| **`StapledStream`** | Combine separate send/receive streams into one bidirectional stream |
+| **`tg.start()`** | `await tg.start(server_fn)` — blocks until the task signals it's ready |
+| **Synchronization primitives** | `Lock`, `Condition`, `Event`, `Semaphore`, `CapacityLimiter` — portable across backends |
+
+---
+
+# But `await` there's more! — Threads, Testing & Beyond
+
+| Feature | Benefit |
+|---|---|
+| **`to_thread` / `from_thread`** | Bidirectional sync↔async bridging with structured cancellation |
+| **Subinterpreters** | `to_interpreters` module for true parallelism (Python 3.13+) |
+| **Async `functools`** | `anyio.functools.lru_cache` for async functions |
+
 ---
 
 # The Advantage of Being on PyPI
