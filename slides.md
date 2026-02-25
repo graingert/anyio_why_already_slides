@@ -18,9 +18,8 @@ https://graingert.co.uk/why-anyio-already
 - I am a core developer of AnyIO, Twisted and Trio (and a few non-async libraries)
 - I have made contributions to the asyncio happy eyeballs support and fixes to
   TaskGroup
-- Years of teaching async, never actually deployed anything myself
 
-<!-- so I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. I should admit that I've spent years teaching people async Python but I've never actually deployed an async service myself. classic cobbler's children situation. -->
+<!-- so I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
 
 ---
 <style scoped>section{font-size:22px;}</style>
