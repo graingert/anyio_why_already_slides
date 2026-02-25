@@ -28,7 +28,7 @@ https://graingert.co.uk/why-anyio-already
 * why you should use structured concurrency
 * edge cancellation vs level cancellation
 * `asyncio.shield` vs shielded CancelScopes
-* some of my favourite anyio features
+* some of my favourite AnyIO features
     * channels (memory object streams) > `asyncio.Queue`
     * `BufferedByteReceiveStream` AnyIO > Trio
     * `anyio.Path`
@@ -37,7 +37,7 @@ https://graingert.co.uk/why-anyio-already
 * The advantages of being pip installable
 * why you already have AnyIO installed
 
-<!-- here's the plan. first I'll clear up the misconception that asyncio IS async/await, then I'll explain why create_task is broken, cover structured concurrency and cancellation semantics, show some features I like, and then reveal that you've already got anyio installed. -->
+<!-- here's the plan. first I'll clear up the misconception that asyncio IS async/await, then I'll explain why create_task is broken, cover structured concurrency and cancellation semantics, show some features I like, and then reveal that you've already got AnyIO installed. -->
 
 ---
 
@@ -1229,7 +1229,7 @@ Normally at this stage of my talk I'd ask you to go run
 but if you're in this room you probably already have it in your virtual
 environments!
 
-<!-- normally at this point I'd tell you to go pip install anyio. but that's the punchline — you probably already have it. if you've installed httpx, FastAPI, Jupyter, MCP, or any number of popular packages, anyio is already in your virtualenv. -->
+<!-- normally at this point I'd tell you to go pip install AnyIO. but that's the punchline — you probably already have it. if you've installed httpx, FastAPI, Jupyter, MCP, or any number of popular packages, AnyIO is already in your virtualenv. -->
 
 ---
 
@@ -1240,7 +1240,7 @@ $ pipdeptree -p anyio -r  # reverse dependencies (dependants) of anyio
 
 Watch the tree unfold: loads of packages you use daily depend on AnyIO
 
-<!-- try this yourself. install a few common packages and run pipdeptree in reverse mode for anyio. you'll see a massive dependency tree. -->
+<!-- try this yourself. install a few common packages and run pipdeptree in reverse mode for AnyIO. you'll see a massive dependency tree. -->
 
 ---
 
