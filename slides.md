@@ -41,37 +41,44 @@ https://graingert.co.uk/why-anyio-already
 
 ---
 
-
 # asyncio != async/await
 
-- Coroutines are generator-based in Python
-- not just asyncio can use them because `async`/`await` is totally decoupled from `asyncio`.
-- Twisted, Trio, and Curio can support async functions while being completely unrelated to asyncio.
-- You can even use `async`/`await` to make your own generators:
+- `async`/`await` is syntactic sugar over generators — completely decoupled from any event loop
+- Twisted, Trio, and Curio all use `async`/`await` with their own event loops
+- You can even use `async`/`await` with no event loop at all
 
-<!-- this is the most common misconception I run into. people think asyncio IS async/await. it's not. async/await is just syntactic sugar over generators — it's completely decoupled from asyncio. Twisted, Trio, Curio all use the same syntax with totally different event loops underneath. you can even abuse async/await to make plain generators, which I'll show you. -->
+<!-- async/await is NOT asyncio. it's just syntax built on top of the generator protocol. any framework can drive coroutines — Twisted, Trio, Curio all do it with completely different event loops. and as I'll show you, you don't even need an event loop. -->
 
 ---
 
+# No event loop required
+
 ```python
->>> import types
->>> @types.coroutine
-... def _async_yield(v):
-...     return (yield v)
-...     
->>> async def coro_fn():
-...     await _async_yield(1)
-...     await _async_yield(2)
-...     await _async_yield(3)
-...     
->>> coro = coro_fn()
->>> gen = coro.__await__()
->>> list(gen)
-[1, 2, 3]
->>> 
+import types
+
+@types.coroutine
+def _async_yield(v):
+    return (yield v)
+
+async def async_range():
+    await _async_yield(1)
+    await _async_yield(2)
+    await _async_yield(3)
 ```
 
-<!-- here's the proof. types.coroutine makes a raw coroutine that just yields values. we build an async function on top, grab the __await__ iterator, drain it into a list. no event loop, no asyncio, just generators all the way down. this is how multiple async frameworks can coexist — they're all just driving generators. -->
+<!-- types.coroutine bridges the generator protocol to the coroutine protocol. _async_yield is a raw coroutine that just yields a value. async_range is a normal async function built on top — no asyncio anywhere. -->
+
+---
+
+# It's generators all the way down
+
+```python
+coro = async_range()
+gen = coro.__await__()
+list(gen)  # [1, 2, 3]  — no asyncio, no event loop
+```
+
+<!-- grab the __await__ iterator, drain it into a list. that's it. no event loop, no scheduler, just generators. this is how multiple async frameworks can coexist — they're all just driving the same generator protocol underneath. -->
 
 ---
 
