@@ -74,17 +74,40 @@ async def structured():
 ---
 
 # Level Cancellation vs Edge Cancellation
+<table>
+<tr>
+<th>AnyIO — level-triggered ✅</th>
+<th>asyncio — edge-triggered ❌</th>
+</tr>
+<tr>
+<td>
 
 ```python
-# AnyIO — level-triggered ✅            # asyncio — edge-triggered ❌
-with anyio.fail_after(0):                async with asyncio.timeout(0):
-    try:                                     try:
-        await anyio.sleep(1)                     await asyncio.sleep(1)
-        # raises CancelledError                  # raises CancelledError
-    finally:                                 finally:
-        await anyio.sleep(1000)                  await asyncio.sleep(1000)
-        # ALSO raises CancelledError             # waits 1000 seconds! 😱
+with anyio.fail_after(0):
+    try:
+        await anyio.sleep(1)
+        # raises CancelledError
+    finally:
+        await anyio.sleep(1000)
+        # ALSO raises CancelledError
 ```
+
+</td>
+<td>
+
+```python
+async with asyncio.timeout(0):
+    try:
+        await asyncio.sleep(1)
+        # raises CancelledError
+    finally:
+        await asyncio.sleep(1000)
+        # waits 1000 seconds! 😱
+```
+
+</td>
+</tr>
+</table>
 
 Edge cancellation = **your 0s timeout becomes a 1000s timeout**. With level cancellation every `await` in a cancelled scope fails. No surprises.
 
