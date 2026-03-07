@@ -185,6 +185,7 @@ Every function call might secretly spawn tasks that outlive the function
 # This LOOKS safe... (pseudocode)
 async with aopen("data.csv") as f:
     await process_file(f)
+
 # File closed here... right?
 # But what if process_file did this:
 async def process_file(f):
@@ -449,7 +450,7 @@ asyncio.run(main())
 
 ---
 
-output + after hitting Ctrl+C a few times:
+## output
 
 <!-- walk through it: task_with_finally sleeps, then in its finally block awaits a Future that never completes. crash_soon raises after 1 second. the TaskGroup cancels task_with_finally, but because cancellation is edge-triggered, the finally block's `await never` is NOT cancelled — it just hangs forever. you have to Ctrl+C multiple times to kill it. -->
 
@@ -463,7 +464,7 @@ awaiting never-completing future (WILL HANG)
 
 ---
 
-After hitting Ctrl+C a few times:
+## Output after hitting Ctrl+C a few times:
 ```sh
 task_with_finally running
 crash_soon raising
@@ -1138,7 +1139,9 @@ async def test_something():
 <!-- AnyIO ships with its own pytest plugin — the same one it uses to test itself. so if you already depend on AnyIO you don't need pytest-asyncio. just @pytest.mark.anyio and you're done. -->
 
 ---
-By default the plugin runs your tests under both asyncio and Trio, so if you're still gradually migrating to AnyIO and still require asyncio support, you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
+* By default the plugin runs your tests under both asyncio and Trio
+* if you're still gradually migrating to AnyIO and still only supportasyncio support
+* you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
 
 ```python
 @pytest.fixture
