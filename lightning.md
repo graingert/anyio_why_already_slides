@@ -118,17 +118,18 @@ Edge cancellation = **your 0s timeout becomes a 1000s timeout**. With level canc
 # Shielded Cancel Scopes > `asyncio.shield`
 
 ```python
-# asyncio.shield — wraps ONE await, orphans the inner task, edge-triggered 😬
-await asyncio.shield(db.execute(INSERT, data))
+# asyncio.shield — wraps ONE await, orphans process.wait(), edge-triggered 😬
+await asyncio.shield(process.wait())
+# can't reliably terminate + join: edge cancellation breaks the cleanup
 
-# AnyIO — shields an entire block, no orphans, level-triggered 😎
+# AnyIO — terminate the process, shield the join, no zombies 😎
+process.terminate()
 with anyio.CancelScope(shield=True):
-    await anyio.to_thread.run_sync(db_blocking_write, data)
-    await anyio.to_thread.run_sync(db_blocking_flush, data)
+    await process.wait()  # reap the process even under cancellation
 # Pending cancellation reliably re-raised here
 ```
 
-<!-- asyncio.shield wraps one await and orphans the task. AnyIO CancelScope shields an entire block, joins threads, and defers cancellation cleanly. -->
+<!-- asyncio.shield wraps one await and orphans the task. with subprocesses you need to terminate AND join — but edge cancellation makes the join unreliable. AnyIO CancelScope shields the join, reaps the process, and defers cancellation cleanly. no zombies. -->
 
 ---
 
