@@ -597,25 +597,26 @@ async def example():
 
 # Shielding from Cancellation
 
-## When you *can't* cancel — even if you want to
+## When you *can't* just walk away — even after cancelling
 
-Some I/O operations are **uncancellable by nature**, or you must wait for the
-cancel to be processed by the OS:
+Sometimes you can cancel the work, but you **must wait for it to finish dying**:
 
-- Waiting for a thread to finish (`loop.run_in_executor`, `anyio.to_thread.run_sync`)
-- On Windows IOCP (Proactor)
-    - To cancel pending I/O operations in an IOCP (I/O Completion Port) server, use `CancelIoEx` to target specific operations, or `closesocket(handle)`
-    to cancel all pending I/O on a socket. Canceled operations complete with `ERROR_OPERATION_ABORTED`, and you must wait for the completion packet before freeing memory.
+- Subprocesses (`anyio.to_process.run_sync`): you can `terminate()` the process, but you must still `wait()` to join it — otherwise you get zombie processes
+- Waiting for a thread to finish (`loop.run_in_executor`, `anyio.to_thread.run_sync`) — threads can't be interrupted at all
+- On Windows IOCP (Proactor): cancelled operations complete with `ERROR_OPERATION_ABORTED`, and you must wait for the completion packet before freeing memory
 
-<!-- sometimes you genuinely can't cancel work. threads can't be interrupted. on Windows IOCP you have to wait for the OS to acknowledge the cancellation before you can free memory. this is where shielding comes in. but asyncio's approach to this is broken. -->
+<!-- sometimes you can cancel the work but you can't just walk away. subprocesses are the perfect example: you can terminate the process, but you MUST still join it afterwards. if you don't wait, you get zombie processes. threads are worse — you can't even cancel them. and on Windows IOCP the OS must acknowledge the cancel before you can free memory. this is where shielding comes in. -->
 
 ---
 
-The async framework can raise `CancelledError` in your coroutine, but the **underlying thread keeps running** or **something still needs to wait to be able to clear memory**
+The async framework can raise `CancelledError` in your coroutine, but:
+- the **underlying thread keeps running**
+- a **terminated subprocess still needs to be joined**
+- **something still needs to wait to be able to clear memory**
 
 You're not cancelling the work — you're just *abandoning* the future that was watching it. 👻
 
-<!-- key insight: when you cancel an executor task in asyncio, the thread keeps running. you've just abandoned the Future. the work is still happening, you just stopped paying attention to it. like hanging up the phone on someone mid-sentence. -->
+<!-- key insight: when you cancel an executor task in asyncio, the thread keeps running. when you cancel a subprocess wrapper, the process might still be alive or needs joining. you've just abandoned the Future. the work is still happening, you just stopped paying attention to it. like hanging up the phone on someone mid-sentence. -->
 
 ---
 
@@ -638,60 +639,66 @@ finally:
 # `asyncio.shield` — The Duct-Tape Approach
 
 ```python
-async def save_to_db(data):
-    # We don't want cancellation to interrupt this
-    await asyncio.shield(db.execute(INSERT, data))
-    # ⚠️ If cancelled, shield absorbs the cancel...
-    # ... but db.execute() keeps running as an orphaned task
-    # ⚠️ Edge cancellation means the *next* await might
-    # succeed even though we're "cancelled"
+async def run_in_process(fn, *args):
+    process = await asyncio.create_subprocess_exec(...)
+    try:
+        await asyncio.shield(process.wait())
+        # ⚠️ If cancelled, shield absorbs the cancel...
+        # ... but process.wait() keeps running as an orphaned task
+    except asyncio.CancelledError:
+        process.terminate()
+        # ⚠️ Edge cancellation: the next await might succeed
+        # even though we're "cancelled" — so we can't reliably
+        # join the process here
+        await process.wait()  # might wait forever!
 ```
 
-<!-- asyncio.shield is the standard answer to "how do I protect work from cancellation". but it's duct tape. wraps a single await, creates an orphaned task, and because of edge cancellation, behaviour after the shield is unpredictable. -->
+<!-- asyncio.shield is the standard answer to "how do I protect work from cancellation". but it's duct tape. it wraps a single await, creates an orphaned task. and because of edge cancellation, the process.wait() in the except block might actually wait forever since the cancellation was consumed. -->
 
 ---
 
 ### Problems
 
 ❌ **Edge-triggered**: a `CancelledError` sneaks through on the *next* checkpoint after the shield exits  
-❌ **Orphaned inner task**: the shielded work keeps running with no owner  
-❌ **No scope**: shield applies to one `await`, not a logical block of work  
-❌ **Thread can't be shielded**: `run_in_executor` inside a shield still abandons the thread
+❌ **Orphaned inner task**: the shielded `process.wait()` keeps running with no owner  
+❌ **No scope**: shield applies to one `await`, not a logical block (terminate + join)  
+❌ **Can't compose terminate + join**: need to shield the wait, then join, then re-raise — but edge cancellation makes the join unreliable
 
-<!-- four problems, all from asyncio.shield being a point fix rather than structural. only shields one await, orphans the inner task, edge cancellation makes subsequent behaviour unpredictable, and it can't protect threads at all. -->
+<!-- four problems. shield only wraps one await. the inner task is orphaned. and the critical issue for subprocesses: you need to terminate AND join as a single logical unit, but shield can't express that. edge cancellation means the join in the except block might not be cancelled, so it waits forever. -->
 
 ---
 
 # AnyIO Shielded Cancel Scopes — The Structured Approach
 
 ```python
-async def save_to_db(data):
-    # Level-triggered: cancellation is *held* until we exit the shield
-    with anyio.CancelScope(shield=True):
-        await anyio.to_thread.run_sync(db_blocking_write, data)
-        # Thread runs to completion — no orphan, no abandonment
-        await anyio.to_thread.run_sync(db_blocking_flush, data)
-        # Still shielded — the *whole scope* is protected
-    # Pending cancellation is re-raised here, reliably
-# Works correctly even when called inside a task group under timeout:
-async def example():
-    with anyio.fail_after(5):
-        async with anyio.create_task_group() as tg:
-            tg.start_soon(save_to_db, important_data)
+# Simplified implementation of anyio.to_process.run_sync
+async def to_process_run_sync(fn, *args):
+    process = await anyio.open_process(...)
+    try:
+        await process.wait()
+        return process.returncode
+    except BaseException:
+        process.terminate()
+        # Shield the join: we MUST wait for the process to exit
+        # even though we've been cancelled
+        with anyio.CancelScope(shield=True):
+            await process.wait()  # no zombie processes
+        raise
+    # Pending cancellation is re-raised after the shielded join
 ```
 
-<!-- AnyIO's approach is fundamentally different. CancelScope with shield=True protects an entire block, not one await. thread runs to completion. pending cancellation is deferred and reliably re-raised when you exit the shield. composes correctly with task groups and timeouts. -->
+<!-- AnyIO's approach is fundamentally different. when cancellation hits, we terminate the process, then shield the join. CancelScope with shield=True protects the wait — the process is properly reaped even under cancellation. pending cancellation is deferred and reliably re-raised after we exit the shield. no zombies, no orphans. -->
 
 ---
 
 ### Why it works
 
 ✅ **Level-triggered**: cancellation is *deferred*, not lost — re-fires when you leave the scope  
-✅ **Thread-aware**: `run_sync` joins the thread; the shield keeps the join alive  
-✅ **Scoped**: protect a whole logical block, not just one `await`  
-✅ **No orphans**: structured concurrency means every task has an owner
+✅ **Process-aware**: `terminate()` + shielded `wait()` — kill it, then reap it  
+✅ **Scoped**: protect the whole terminate-and-join block, not just one `await`  
+✅ **No zombies**: structured concurrency means every process is joined
 
-<!-- level-triggered, thread-aware, scoped, no orphans. every problem with asyncio.shield is solved. this is what structured concurrency gives you. -->
+<!-- level-triggered, process-aware, scoped, no zombies. the shield lets you express "I need to do cleanup that involves I/O" which is exactly what joining a terminated process requires. every problem with asyncio.shield is solved. -->
 
 ---
 
@@ -718,12 +725,12 @@ async def example():
 |---|---|---|
 | Cancellation model | Edge (one-shot) | Level (persistent, deferred) |
 | Scope | Single `await` | Entire `with` block |
-| Thread safety | ❌ Abandons thread | ✅ Joins thread to completion |
+| Process cleanup | ❌ Can't reliably terminate + join | ✅ Terminate then shielded join |
 | Cancellation after exit | ⚠️ Maybe (edge, unreliable) | ✅ Always re-raised |
 | Orphaned tasks | ❌ Yes | ✅ Never |
 | Composable | ❌ Not really | ✅ Nests with task groups |
 
-<!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. -->
+<!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. the process case makes this crystal clear — you need to shield a multi-step cleanup sequence. -->
 
 ------------------------------------------------------------------------
 
