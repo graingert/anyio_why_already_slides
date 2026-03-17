@@ -242,6 +242,8 @@ consider: `asyncio.TaskGroup` or explicit awaiting
 
 # Structured Concurrency with Task Groups
 
+*"structured" = tasks have a guaranteed reunion point with their parent*
+
 ```python
 # asyncio - UNSTRUCTURED (bad)
 async def unstructured():
@@ -259,8 +261,6 @@ async def structured():
     # All cleanup happens automatically
     return  # NOW we're actually done
 ```
-
-**Task groups enforce: tasks must complete before you can continue**
 
 <!-- here's the fix: task groups. you can't exit the async with block until ALL child tasks have finished. errors propagate automatically. cleanup happens automatically. when the function returns, it's actually done. this is structured concurrency — same revolution that if/while/for brought to control flow. -->
 
