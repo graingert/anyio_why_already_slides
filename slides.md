@@ -105,7 +105,7 @@ list(gen)  # [1, 2, 3]  — no asyncio, no event loop
 
 ---
 
-# The Problem with `asyncio.create_task()`
+# The Problems with `asyncio.create_task()`
 
 ## It's a "go statement" - and go statements break everything
 
