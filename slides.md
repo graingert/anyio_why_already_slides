@@ -1233,6 +1233,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 
 ---
 
+# The Advantage of Being on PyPI (continued)
 * you need to use the latest version of Python for fixed asyncio
 * Because AnyIO is hosted on PyPI you get bugfixes on all supported python versions
 * AnyIO is currently still supporting the EOL Python 3.9 (as of v4.12.1)
