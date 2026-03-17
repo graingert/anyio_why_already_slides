@@ -917,7 +917,7 @@ Most people assume this. But AnyIO adds real value even on the Trio backend.
 
 -   ✅ Stapled streams
 
--   ✅ Thread/subprocess helpers
+-   ✅ Thread/subprocess/subinterpreter helpers
 
 <!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include — buffered streams, memory object streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
 
@@ -1227,7 +1227,7 @@ def anyio_backend():
 | Feature | Benefit |
 |---|---|
 | **`to_thread` / `from_thread`** | Bidirectional sync↔async bridging with structured cancellation |
-| **Subinterpreters** | `to_interpreters` module for true parallelism (Python 3.13+) |
+| **Subinterpreters** | `anyio.to_interpreter.run_sync` subinterpreter helpers for true parallelism (Python 3.13+) |
 | **Async `functools`** | `anyio.functools.lru_cache` for async functions |
 
 <!-- and more: bidirectional sync/async bridging with structured cancellation, subinterpreter support for true parallelism on 3.13+, and async functools like lru_cache. -->
