@@ -113,7 +113,7 @@ list(gen)  # [1, 2, 3]  — no asyncio, no event loop
 
 ---
 
-## What's a "go statement"?
+# What's a "go statement"?
 
 ```python
 # asyncio
@@ -135,7 +135,7 @@ threading.Thread(target=myfunc).start()  # Also same
 
 ---
 
-## Problem 1: Functions Aren't Black Boxes Anymore
+# Problem 1: Functions Aren't Black Boxes Anymore
 
 ```python
 async def process_data(data):
@@ -154,7 +154,7 @@ Every function call might secretly spawn tasks that outlive the function
 
 ---
 
-## Problem 2: Resource Cleanup Breaks
+# Problem 2: Resource Cleanup Breaks
 
 ```python
 # This LOOKS safe... (pseudocode)
@@ -176,7 +176,7 @@ async def process_file(f):
 
 ---
 
-## Problem 3: Error Handling Breaks
+# Problem 3: Error Handling Breaks
 
 ```python
 async def background_task():
@@ -192,6 +192,8 @@ task = asyncio.create_task(background_task())
 
 ---
 
+# Why Errors Can't Propagate
+
 **Exceptions can't propagate because there's no stack to unwind**
 
 Compare to regular Python:
@@ -206,7 +208,7 @@ my_function()  # Exception propagates to caller automatically
 
 ---
 
-## Problem 4: You Can't Tell If Code Is Finished
+# Problem 4: You Can't Tell If Code Is Finished
 
 ``` python
 async def mystery_function():
@@ -225,7 +227,7 @@ result = await mystery_function()
 
 ---
 
-## The Root Cause: Unstructured Concurrency
+# The Root Cause: Unstructured Concurrency
 
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg" alt="create_task running off on its own" style="display: block; margin: 0 auto;" width="400">
 
@@ -237,7 +239,7 @@ consider: `asyncio.TaskGroup` or explicit awaiting
 
 ---
 
-## Real-World Consequences
+# Real-World Consequences
 
 ### In asyncio programs:
 
@@ -257,7 +259,7 @@ invisible\
 
 ---
 
-## The Solution: Structured Concurrency with Task Groups
+# Structured Concurrency with Task Groups
 
 ``` python
 # asyncio - UNSTRUCTURED (bad)
@@ -297,7 +299,7 @@ cancellation · exception propagation · task supervision included
 
 ---
 
-## Dijkstra Was Right (Again)
+# Dijkstra Was Right (Again)
 
 In 1968, Dijkstra showed that **goto statements break abstraction**
 
@@ -315,6 +317,8 @@ In 2018, we learned that **go statements do the same thing**
 
 ---
 
+# The Same Solution
+
 * **Solution then:** Remove goto, add structured control flow
 (if/while/functions)
 * **Solution now:** Remove create_task, add structured concurrency (task
@@ -324,7 +328,7 @@ groups)
 
 ---
 
-## Key Takeaway
+# Key Takeaway
 
 **`asyncio.create_task()` is the `goto` of concurrency**
 
@@ -343,7 +347,7 @@ groups)
 
 ---
 
-## Further Reading 
+# Further Reading 
 
 **Nathaniel J. Smith (Trio author):**\
 ["Notes on structured concurrency, or: Go statement considered harmful"](https://graingert.co.uk/trio-sc)\
@@ -366,11 +370,14 @@ support
 
 ---
 
-with level cancellation every async operation in a cancelled CancelScope will fail
-with a CancelledError
+# Level-Triggered Cancellation
+
+With level cancellation every async operation in a cancelled CancelScope will fail
+with a `CancelledError`
 
 ```python
 import anyio
+
 async def example():
     with anyio.fail_after(0):
         try:
@@ -378,6 +385,7 @@ async def example():
         finally:
             await anyio.sleep(1000)  # also raises CancelledError
     # raises TimeoutError as you leave the scope
+
 anyio.run(example)
 ```
 
@@ -388,6 +396,7 @@ anyio.run(example)
 # The asyncio Equivalent
 ```python
 import asyncio
+
 async def example():
     async with asyncio.timeout(0):
         try:
@@ -395,6 +404,7 @@ async def example():
         finally:
             await asyncio.sleep(1000)  # waits 1000 seconds
     # raises TimeoutError.... eventually
+
 asyncio.run(example())
 ```
 
@@ -402,16 +412,18 @@ asyncio.run(example())
 
 ---
 
-<style scoped>section { padding-top: 20px; }</style>
+<style scoped>section { font-size: 99%; }</style>
 
-## Edge cancellation can result in deadlocks on asyncio
+# Deadlocks in asyncio
 
-For example, the following program hangs:
+edge cancellation can result in deadlocks on asyncio for example, the following program hangs:
 
 ```python
 import asyncio
+
 async def main():
     never = asyncio.Future()
+
     async def task_with_finally():
         try:
             print("task_with_finally running")
@@ -421,13 +433,16 @@ async def main():
             print("awaiting never-completing future (WILL HANG)")
             await never
             print("never reached")
+
     async def crash_soon():
         await asyncio.sleep(1)
         print("crash_soon raising")
         raise RuntimeError("boom")
+
     async with asyncio.TaskGroup() as tg:
         tg.create_task(task_with_finally())
         tg.create_task(crash_soon())
+
 asyncio.run(main())
 ```
 <!-- edge cancellation doesn't just cause slowdowns — it can deadlock. here's a real example that hangs. -->
@@ -503,8 +518,10 @@ KeyboardInterrupt
 ```python
 import asyncio
 import anyio
+
 async def main():
     never = asyncio.Future()
+
     async def task_with_finally():
         try:
             print("task_with_finally running")
@@ -514,13 +531,16 @@ async def main():
             print("awaiting never-completing future (WILL HANG)")
             await never
             print("never reached")
+
     async def crash_soon():
         await asyncio.sleep(1)
         print("crash_soon raising")
         raise RuntimeError("boom")
+
     async with anyio.create_task_group() as tg:
         tg.start_soon(task_with_finally)
         tg.start_soon(crash_soon)
+
 asyncio.run(main())
 ```
 
@@ -647,7 +667,7 @@ async def run_in_process(fn, *args):
 
 ---
 
-### Problems
+# Problems
 
 ❌ **Edge-triggered**: a `CancelledError` sneaks through on the *next* checkpoint after the shield exits  
 ❌ **Orphaned inner task**: the shielded `process.wait()` keeps running with no owner  
@@ -733,6 +753,8 @@ async def to_process_run_sync(fn, *args):
 
 ---
 
+# Memory Object Streams: Full Example
+
 ```python
 import anyio
 async def consume_ws(url, stream):
@@ -760,7 +782,7 @@ note the synchronous `with stream:` — AnyIO guarantees every start_soon'd task
 
 <style scoped>section { padding-top: 10px; padding-bottom: 40px; }</style>
 
-### Key properties
+# Key Properties
 
 -   ✅ **Buffer size defaults to 0** → automatic backpressure
 
@@ -785,7 +807,7 @@ note the synchronous `with stream:` — AnyIO guarantees every start_soon'd task
 
 ---
 
-### `async with` or sync `with` closes streams automatically so there's a shortcut
+# `async with` or sync `with` closes streams automatically so there's a shortcut
 
 ```python
 async def consume_ws(url, stream):
@@ -1097,7 +1119,7 @@ async def amain():
 
 ---
 
-## The Solution: anyio.Path
+# The Solution: `anyio.Path`
 
 ```python
 import anyio
@@ -1116,7 +1138,7 @@ async def amain():
 
 ---
 
-## Real Power: Parallel File Operations
+# Real Power: Parallel File Operations
 
 ```python
 import anyio
@@ -1136,7 +1158,7 @@ anyio.run(concurrently_chmod_all_csvs)
 
 ---
 
-## Key Features
+# Key Features
 
 | Feature | pathlib | anyio.Path |
 |---------|---------|------------|
@@ -1272,6 +1294,8 @@ environments!
 <!-- normally at this point I'd tell you to go pip install AnyIO. but that's the punchline — you probably already have it. if you've installed httpx, FastAPI, Jupyter, MCP, or any number of popular packages, AnyIO is already in your virtualenv. -->
 
 ---
+
+# Demo: You Already Have It
 
 ```sh
 $ pip install httpx fastapi jupyter mcp pipdeptree
