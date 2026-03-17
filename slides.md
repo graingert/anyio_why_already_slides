@@ -22,17 +22,20 @@ https://graingert.co.uk/why-anyio-already
 <!-- hi I'm Thomas Grainger, graingert on GitHub. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to CPython asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
 
 ---
-<style scoped>section{font-size:22px;}</style>
+<style scoped>section{font-size:22px; padding-top:20px;}</style>
 
 # Agenda
 
 * misconception: `asyncio` == `async`/`await`
 * the problems with `asyncio.create_task`
 * why you should use structured concurrency
+* "But I want to return without waiting!"
+* the two most important reasons to use AnyIO
 * edge cancellation vs level cancellation
 * `asyncio.shield` vs shielded CancelScopes
 * some of my favourite AnyIO features
     * channels (memory object streams) > `asyncio.Queue`
+    * "If I'm already using Trio, I don't need AnyIO"
     * `BufferedByteReceiveStream`
     * `anyio.Path`
     * pytest plugin built in
@@ -40,7 +43,7 @@ https://graingert.co.uk/why-anyio-already
 * The advantages of being pip installable
 * why you already have AnyIO installed
 
-<!-- here's the plan. first I'll clear up the misconception that asyncio IS async/await, then I'll explain why create_task is broken, cover structured concurrency and cancellation semantics, show some features I like, and then reveal that you've already got AnyIO installed. -->
+<!-- here's the plan. first I'll clear up the misconception that asyncio IS async/await, then I'll explain why create_task is broken, cover structured concurrency and the "return without waiting" pattern, then the two main reasons to use AnyIO, cancellation semantics, features I like, and finally reveal that you've already got AnyIO installed. -->
 
 ---
 
