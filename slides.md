@@ -216,7 +216,7 @@ my_function()  # Exception propagates to caller automatically
 
 # The Root Cause: Unstructured Concurrency
 
-<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg" alt="create_task running off on its own" style="display: block; margin: 0 auto;" width="400">
+<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg" alt="create_task running off on its own" style="display: block; margin: 0 auto;" width="700">
 
 ⚠ no await, no supervision, no cancellation — exceptions silently swallowed
 
