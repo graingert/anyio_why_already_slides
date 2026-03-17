@@ -7,15 +7,19 @@ html: true
 
 ### ⚡ Lightning Talk Edition
 
+https://graingert.co.uk/why-anyio-already
+
 <!-- hi everyone, I'm going to give you the speedrun on AnyIO. Why you should use it because you already have it installed -->
 
 ---
 
-https://graingert.co.uk/why-anyio-already
-<img src="https://avatars.githubusercontent.com/u/413772" alt="graingert" style="display: block; margin: 0 auto;" width="400">
+# About Me
+
+<img src="https://avatars.githubusercontent.com/u/413772" alt="graingert" style="display: block; margin: 0 auto;" width="200">
 
 - Core developer of AnyIO, Twisted, and Trio
-- Contributed to asyncio happy eyeballs + TaskGroup fixes
+- Contributed to CPython asyncio happy eyeballs + TaskGroup fixes
+- Member of PyPy, pytest-dev, PyCQA, Dask orgs
 
 <!-- I'm Thomas Grainger, graingert on GitHub. I work on AnyIO, Twisted, Trio, and asyncio itself. -->
 

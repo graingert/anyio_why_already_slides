@@ -15,11 +15,11 @@ https://graingert.co.uk/why-anyio-already
 
 <img src="https://avatars.githubusercontent.com/u/413772" alt="graingert" style="display: block; margin: 0 auto;" width="200">
 
-- I am a core developer of AnyIO, Twisted and Trio (and a few non-async libraries)
-- I have made contributions to the asyncio happy eyeballs support and fixes to
-  TaskGroup
+- Core developer of AnyIO, Twisted, and Trio
+- Contributed to CPython asyncio happy eyeballs + TaskGroup fixes
+- Member of PyPy, pytest-dev, PyCQA, Dask orgs
 
-<!-- hi I'm Thomas Grainger, graingert on GitHub. slides are at that link. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
+<!-- hi I'm Thomas Grainger, graingert on GitHub. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to CPython asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
 
 ---
 <style scoped>section{font-size:22px;}</style>
