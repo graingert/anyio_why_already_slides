@@ -253,8 +253,10 @@ result = await mystery_function()
 ## The Root Cause: Unstructured Concurrency
 
 ![create_task running off on its own](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg)
-**One-way jump = no guaranteed cleanup, no error propagation, no
-completion tracking**
+
+⚠ no await, no supervision, no cancellation — exceptions silently swallowed
+
+consider: `asyncio.TaskGroup` or explicit awaiting
 
 <!-- this diagram shows it. create_task launches a task that runs off on its own with no structural connection back to the parent. no guaranteed reunion point. unstructured concurrency — the concurrent equivalent of goto spaghetti. -->
 
@@ -312,7 +314,9 @@ async def structured():
 
 ![anyio create task group](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_create_task_group.svg)
 
-**Scoped join = guaranteed cleanup, automatic error propagation, completion tracking built-in**
+✓ structured concurrency — no orphaned tasks
+
+cancellation · exception propagation · task supervision included
 
 <!-- compare this with the previous diagram. tasks are contained within the task group scope. they fan out, do work, fan back in. structured and predictable. -->
 
