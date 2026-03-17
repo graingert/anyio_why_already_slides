@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 510" width="750" height="510" font-family="'Courier New', monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 445" width="750" height="445" font-family="'Courier New', monospace">
   <defs>
     <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#0d1117"/>
@@ -53,7 +53,7 @@
   </defs>
 
   <!-- Background -->
-  <rect width="750" height="510" fill="url(#bgGrad)" rx="12"/>
+  <rect width="750" height="445" fill="url(#bgGrad)" rx="12"/>
 
   <!-- Subtle grid -->
   <g opacity="0.035" stroke="#3fb950" stroke-width="1">
@@ -68,7 +68,6 @@
     <line x1="0" y1="360" x2="750" y2="360"/>
     <line x1="0" y1="400" x2="750" y2="400"/>
     <line x1="0" y1="440" x2="750" y2="440"/>
-    <line x1="0" y1="480" x2="750" y2="480"/>
   </g>
 
   <!-- Title -->
@@ -145,6 +144,6 @@
   <text x="375" y="417" text-anchor="middle" fill="#d4a92a" font-size="10" font-family="'Courier New', monospace">all tasks joined ✓</text>
 
   <!-- Corner labels -->
-  <text x="14" y="504" fill="#30363d" font-size="10" font-family="'Courier New', monospace">anyio</text>
-  <text x="683" y="504" fill="#30363d" font-size="10" font-family="'Courier New', monospace">trio/asyncio</text>
+  <text x="14" y="439" fill="#30363d" font-size="10" font-family="'Courier New', monospace">anyio</text>
+  <text x="683" y="439" fill="#30363d" font-size="10" font-family="'Courier New', monospace">trio/asyncio</text>
 </svg>
