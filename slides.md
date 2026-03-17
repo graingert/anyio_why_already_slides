@@ -289,7 +289,7 @@ async def structured():
 
 # The Fix: Structured Concurrency
 
-<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_create_task_group.svg" alt="anyio create task group" style="display: block; margin: 0 auto;" width="400">
+<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_create_task_group.svg" alt="anyio create task group" style="display: block; margin: 0 auto;" width="700">
 
 ✓ structured concurrency — no orphaned tasks
 
