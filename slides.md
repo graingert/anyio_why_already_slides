@@ -695,15 +695,11 @@ async def to_process_run_sync(fn, *args):
 # Shielding in Detail: asyncio.shield
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_shield.svg" alt="asyncio.shield()" style="display: block; margin: 0 auto;" width="400">
 
+⚠ edge-triggered: outer coroutine receives `CancelledError` immediately, but the next checkpoint may still succeed — cancellation was "used up"
+
+**one-way valve** — Outer Future cancelled. Inner Task orphaned. Result silently discarded.
+
 <!-- in this diagram you can see the orphaned inner task running off on its own — same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
-
----
-# CancelScope(shield=True)
-<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_shield.svg" alt="CancelScope(shield=True)" style="display: block; margin: 0 auto;" width="400">
-
-<!-- compare: AnyIO shield wraps the entire scope. everything inside is protected. cancellation is held at the boundary and re-raised cleanly when you exit. structured and predictable. -->
-
----
 
 # Comparison
 
