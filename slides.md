@@ -23,6 +23,9 @@ https://graingert.co.uk/why-anyio-already
 
 ---
 <style scoped>section{font-size:22px;}</style>
+
+# Agenda
+
 * misconception: `asyncio` == `async`/`await`
 * the problems with `asyncio.create_task`
 * why you should use structured concurrency
@@ -94,9 +97,9 @@ list(gen)  # [1, 2, 3]  — no asyncio, no event loop
 
 # How AnyIO Dispatches to the Right Backend
 
-AnyIO calls either the asyncio API or the Trio API depending on what library is
-currently in use, this is similar in approach to libraries like `six` which let you write
-code compatible with Python 2 and Python 3
+- Uses `sniffio` to detect which async framework is currently running
+- Dispatches to the right backend API — asyncio or Trio
+- Similar in approach to `six`: write once, run on both
 
 <!-- so how does AnyIO work? it uses sniffio to detect which async framework is running, then dispatches to the right API. similar to how the old `six` library worked for Python 2/3 compat — write once, run on both asyncio and Trio. -->
 
@@ -310,7 +313,7 @@ async def structured():
 
 <style scoped>section { padding-top: 40px; }</style>
 
-## The Fix: Structured Concurrency
+# The Fix: Structured Concurrency
 
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_create_task_group.svg" alt="anyio create task group" style="display: block; margin: 0 auto;" width="400">
 
@@ -460,7 +463,7 @@ asyncio.run(main())
 
 ---
 
-## output
+# asyncio Output
 
 <!-- walk through it: task_with_finally sleeps, then in its finally block awaits a Future that never completes. crash_soon raises after 1 second. the TaskGroup cancels task_with_finally, but because cancellation is edge-triggered, the finally block's `await never` is NOT cancelled — it just hangs forever. you have to Ctrl+C multiple times to kill it. -->
 
@@ -474,7 +477,7 @@ awaiting never-completing future (WILL HANG)
 
 ---
 
-## Output after hitting Ctrl+C a few times:
+# Output after hitting Ctrl+C a few times
 ```sh
 task_with_finally running
 crash_soon raising
@@ -1054,7 +1057,7 @@ while True:
 
 ---
 
-## Quadratic performance in the inner loop
+# Quadratic Performance in the Inner Loop
 
 Every iteration of `while b"\n" in buffer` does `buffer = bytearray(rest)`,
 copying the remaining data each time. If you receive a chunk with many
