@@ -48,13 +48,14 @@ asyncio.create_task(myfunc())  # Fire and forget!
 - ❌ Functions aren't black boxes — hidden background tasks survive returns
 - ❌ Resource cleanup breaks — `async with` can't track orphaned tasks
 - ❌ Errors silently drop — no stack to propagate up
-- ❌ Return statements lie — "done" doesn't mean done
 
-<!-- create_task is a go statement. it's a one-way jump that breaks functions as black boxes, breaks resource cleanup, silently drops errors, and makes return statements lie. Dijkstra was right again. -->
+<!-- create_task is a go statement. it's a one-way jump that breaks functions as black boxes, breaks resource cleanup, and silently drops errors. -->
 
 ---
 
 # The Fix: Structured Concurrency with Task Groups
+
+*"structured" = tasks have a guaranteed reunion point with their parent*
 
 ```python
 # asyncio — UNSTRUCTURED 😰
@@ -71,9 +72,6 @@ async def structured():
     # BLOCKED until ALL tasks finish
     # Errors propagate. Cleanup happens. Actually done.
 ```
-
-**Task groups = `if`/`while`/`for` of concurrency**
-
 <!-- task groups are the fix. you can't leave the block until all children complete. errors propagate, cleanup happens, and when you return, you're actually done. -->
 
 ---
@@ -121,6 +119,8 @@ Edge cancellation = **your 0s timeout becomes a 1000s timeout**. With level canc
 ---
 
 # Shielded Cancel Scopes > `asyncio.shield`
+
+A CancelScope is a scoped region of code that can be cancelled or given a deadline.
 
 ```python
 # asyncio.shield — wraps ONE await, orphans process.wait(), edge-triggered 😬
