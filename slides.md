@@ -22,13 +22,14 @@ https://graingert.co.uk/why-anyio-already
 <!-- hi I'm Thomas Grainger, graingert on GitHub. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to CPython asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
 
 ---
-<style scoped>section{font-size:22px; padding-top:20px;}</style>
+<style scoped>section{font-size:20px; padding-top:20px;}</style>
 
 # Agenda
 
 * misconception: `asyncio` == `async`/`await`
 * the problems with `asyncio.create_task`
 * why you should use structured concurrency
+* getting a result from a task with `nonlocal`
 * "But I want to return without waiting!"
 * the two most important reasons to use AnyIO
 * edge cancellation vs level cancellation
@@ -299,6 +300,36 @@ cancellation · exception propagation · task supervision included
 -   **They let you reason about your code**
 
 <!-- this is the slide I want you to remember. create_task is goto. task groups are if/while/for. if someone told you to use goto in 2025 you'd laugh. start treating create_task the same way. -->
+
+---
+
+<style scoped>section { padding-top: 20px; }</style>
+
+# Getting a Result from a Task
+
+```python
+async def fetch_both(url1: str, url2: str) -> tuple[str, str]:
+    result1: str | None = None
+    result2: str | None = None
+
+    async def get1() -> None:
+        nonlocal result1
+        result1 = await fetch(url1)
+
+    async def get2() -> None:
+        nonlocal result2
+        result2 = await fetch(url2)
+
+    async with anyio.create_task_group() as tg:
+        tg.start_soon(get1)
+        tg.start_soon(get2)
+    # both tasks are done — results are ready
+    assert result1 is not None
+    assert result2 is not None
+    return result1, result2
+```
+
+<!-- tasks can't return values directly, but you can close over a nonlocal variable. each inner function sets its nonlocal when it finishes. after the task group exits, both results are guaranteed to be set — structured concurrency gives you that guarantee for free. -->
 
 ---
 
