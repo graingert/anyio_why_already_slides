@@ -1,5 +1,19 @@
 # Why You Should Use AnyIO (And Why You Might Already Have It)
 
+## Slides
+
+This repository contains two sets of slides built with [Marp](https://marp.app/):
+
+- **`slides.md`** — Full 40-minute talk: "Why you should use AnyIO and why you might already have it installed"
+- **`lightning.md`** — Lightning talk edition: "Why You Should Use AnyIO (and Why You Already Have It Installed)"
+
+### Generating PDFs
+
+```
+npx @marp-team/marp-cli@latest lightning.md --pdf --html
+npx @marp-team/marp-cli@latest slides.md --pdf --html
+```
+
 ## Abstract
 
 Async Python is fragmented—but you probably already have the solution installed. AnyIO is a portability layer for asyncio and Trio that fixes critical cancellation bugs and provides structured concurrency. If you use httpx, FastAPI, or Jupyter, AnyIO is already in your environment powering your HTTP clients, web frameworks, and notebooks.
