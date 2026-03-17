@@ -1,25 +1,23 @@
 ---
 marp: true
+html: true
 ---
 
-# Why you should use AnyIO and why you might already have it installed 
+# Why you should use AnyIO and why you might already have it installed
+
+https://graingert.co.uk/why-anyio-already
 
 <!-- right so this is a talk about AnyIO. you probably already have it installed and don't know it. I'm going to try and convince you to actually use it on purpose. -->
 
 ---
 
-https://graingert.co.uk/why-anyio-already
-![graingert](https://avatars.githubusercontent.com/u/413772)
-
-<!-- hi I'm Thomas Grainger, graingert on GitHub. slides are at that link. -->
-
----
+<img src="https://avatars.githubusercontent.com/u/413772" alt="graingert" style="display: block; margin: 0 auto;" width="400">
 
 - I am a core developer of AnyIO, Twisted and Trio (and a few non-async libraries)
 - I have made contributions to the asyncio happy eyeballs support and fixes to
   TaskGroup
 
-<!-- so I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
+<!-- hi I'm Thomas Grainger, graingert on GitHub. slides are at that link. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
 
 ---
 <style scoped>section{font-size:22px;}</style>
@@ -252,7 +250,7 @@ result = await mystery_function()
 
 ## The Root Cause: Unstructured Concurrency
 
-![create_task running off on its own](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg)
+<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg" alt="create_task running off on its own" style="display: block; margin: 0 auto;" width="400">
 
 ⚠ no await, no supervision, no cancellation — exceptions silently swallowed
 
@@ -312,7 +310,7 @@ async def structured():
 
 ## The Fix: Structured Concurrency
 
-![anyio create task group](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_create_task_group.svg)
+<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_create_task_group.svg" alt="anyio create task group" style="display: block; margin: 0 auto;" width="400">
 
 ✓ structured concurrency — no orphaned tasks
 
@@ -717,13 +715,13 @@ async def to_process_run_sync(fn, *args):
 ---
 
 ## asyncio.shield
-![asyncio.shield()](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_shield.svg)
+<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_shield.svg" alt="asyncio.shield()" style="display: block; margin: 0 auto;" width="400">
 
 <!-- in this diagram you can see the orphaned inner task running off on its own — same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
 
 ---
 ## CancelScope(shield=True)
-![CancelScope(shield=True)](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_shield.svg)
+<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_shield.svg" alt="CancelScope(shield=True)" style="display: block; margin: 0 auto;" width="400">
 
 <!-- compare: AnyIO shield wraps the entire scope. everything inside is protected. cancellation is held at the boundary and re-raised cleanly when you exit. structured and predictable. -->
 

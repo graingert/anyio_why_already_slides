@@ -1,5 +1,6 @@
 ---
 marp: true
+html: true
 ---
 
 # Why You Should Use AnyIO (and Why You Already Have It Installed)
@@ -11,7 +12,7 @@ marp: true
 ---
 
 https://graingert.co.uk/why-anyio-already
-![graingert](https://avatars.githubusercontent.com/u/413772)
+<img src="https://avatars.githubusercontent.com/u/413772" alt="graingert" style="display: block; margin: 0 auto;" width="400">
 
 - Core developer of AnyIO, Twisted, and Trio
 - Contributed to asyncio happy eyeballs + TaskGroup fixes
