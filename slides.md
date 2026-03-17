@@ -181,6 +181,7 @@ async def process_file(f):
 ```python
 async def background_task():
     raise ValueError("Something went wrong!")
+
 # Start background task
 task = asyncio.create_task(background_task())
 # Error happens... but where does it go?
@@ -201,6 +202,7 @@ Compare to regular Python:
 ```python
 def my_function():
     raise ValueError("Something went wrong!")
+
 my_function()  # Exception propagates to caller automatically
 ```
 
@@ -546,6 +548,7 @@ async def consume_ws():
         async for message in ws:
             await process(message)  # cancellation happens here
      # cancellation doesn't happen as we `__aexit__()` the context manager
+
 async def example():
     async with asyncio.timeout(10):
         await consume_ws()  # could hang forever
@@ -795,13 +798,16 @@ async def news_and_weather():
 
 ```python
 import asyncio
+
 async def main():
     q = asyncio.Queue()  # unbounded by default (!)
+
     async def producer():
         for i in range(3):
             print("put", i)
             await q.put(i)
         # How do we signal completion?
+
     async def consumer():
         while True:
             item = await q.get()
