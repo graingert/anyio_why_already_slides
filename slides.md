@@ -105,34 +105,6 @@ list(gen)  # [1, 2, 3]  — no asyncio, no event loop
 
 ---
 
-```python
-from sniffio import current_async_library
-async def sleep_for_one_loop_cycle():
-    if current_async_library() == "asyncio":
-        fut = asyncio.Future()
-        asyncio.create_task(set_fut_result_soon(fut))
-        await fut  # calls fut.__await__().send(None)
-    elif current_async_library() == "trio":
-        event = trio.Event()
-        trio.lowlevel.spawn_system_task(set_event_soon, event)
-        await event
-        """
-        this call calls
-            (
-                _async_yield(
-                    WaitTaskRescheduled(abort_func)
-                )
-                .__await__()
-                .send(outcome.Value(None))
-            )
-        """
-    else:  # Twisted?
-        raise RuntimeError("unsupported async framework")
-```
-
-<!-- here's a simplified view of what's happening under the hood. sniffio detects which library is running, then we call the right low-level API. notice how different the internals are — asyncio uses Futures and create_task, Trio uses Events and spawn_system_task with a completely different yield protocol. AnyIO abstracts all this away. -->
----
-
 # The Problem with `asyncio.create_task()`
 
 ## It's a "go statement" - and go statements break everything
@@ -413,7 +385,7 @@ anyio.run(example)
 
 ---
 
-# in asyncio
+# The asyncio Equivalent
 ```python
 import asyncio
 async def example():
@@ -593,7 +565,7 @@ awaiting never-completing future (WILL NOT HANG)
 
 ---
 
-This is still a problem when using WebSockets over TLS
+# Edge Cancellation with WebSockets over TLS
 
 ```python
 async def consume_ws():
@@ -624,6 +596,8 @@ Sometimes you can cancel the work, but you **must wait for it to finish dying**:
 
 ---
 
+# Cancellation Abandons the Work, Not the Task
+
 The async framework can raise `CancelledError` in your coroutine, but:
 - the **underlying thread keeps running**
 - a **terminated subprocess still needs to be joined**
@@ -634,6 +608,8 @@ You're not cancelling the work — you're just *abandoning* the future that was 
 <!-- key insight: when you cancel an executor task in asyncio, the thread keeps running. when you cancel a subprocess wrapper, the process might still be alive or needs joining. you've just abandoned the Future. the work is still happening, you just stopped paying attention to it. like hanging up the phone on someone mid-sentence. -->
 
 ---
+
+# Example: Windows IOCP Buffer Safety
 
 ```python
 # IOCP
@@ -706,7 +682,7 @@ async def to_process_run_sync(fn, *args):
 
 ---
 
-### Why it works
+# Why It Works
 
 ✅ **Level-triggered**: cancellation is *deferred*, not lost — re-fires when you leave the scope  
 ✅ **Process-aware**: `terminate()` + shielded `wait()` — kill it, then reap it  
@@ -723,14 +699,14 @@ async def to_process_run_sync(fn, *args):
 <!-- in this diagram you can see the orphaned inner task running off on its own — same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
 
 ---
-## CancelScope(shield=True)
+# CancelScope(shield=True)
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_shield.svg" alt="CancelScope(shield=True)" style="display: block; margin: 0 auto;" width="400">
 
 <!-- compare: AnyIO shield wraps the entire scope. everything inside is protected. cancellation is held at the boundary and re-raised cleanly when you exit. structured and predictable. -->
 
 ---
 
-## Comparison
+# Comparison
 
 | | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
 |---|---|---|
@@ -855,7 +831,7 @@ async def main():
 
 ---
 
-### Problems
+# Problems with `asyncio.Queue`
 
 -   ❌ Unbounded by default (no backpressure)
 
@@ -995,7 +971,7 @@ anyio.run(main)
 
 ---
 
-### Output + What Just Happened
+# Output + What Just Happened
 
 <!-- producer sends both lines in one chunk. consumer uses receive_until to split by newline. no manual buffer management, no partial read handling. it just works. -->
 
@@ -1036,9 +1012,9 @@ But you must manually:
 <!-- with raw Trio you have to do all this yourself. accumulate into a buffer, scan for delimiters, slice, handle partial frames, handle EOF. it's not rocket science but it's tedious and easy to get wrong. speaking of getting it wrong... -->
 
 ---
-Example (simplified):
+# Can You Spot the Bug?
 
-I asked ChatGPT and it gave me this — can you spot the bug?
+I asked ChatGPT for an example — can you spot the bug?
 
 ```python
 buffer = bytearray()
@@ -1352,6 +1328,8 @@ anyio==4.12.1
 <!-- look at this tree. starlette, FastAPI, MCP, httpx, Jupyter — they all depend on AnyIO. if you're using any modern Python web framework or data science tool you already have it installed. might as well use it. -->
 
 ---
+
+# Wrap Up
 
 * I've given you a whistle-stop tour of some of my favourite features, there's loads more
    * and more being added all the time
