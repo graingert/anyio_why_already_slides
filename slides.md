@@ -22,7 +22,7 @@ https://graingert.co.uk/why-anyio-already
 <!-- hi I'm Thomas Grainger, graingert on GitHub. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to CPython asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
 
 ---
-<style scoped>section{font-size:20px; padding-top:20px;}</style>
+<style scoped>section{font-size:22px; padding-top:10px;}</style>
 
 # Agenda
 
@@ -30,14 +30,13 @@ https://graingert.co.uk/why-anyio-already
 * the problems with `asyncio.create_task`
 * why you should use structured concurrency
 * getting a result from a task with `nonlocal`
-* "But I want to return without waiting!"
-* the two most important reasons to use AnyIO
+* "But I want to return without waiting!": application scoped task groups
+* the two most important reasons to use AnyIO: incrementally adoptable, cancellations are level-triggered
 * edge cancellation vs level cancellation
 * `asyncio.shield` vs shielded CancelScopes
 * some of my favourite AnyIO features
     * channels (memory object streams) > `asyncio.Queue`
-    * "If I'm already using Trio, I don't need AnyIO"
-    * `BufferedByteReceiveStream`
+    * "If I'm already using Trio, I don't need AnyIO": `BufferedByteReceiveStream`
     * `anyio.Path`
     * pytest plugin built in
     * summary of features not covered so far
