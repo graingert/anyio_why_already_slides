@@ -26,11 +26,11 @@ Target audience: Intermediate Python developers working with async code who want
 
 ### Talk Structure (40 minutes)
 
-**1. Misconception: `asyncio` != `async`/`await`**
+**1. Misconception: `asyncio` != `async`/`await` (1 min)**
 - `async`/`await` is syntactic sugar over generators — no event loop required
 - AnyIO dispatches to the right backend at runtime
 
-**2. The Problems with `asyncio.create_task()` (9 min)**
+**2. The Problems with `asyncio.create_task()` (8 min)**
 - Go statements break everything: one-way jumps, no guaranteed cleanup
 - Four core problems: functions aren't black boxes, resource cleanup breaks, error handling breaks, can't tell if code is finished
 - The root cause: unstructured concurrency
@@ -38,11 +38,11 @@ Target audience: Intermediate Python developers working with async code who want
 - The solution: structured concurrency with task groups
 - "But I want to return without waiting!": using a long-lived task group scoped to the application lifetime (FastAPI lifespan example with `except* Done` and `cancel_scope.cancel()` alternatives)
 
-**3. Two Most Important Reasons to Use AnyIO**
+**3. Two Most Important Reasons to Use AnyIO (1 min)**
 - Incrementally adoptable: drop into an existing asyncio codebase
 - Cancellations are level-triggered
 
-**4. Level vs Edge Cancellation (9 min)**
+**4. Level vs Edge Cancellation (8 min)**
 - Level-triggered cancellation: every `await` in a cancelled `CancelScope` raises `CancelledError`
 - Edge-triggered cancellation in asyncio: `CancelledError` is a one-shot event that can be swallowed
 - Live bug demo: asyncio code that hangs vs AnyIO code that fails fast
