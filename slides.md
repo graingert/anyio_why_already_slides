@@ -1138,18 +1138,16 @@ async def amain():
 ## Real Power: Parallel File Operations
 
 ```python
-# Process multiple files in parallel
-data_dir = anyio.Path("training_data")
-results = []
+import anyio
 
-async def process_and_append(p):
-    content = await p.read_text()
-    results.append(parse_csv(content))
+async def concurrently_chmod_all_csvs():
+    data_dir = anyio.Path("training_data")
+    async with anyio.create_task_group() as tg:
+        async for path in data_dir.iterdir():
+            if await path.is_file() and path.suffix == '.csv':
+                tg.start_soon(path.chmod, 0o644)
 
-async with anyio.create_task_group() as tg:
-    async for path in data_dir.iterdir():
-        if await path.is_file() and path.suffix == '.csv':
-            tg.start_soon(process_and_append, path)
+anyio.run(concurrently_chmod_all_csvs)
 # All files processed concurrently!
 ```
 
