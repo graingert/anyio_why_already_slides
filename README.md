@@ -62,7 +62,7 @@ Target audience: Intermediate Python developers working with async code who want
 - Why httpx, FastAPI, Jupyter, and Anthropic's MCP SDK chose AnyIO
 - You already have it installed—now you know how to use it directly
 
-**7. Q&A (1 min)**
+**7. Q&A (6 min)**
 
 ### Prior Knowledge Expected
 
