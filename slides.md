@@ -411,12 +411,8 @@ asyncio.run(example())
 <!-- now look at the same thing with asyncio. the first await raises CancelledError as expected. but in the finally block the cancellation has been consumed — it was edge-triggered, a one-shot event. so await asyncio.sleep(1000) actually waits 1000 seconds. your timeout of 0 becomes a timeout of 1000. this is a real class of bug. -->
 
 ---
-
-<style scoped>section { font-size: 99%; }</style>
-
+<style scoped>section { padding-top: 20px; }</style>
 # Deadlocks in asyncio
-
-edge cancellation can result in deadlocks on asyncio for example, the following program hangs:
 
 ```python
 import asyncio
@@ -587,14 +583,19 @@ awaiting never-completing future (WILL NOT HANG)
 # Edge Cancellation with WebSockets over TLS
 
 ```python
+import asyncio
+
 async def consume_ws():
     async with await connect_ws("wss://example.com/news") as ws:
         async for message in ws:
             await process(message)  # cancellation happens here
      # cancellation doesn't happen as we `__aexit__()` the context manager
+
 async def example():
     async with asyncio.timeout(10):
         await consume_ws()  # could hang forever
+
+asyncio.run(example())
 ```
 
 <!-- this isn't contrived. if you're using WebSockets over TLS, the TLS shutdown in __aexit__ involves awaiting I/O. with edge cancellation that await succeeds even though you're in a cancelled state, so your timeout becomes meaningless. your 10-second timeout could hang forever. -->
@@ -757,11 +758,13 @@ async def to_process_run_sync(fn, *args):
 
 ```python
 import anyio
+
 async def consume_ws(url, stream):
     with stream:              # sync — runs before first await
         async with await connect_ws(url) as ws:
             async for msg in ws:
                 await stream.send(msg)
+
 async def news_and_weather():
     tx, rx = anyio.create_memory_object_stream[bytes]()  # default buffer size = 0
     with tx, rx:
@@ -771,6 +774,7 @@ async def news_and_weather():
             tx.close()
             async for item in rx:
                 print(item)
+
 anyio.run(news_and_weather)
 ```
 
@@ -807,7 +811,12 @@ note the synchronous `with stream:` — AnyIO guarantees every start_soon'd task
 
 ---
 
-# `async with` or sync `with` closes streams automatically so there's a shortcut
+# `async with` shortcut
+
+<style scoped>section { padding-top: 20px; }</style>
+
+- `async with` = `with` for streams — automatic cleanup
+- Combine streams, task groups, etc. in one `async with`:
 
 ```python
 async def consume_ws(url, stream):
