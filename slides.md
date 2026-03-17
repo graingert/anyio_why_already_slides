@@ -945,24 +945,31 @@ AnyIO does.
 
 ---
 
+<style scoped>section { padding-top: 20px; }</style>
+
 # Demo --- AnyIO Buffered Byte Streams
 
 ```python
 import anyio
+
 async def main():
     send, receive = anyio.create_memory_object_stream[bytes]()
+
     async def producer():
         await send.send(b"hello\nworld\n")
         await send.aclose()
+
     async def consumer():
         buffered = anyio.streams.buffered.BufferedByteReceiveStream(receive)
         line1 = await buffered.receive_until(b"\n", 4096)
         print("line1:", line1)
         line2 = await buffered.receive_until(b"\n", 4096)
         print("line2:", line2)
+
     async with anyio.create_task_group() as tg:
         tg.start_soon(producer)
         tg.start_soon(consumer)
+
 anyio.run(main)
 ```
 
