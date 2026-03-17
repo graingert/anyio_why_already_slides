@@ -334,7 +334,7 @@ async def process(data: str):
 
 # "But I want to return without waiting!" (continued)
 
-- On Trio: `trio.lowlevel.spawn_system_task()` spawns into a system nursery that lives for the entire `trio.run()`
+- On Trio: `trio.lowlevel.spawn_system_task()` spawns into a system nursery (Trio's name for a TaskGroup) that lives for the entire `trio.run()`
 - AnyIO can't provide a portable `anyio.spawn_system_task()` — asyncio has no equivalent global supervised task group, only the unstructured `asyncio.create_task()`
 
 <!-- trio has spawn_system_task for this pattern natively. anyio can't abstract over it because asyncio has no equivalent — there's no global supervised nursery, only the unstructured create_task. the FastAPI lifespan pattern is the asyncio-compatible solution. -->
