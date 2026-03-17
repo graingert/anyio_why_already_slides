@@ -126,7 +126,9 @@ A CancelScope is a scoped region of code that can be cancelled or given a deadli
 # asyncio.shield - wraps ONE await, orphans process.wait(), edge-triggered 😬
 await asyncio.shield(process.wait())
 # can't reliably terminate + join: edge cancellation breaks the cleanup
+```
 
+```python
 # AnyIO - terminate the process, shield the join, no zombies 😎
 process.terminate()
 with anyio.CancelScope(shield=True):
