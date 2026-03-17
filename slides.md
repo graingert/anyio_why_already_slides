@@ -208,25 +208,6 @@ my_function()  # Exception propagates to caller automatically
 
 ---
 
-# Problem 4: You Can't Tell If Code Is Finished
-
-```python
-async def mystery_function():
-    await do_something()
-    return "done"
-
-result = await mystery_function()
-# Is mystery_function actually done?
-# Or did it spawn tasks that are still running?
-# NO WAY TO KNOW!
-```
-
-**The "return" statement lies to you**
-
-<!-- when mystery_function returns "done", is it actually done? no way to know without reading every line of code it calls. the return statement lies to you. this is the most insidious problem. -->
-
----
-
 # The Root Cause: Unstructured Concurrency
 
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg" alt="create_task running off on its own" style="display: block; margin: 0 auto;" width="400">
@@ -297,33 +278,6 @@ cancellation · exception propagation · task supervision included
 
 ---
 
-# Dijkstra Was Right (Again)
-
-In 1968, Dijkstra showed that **goto statements break abstraction**
-
-In 2018, we learned that **go statements do the same thing**
-
-| goto (1960s) | asyncio.create_task() (2010s) |
-|--------------|-------------------------------|
-| One-way jump | One-way jump |
-| Breaks function boundaries | Breaks function boundaries |
-| No automatic cleanup | No automatic cleanup |
-| No error propagation | No error propagation |
-| Makes code impossible to reason about | Makes code impossible to reason about |
-
-<!-- the parallel to Dijkstra's goto paper is striking. every problem with goto in the 60s maps directly to create_task today. one-way jumps, broken function boundaries, no cleanup, no error propagation. history is rhyming. -->
-
----
-
-# The Same Solution
-
-* **Solution then:** Remove goto, add structured control flow (if/while/functions)
-* **Solution now:** Remove create_task, add structured concurrency (task groups)
-
-<!-- same solution. in the 60s we removed goto and replaced it with structured control flow. now we remove create_task and replace it with task groups. -->
-
----
-
 # Key Takeaway
 
 **`asyncio.create_task()` is the `goto` of concurrency**
@@ -389,6 +343,7 @@ anyio.run(example)
 ---
 
 # The asyncio Equivalent
+
 ```python
 import asyncio
 
@@ -455,6 +410,7 @@ awaiting never-completing future (WILL HANG)
 ---
 
 # Output after hitting Ctrl+C a few times
+
 ```sh
 task_with_finally running
 crash_soon raising
