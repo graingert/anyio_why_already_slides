@@ -82,7 +82,7 @@ list(gen)  # [1, 2, 3]  — no asyncio, no event loop
 
 ---
 
-For more generator tricks see also:
+# Further Reading: Generator Tricks
 
 - [Generator Tricks for Systems Programmers](https://graingert.co.uk/dabeaz-gen) — `graingert.co.uk/dabeaz-gen`
 - [A Curious Course on Coroutines and Concurrency](https://graingert.co.uk/dabeaz-coro) — `graingert.co.uk/dabeaz-coro`
@@ -92,8 +92,9 @@ For more generator tricks see also:
 
 ---
 
-This means libraries like AnyIO can call either the asyncio API or the
-Trio API depending on what library is currently in use:
+# How AnyIO Dispatches to the Right Backend
+
+AnyIO calls either the asyncio API or the Trio API depending on what library is currently in use:
 
 This is similar in approach to libraries like `six` which let you write
 code compatible with Python 2 and Python 3
@@ -522,7 +523,7 @@ KeyboardInterrupt
 
 ---
 
-example with anyio
+# The Same Example with AnyIO
 
 ```python
 import asyncio
@@ -550,7 +551,7 @@ asyncio.run(main())
 
 ---
 
-output:
+# AnyIO Output
 
 <!-- same program with anyio.create_task_group. only change is using anyio.create_task_group instead of asyncio.TaskGroup. because AnyIO uses level-triggered cancellation, when crash_soon raises, the cancellation of task_with_finally persists into its finally block. the `await never` is immediately cancelled too. no hang. -->
 ```sh
@@ -1088,15 +1089,7 @@ This is a real ergonomic upgrade.
 
 <!-- receive_exactly, receive_until, proper EOF, efficient buffering, works on both backends. real ergonomic upgrade. -->
 
----
-- Trio gives you safety.
-- AnyIO gives you safety **plus portability and batteries included.**
-
-<!-- to summarise: Trio gives you safety. AnyIO gives you safety plus portability and batteries. no downside. -->
-
----
-
-citation:
+# Further Reading
 
 -   https://github.com/python-trio/trio/issues/796
 -   https://github.com/groove-x/trio-util/issues/22
@@ -1197,7 +1190,7 @@ async def test_something():
 
 ---
 * By default the plugin runs your tests under both asyncio and Trio
-* if you're still gradually migrating to AnyIO and still only supportasyncio support
+* if you're still gradually migrating to AnyIO and still call asyncio APIs directly
 * you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
 
 ```python
@@ -1311,7 +1304,7 @@ Watch the tree unfold: loads of packages you use daily depend on AnyIO
 
 ---
 
-output:
+# `pipdeptree` Output
 ```
 anyio==4.12.1
 ├── starlette==0.52.1 [requires: anyio>=3.6.2,<5]
