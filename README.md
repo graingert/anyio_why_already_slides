@@ -26,38 +26,43 @@ Target audience: Intermediate Python developers working with async code who want
 
 ### Talk Structure (40 minutes)
 
-**1. The Problem with `asyncio.create_task()` (9 min)**
+**1. Misconception: `asyncio` != `async`/`await`**
+- `async`/`await` is syntactic sugar over generators — no event loop required
+- AnyIO dispatches to the right backend at runtime
+
+**2. The Problems with `asyncio.create_task()` (9 min)**
 - Go statements break everything: one-way jumps, no guaranteed cleanup
 - Four core problems: functions aren't black boxes, resource cleanup breaks, error handling breaks, can't tell if code is finished
 - The root cause: unstructured concurrency
 - Real-world consequences in data pipelines
 - The solution: structured concurrency with task groups
+- "But I want to return without waiting!": using a long-lived task group scoped to the application lifetime (FastAPI lifespan example with `except* Done` and `cancel_scope.cancel()` alternatives)
 
-**2. Level vs Edge Cancellation (9 min)**
-- Edge-triggered cancellation in asyncio: cancellation is a one-shot signal that can be swallowed
+**3. Two Most Important Reasons to Use AnyIO**
+- Incrementally adoptable: drop into an existing asyncio codebase
+- Cancellations are level-triggered
+
+**4. Level vs Edge Cancellation (9 min)**
+- Level-triggered cancellation: every `await` in a cancelled `CancelScope` raises `CancelledError`
+- Edge-triggered cancellation in asyncio: `CancelledError` is a one-shot event that can be swallowed
 - Live bug demo: asyncio code that hangs vs AnyIO code that fails fast
-- Why this causes production failures: timeouts that don't timeout, cleanup that never happens
-- How AnyIO's level-triggered cancellation ensures cancelled tasks stay cancelled
+- Deadlocks in asyncio caused by edge cancellation
+- `asyncio.shield` (duct-tape approach) vs AnyIO shielded `CancelScope` (structured approach)
 
-**3. Building Real Applications (10 min)**
-- Memory object streams: producer-consumer with backpressure by default (vs asyncio.Queue)
-- Getting results from task groups: nonlocal pattern vs memory streams
+**5. Building Real Applications (10 min)**
+- Memory object streams: producer-consumer with backpressure by default (vs `asyncio.Queue`)
+- "If I'm already using Trio, I don't need AnyIO" — rebuttal: AnyIO adds buffered byte streams, stapled streams, memory object streams, and more on top of Trio
 - Buffered byte streams: why AnyIO adds value even on Trio
 - `anyio.Path`: truly async file operations
 - pytest plugin: test under both asyncio and Trio
 
-**4. Ecosystem & Migration (6 min)**
-- Major adopters revealed by pipdeptree
-- Migration patterns: `asyncio.gather()` → task groups, `asyncio.Queue` → memory streams
-- Why PyPI distribution matters: bugfixes on all Python versions
-- Why data scientists should care
-
-**5. The Hidden Dependency Reveal (5 min)**
+**6. Ecosystem & The Hidden Dependency Reveal (6 min)**
+- The advantage of being on PyPI: bugfixes on all Python versions
 - Live demo: `pipdeptree -p anyio -r` reveals dozens of packages depend on AnyIO
 - Why httpx, FastAPI, Jupyter, and Anthropic's MCP SDK chose AnyIO
 - You already have it installed—now you know how to use it directly
 
-**6. Q&A (1 min)**
+**7. Q&A (1 min)**
 
 ### Prior Knowledge Expected
 
