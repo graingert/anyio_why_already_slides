@@ -1067,7 +1067,7 @@ AnyIO does.
 # Demo --- AnyIO Buffered Byte Streams
 
 ```python
-import anyio
+import anyio.streams.buffered
 
 async def main():
     send, receive = anyio.create_memory_object_stream[bytes]()
