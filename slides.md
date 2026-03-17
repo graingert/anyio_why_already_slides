@@ -326,10 +326,16 @@ class State(TypedDict):
 class ProcessResponse(BaseModel):
     status: str
 
+class Done(Exception): pass
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
-    async with anyio.create_task_group() as tg:
-        yield State(tg=tg)
+    try:
+        async with anyio.create_task_group() as tg:
+            yield State(tg=tg)
+            raise Done
+    except* Done:
+        pass
 
 app = FastAPI(lifespan=lifespan)
 
@@ -340,6 +346,25 @@ async def process(data: str, request: Request[State]) -> ProcessResponse:
 ```
 
 <!-- the task group lives for the lifetime of the app. individual requests can start_soon without waiting — fire and forget from the endpoint's point of view. but the tasks are still supervised: errors propagate, and on shutdown the lifespan context waits for all tasks to finish before the server exits. -->
+
+---
+
+# Zooming in: the lifespan context
+
+```python
+class Done(Exception): pass
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
+    try:
+        async with anyio.create_task_group() as tg:
+            yield State(tg=tg)
+            raise Done
+    except* Done:
+        pass
+```
+
+<!-- `yield` — app is running, tasks can be started. `raise Done` — on shutdown, raises Done inside the task group, which wraps it in an ExceptionGroup. `except* Done` — the except* syntax unpacks the ExceptionGroup and handles Done branches, cleanly absorbing the shutdown signal so it doesn't propagate as an error. -->
 
 ---
 
