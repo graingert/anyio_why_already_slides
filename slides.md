@@ -1299,6 +1299,8 @@ Watch the tree unfold: loads of packages you use daily depend on AnyIO
 
 ---
 
+<style scoped>section { padding-top: 20px; }</style>
+
 # `pipdeptree` Output
 ```
 anyio==4.12.1
