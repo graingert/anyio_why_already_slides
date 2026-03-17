@@ -323,8 +323,8 @@ cancellation · exception propagation · task supervision included
 
 # Level-Triggered Cancellation
 
-With level cancellation every async operation in a cancelled CancelScope will fail
-with a `CancelledError`
+With level cancellation every async operation in a cancelled CancelScope (a scoped
+region of code that can be cancelled or given a deadline) will fail with a `CancelledError`
 
 ```python
 import anyio
