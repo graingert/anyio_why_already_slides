@@ -27,11 +27,11 @@ https://graingert.co.uk/why-anyio-already
 
 # Misconception: `asyncio` == `async`/`await`
 
-- `async`/`await` is **syntactic sugar over generators** — decoupled from asyncio
+- `async`/`await` is **syntactic sugar over generators** - decoupled from asyncio
 - Twisted, Trio, Curio all use the same syntax with different event loops
 - AnyIO uses `sniffio` to detect which framework is running, dispatches to the right API
 
-<!-- first: async/await is NOT asyncio. it's just generators. multiple frameworks use the same syntax — AnyIO detects which one you're running and does the right thing. like `six` for async frameworks. -->
+<!-- first: async/await is NOT asyncio. it's just generators. multiple frameworks use the same syntax - AnyIO detects which one you're running and does the right thing. like `six` for async frameworks. -->
 
 ---
 
@@ -45,9 +45,9 @@ asyncio.create_task(myfunc())  # Fire and forget!
 
 **One-way jump** → same problems as `goto`:
 
-- ❌ Functions aren't black boxes — hidden background tasks survive returns
-- ❌ Resource cleanup breaks — `async with` can't track orphaned tasks
-- ❌ Errors silently drop — no stack to propagate up
+- ❌ Functions aren't black boxes - hidden background tasks survive returns
+- ❌ Resource cleanup breaks - `async with` can't track orphaned tasks
+- ❌ Errors silently drop - no stack to propagate up
 
 <!-- create_task is a go statement. it's a one-way jump that breaks functions as black boxes, breaks resource cleanup, and silently drops errors. -->
 
@@ -58,13 +58,13 @@ asyncio.create_task(myfunc())  # Fire and forget!
 *"structured" = tasks have a guaranteed reunion point with their parent*
 
 ```python
-# asyncio — UNSTRUCTURED 😰
+# asyncio - UNSTRUCTURED 😰
 async def unstructured():
     asyncio.create_task(myfunc())  # fire and forget
     asyncio.create_task(other())   # errors go nowhere
     return  # are we done? who knows!
 
-# AnyIO — STRUCTURED 😌
+# AnyIO - STRUCTURED 😌
 async def structured():
     async with anyio.create_task_group() as tg:
         tg.start_soon(myfunc)
@@ -79,8 +79,8 @@ async def structured():
 # Level Cancellation vs Edge Cancellation
 <table>
 <tr>
-<th>AnyIO — level-triggered ✅</th>
-<th>asyncio — edge-triggered ❌</th>
+<th>AnyIO - level-triggered ✅</th>
+<th>asyncio - edge-triggered ❌</th>
 </tr>
 <tr>
 <td>
@@ -114,7 +114,7 @@ async with asyncio.timeout(0):
 
 Edge cancellation = **your 0s timeout becomes a 1000s timeout**. With level cancellation every `await` in a cancelled scope fails. No surprises.
 
-<!-- this is the other killer feature. asyncio's edge-triggered cancellation is consumed after one catch — your finally block escapes the timeout. AnyIO's level-triggered cancellation persists. your timeouts actually mean something. -->
+<!-- this is the other killer feature. asyncio's edge-triggered cancellation is consumed after one catch - your finally block escapes the timeout. AnyIO's level-triggered cancellation persists. your timeouts actually mean something. -->
 
 ---
 
@@ -123,18 +123,18 @@ Edge cancellation = **your 0s timeout becomes a 1000s timeout**. With level canc
 A CancelScope is a scoped region of code that can be cancelled or given a deadline.
 
 ```python
-# asyncio.shield — wraps ONE await, orphans process.wait(), edge-triggered 😬
+# asyncio.shield - wraps ONE await, orphans process.wait(), edge-triggered 😬
 await asyncio.shield(process.wait())
 # can't reliably terminate + join: edge cancellation breaks the cleanup
 
-# AnyIO — terminate the process, shield the join, no zombies 😎
+# AnyIO - terminate the process, shield the join, no zombies 😎
 process.terminate()
 with anyio.CancelScope(shield=True):
     await process.wait()  # reap the process even under cancellation
 # Pending cancellation reliably re-raised here
 ```
 
-<!-- asyncio.shield wraps one await and orphans the task. with subprocesses you need to terminate AND join — but edge cancellation makes the join unreliable. AnyIO CancelScope shields the join, reaps the process, and defers cancellation cleanly. no zombies. -->
+<!-- asyncio.shield wraps one await and orphans the task. with subprocesses you need to terminate AND join - but edge cancellation makes the join unreliable. AnyIO CancelScope shields the join, reaps the process, and defers cancellation cleanly. no zombies. -->
 
 ---
 
@@ -142,11 +142,11 @@ with anyio.CancelScope(shield=True):
 
 # Batteries Included: Memory Object Streams
 
-- **Memory object streams** — `asyncio.Queue` but with backpressure, `clone()`, structured shutdown, and `async for`
+- **Memory object streams** - `asyncio.Queue` but with backpressure, `clone()`, structured shutdown, and `async for`
 
 ```python
 async def consume_ws(url, stream):
-    with stream:              # sync — runs before first await
+    with stream:              # sync - runs before first await
         async with await connect_ws(url) as ws:
             async for msg in ws:
                 await stream.send(msg)
@@ -160,19 +160,19 @@ async with tx, rx, anyio.create_task_group() as tg:
         print(item)
 ```
 
-AnyIO runs tasks to their first `await` before cancellation — so `with stream:` always closes the clone
+AnyIO runs tasks to their first `await` before cancellation - so `with stream:` always closes the clone
 
-<!-- memory streams: each producer gets a clone, synchronous `with stream:` runs before any await so the clone is always closed even under cancellation — AnyIO guarantees tasks reach their first await before cancellation is delivered. -->
+<!-- memory streams: each producer gets a clone, synchronous `with stream:` runs before any await so the clone is always closed even under cancellation - AnyIO guarantees tasks reach their first await before cancellation is delivered. -->
 
 ---
 
 # Batteries Included: More
 
-- **`BufferedByteReceiveStream`** — `receive_until(delimiter)`, `receive_exactly(n)` — even Trio doesn't have this
-- **`anyio.Path`** — async drop-in for `pathlib` (no more blocking the event loop)
-- **Built-in pytest plugin** — `@pytest.mark.anyio`, no need for `pytest-asyncio`
-- **Networking** — TCP/UDP/TLS/subprocesses with Happy Eyeballs built in
-- **PyPI-shipped bugfixes** — don't wait for a new Python release to fix TaskGroup
+- **`BufferedByteReceiveStream`** - `receive_until(delimiter)`, `receive_exactly(n)` - even Trio doesn't have this
+- **`anyio.Path`** - async drop-in for `pathlib` (no more blocking the event loop)
+- **Built-in pytest plugin** - `@pytest.mark.anyio`, no need for `pytest-asyncio`
+- **Networking** - TCP/UDP/TLS/subprocesses with Happy Eyeballs built in
+- **PyPI-shipped bugfixes** - don't wait for a new Python release to fix TaskGroup
 
 <!-- buffered byte reads Trio doesn't have, async pathlib, built-in pytest plugin, full networking stack, and bugfixes that ship on PyPI. -->
 
@@ -193,17 +193,17 @@ anyio==4.12.1
 
 httpx? FastAPI? Jupyter? MCP? **AnyIO is already in your virtualenv.**
 
-<!-- normally I'd say pip install anyio. but that's the punchline — if you've ever installed httpx, FastAPI, Jupyter, or MCP, you already have it. might as well `await` yourself of it. -->
+<!-- normally I'd say pip install anyio. but that's the punchline - if you've ever installed httpx, FastAPI, Jupyter, or MCP, you already have it. might as well `await` yourself of it. -->
 
 ---
 
 # TL;DR
 
-1. `asyncio.create_task()` is `goto` — use **task groups** instead
+1. `asyncio.create_task()` is `goto` - use **task groups** instead
 2. **Level-triggered cancellation** prevents real bugs that edge cancellation causes
-3. **Batteries included** — streams, paths, pytest, networking
-4. **You already have it installed** — start using it on purpose
+3. **Batteries included** - streams, paths, pytest, networking
+4. **You already have it installed** - start using it on purpose
 
 ### graingert on GitHub · `graingert.co.uk/why-anyio-already`
 
-<!-- structured concurrency, level cancellation, great batteries, already installed. give it a go — it won't leave you hanging. thanks! -->
+<!-- structured concurrency, level cancellation, great batteries, already installed. give it a go - it won't leave you hanging. thanks! -->

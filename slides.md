@@ -19,7 +19,7 @@ https://graingert.co.uk/why-anyio-already
 - Contributed to CPython asyncio happy eyeballs + TaskGroup fixes
 - Member of PyPy, pytest-dev, PyCQA, Dask orgs
 
-<!-- hi I'm Thomas Grainger, graingert on GitHub. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to CPython asyncio itself — the happy eyeballs implementation and various TaskGroup fixes. -->
+<!-- hi I'm Thomas Grainger, graingert on GitHub. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to CPython asyncio itself - the happy eyeballs implementation and various TaskGroup fixes. -->
 
 ---
 <style scoped>section{font-size:22px; padding-top:10px;}</style>
@@ -49,11 +49,11 @@ https://graingert.co.uk/why-anyio-already
 
 # asyncio != async/await
 
-- `async`/`await` is syntactic sugar over generators — completely decoupled from any event loop
+- `async`/`await` is syntactic sugar over generators - completely decoupled from any event loop
 - Twisted, Trio, and Curio all use `async`/`await` with their own event loops
 - You can even use `async`/`await` with no event loop at all
 
-<!-- async/await is NOT asyncio. it's just syntax built on top of the generator protocol. any framework can drive coroutines — Twisted, Trio, Curio all do it with completely different event loops. and as I'll show you, you don't even need an event loop. -->
+<!-- async/await is NOT asyncio. it's just syntax built on top of the generator protocol. any framework can drive coroutines - Twisted, Trio, Curio all do it with completely different event loops. and as I'll show you, you don't even need an event loop. -->
 
 ---
 
@@ -72,7 +72,7 @@ async def async_range():
     await _async_yield(3)
 ```
 
-<!-- types.coroutine bridges the generator protocol to the coroutine protocol. _async_yield is a raw coroutine that just yields a value. async_range is a normal async function built on top — no asyncio anywhere. -->
+<!-- types.coroutine bridges the generator protocol to the coroutine protocol. _async_yield is a raw coroutine that just yields a value. async_range is a normal async function built on top - no asyncio anywhere. -->
 
 ---
 
@@ -81,18 +81,18 @@ async def async_range():
 ```python
 coro = async_range()
 gen = coro.__await__()
-list(gen)  # [1, 2, 3]  — no asyncio, no event loop
+list(gen)  # [1, 2, 3]  - no asyncio, no event loop
 ```
 
-<!-- grab the __await__ iterator, drain it into a list. that's it. no event loop, no scheduler, just generators. this is how multiple async frameworks can coexist — they're all just driving the same generator protocol underneath. -->
+<!-- grab the __await__ iterator, drain it into a list. that's it. no event loop, no scheduler, just generators. this is how multiple async frameworks can coexist - they're all just driving the same generator protocol underneath. -->
 
 ---
 
 # Further Reading: Generator Tricks
 
-- [Generator Tricks for Systems Programmers](https://graingert.co.uk/dabeaz-gen) — `graingert.co.uk/dabeaz-gen`
-- [A Curious Course on Coroutines and Concurrency](https://graingert.co.uk/dabeaz-coro) — `graingert.co.uk/dabeaz-coro`
-- [Generators: The Final Frontier](https://graingert.co.uk/dabeaz-final) — `graingert.co.uk/dabeaz-final`
+- [Generator Tricks for Systems Programmers](https://graingert.co.uk/dabeaz-gen) - `graingert.co.uk/dabeaz-gen`
+- [A Curious Course on Coroutines and Concurrency](https://graingert.co.uk/dabeaz-coro) - `graingert.co.uk/dabeaz-coro`
+- [Generators: The Final Frontier](https://graingert.co.uk/dabeaz-final) - `graingert.co.uk/dabeaz-final`
 
 <!-- if you want to go deeper on generators, David Beazley's talks are brilliant. these three progressively build from basic generators to full coroutine-based concurrency. -->
 
@@ -101,10 +101,10 @@ list(gen)  # [1, 2, 3]  — no asyncio, no event loop
 # How AnyIO Dispatches to the Right Backend
 
 - Uses `sniffio` to detect which async framework is currently running
-- Dispatches to the right backend API — asyncio or Trio
+- Dispatches to the right backend API - asyncio or Trio
 - Similar in approach to `six`: write once, run on both
 
-<!-- so how does AnyIO work? it uses sniffio to detect which async framework is running, then dispatches to the right API. similar to how the old `six` library worked for Python 2/3 compat — write once, run on both asyncio and Trio. -->
+<!-- so how does AnyIO work? it uses sniffio to detect which async framework is running, then dispatches to the right API. similar to how the old `six` library worked for Python 2/3 compat - write once, run on both asyncio and Trio. -->
 
 ---
 
@@ -134,7 +134,7 @@ threading.Thread(target=myfunc).start()  # Also same
 -   Child jumps to myfunc and runs unsupervised
 -   No guaranteed reunion point
 
-<!-- it's the same pattern everywhere — asyncio.create_task, Go's `go` keyword, threading.Thread.start. parent spawns a child and immediately moves on. child runs off unsupervised. no guaranteed reunion point. this one-way jump is the root of all the problems. -->
+<!-- it's the same pattern everywhere - asyncio.create_task, Go's `go` keyword, threading.Thread.start. parent spawns a child and immediately moves on. child runs off unsupervised. no guaranteed reunion point. this one-way jump is the root of all the problems. -->
 
 ---
 
@@ -175,7 +175,7 @@ async def process_file(f):
 
 **The language can't help you with automatic cleanup**
 
-<!-- concrete example. you open a file in an async with block, pass the handle to process_file, block exits, file closes. but if process_file secretly spawned a background task still reading from that handle — boom, error on a closed file. async with can't protect you because it doesn't know about the orphaned task. context managers are broken. -->
+<!-- concrete example. you open a file in an async with block, pass the handle to process_file, block exits, file closes. but if process_file secretly spawned a background task still reading from that handle - boom, error on a closed file. async with can't protect you because it doesn't know about the orphaned task. context managers are broken. -->
 
 ---
 
@@ -192,7 +192,7 @@ task = asyncio.create_task(background_task())
 # (Maybe printed to console if you're lucky)
 ```
 
-<!-- errors in background tasks have nowhere to go. in sync Python, exceptions propagate up the call stack automatically. but a fire-and-forget task is an orphan — the error gets silently dropped. maybe asyncio prints a warning to the console if you're lucky, but your program keeps running in a broken state. -->
+<!-- errors in background tasks have nowhere to go. in sync Python, exceptions propagate up the call stack automatically. but a fire-and-forget task is an orphan - the error gets silently dropped. maybe asyncio prints a warning to the console if you're lucky, but your program keeps running in a broken state. -->
 
 ---
 
@@ -217,11 +217,11 @@ my_function()  # Exception propagates to caller automatically
 
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg" alt="create_task running off on its own" style="display: block; margin: 0 auto;" width="700">
 
-⚠ no await, no supervision, no cancellation — exceptions silently swallowed
+⚠ no await, no supervision, no cancellation - exceptions silently swallowed
 
 consider: `asyncio.TaskGroup` or explicit awaiting
 
-<!-- this diagram shows it. create_task launches a task that runs off on its own with no structural connection back to the parent. no guaranteed reunion point. unstructured concurrency — the concurrent equivalent of goto spaghetti. -->
+<!-- this diagram shows it. create_task launches a task that runs off on its own with no structural connection back to the parent. no guaranteed reunion point. unstructured concurrency - the concurrent equivalent of goto spaghetti. -->
 
 ---
 
@@ -265,7 +265,7 @@ async def structured():
     return  # NOW we're actually done
 ```
 
-<!-- here's the fix: task groups. you can't exit the async with block until ALL child tasks have finished. errors propagate automatically. cleanup happens automatically. when the function returns, it's actually done. this is structured concurrency — same revolution that if/while/for brought to control flow. -->
+<!-- here's the fix: task groups. you can't exit the async with block until ALL child tasks have finished. errors propagate automatically. cleanup happens automatically. when the function returns, it's actually done. this is structured concurrency - same revolution that if/while/for brought to control flow. -->
 
 ---
 
@@ -275,7 +275,7 @@ async def structured():
 
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_create_task_group.svg" alt="anyio create task group" style="display: block; margin: 0 auto;" width="700">
 
-✓ structured concurrency — no orphaned tasks
+✓ structured concurrency - no orphaned tasks
 
 cancellation · exception propagation · task supervision included
 
@@ -322,19 +322,19 @@ async def fetch_both(url1: str, url2: str) -> tuple[str, str]:
     async with anyio.create_task_group() as tg:
         tg.start_soon(get1)
         tg.start_soon(get2)
-    # both tasks are done — results are ready
+    # both tasks are done - results are ready
     assert result1 is not None
     assert result2 is not None
     return result1, result2
 ```
 
-<!-- tasks can't return values directly, but you can close over a nonlocal variable. each inner function sets its nonlocal when it finishes. after the task group exits, both results are guaranteed to be set — structured concurrency gives you that guarantee for free. -->
+<!-- tasks can't return values directly, but you can close over a nonlocal variable. each inner function sets its nonlocal when it finishes. after the task group exits, both results are guaranteed to be set - structured concurrency gives you that guarantee for free. -->
 
 ---
 
 # "But I want to return without waiting!"
 
-Sometimes you genuinely need to kick off work and respond immediately — e.g. a web endpoint that accepts a job and returns `202 Accepted`.
+Sometimes you genuinely need to kick off work and respond immediately - e.g. a web endpoint that accepts a job and returns `202 Accepted`.
 
 The answer: a **long-lived task group** scoped to the application lifetime.
 
@@ -378,7 +378,7 @@ async def process(data: str, request: Request[State]) -> ProcessResponse:
     return ProcessResponse(status="accepted")
 ```
 
-<!-- the task group lives for the lifetime of the app. individual requests can start_soon without waiting — fire and forget from the endpoint's point of view. but the tasks are still supervised: errors propagate, and on shutdown the lifespan context waits for all tasks to finish before the server exits. -->
+<!-- the task group lives for the lifetime of the app. individual requests can start_soon without waiting - fire and forget from the endpoint's point of view. but the tasks are still supervised: errors propagate, and on shutdown the lifespan context waits for all tasks to finish before the server exits. -->
 
 ---
 
@@ -397,7 +397,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
         pass
 ```
 
-<!-- `yield` — app is running, tasks can be started. `raise Done` — on shutdown, raises Done inside the task group, which wraps it in an ExceptionGroup. `except* Done` — the except* syntax unpacks the ExceptionGroup and handles Done branches, cleanly absorbing the shutdown signal so it doesn't propagate as an error. -->
+<!-- `yield` - app is running, tasks can be started. `raise Done` - on shutdown, raises Done inside the task group, which wraps it in an ExceptionGroup. `except* Done` - the except* syntax unpacks the ExceptionGroup and handles Done branches, cleanly absorbing the shutdown signal so it doesn't propagate as an error. -->
 
 ---
 
@@ -411,16 +411,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
         tg.cancel_scope.cancel()
 ```
 
-<!-- simpler alternative: cancel_scope.cancel() directly cancels the task group's scope on shutdown, so child tasks receive Cancelled and stop immediately. no exception propagates out of the async with block — no except* needed. this is the idiomatic AnyIO way to stop a task group. the Done/except* version is more verbose but demonstrates Python 3.11's ExceptionGroup and except* syntax, which is worth knowing for error handling in concurrent code. both approaches cancel in-flight tasks rather than waiting for them to finish. -->
+<!-- simpler alternative: cancel_scope.cancel() directly cancels the task group's scope on shutdown, so child tasks receive Cancelled and stop immediately. no exception propagates out of the async with block - no except* needed. this is the idiomatic AnyIO way to stop a task group. the Done/except* version is more verbose but demonstrates Python 3.11's ExceptionGroup and except* syntax, which is worth knowing for error handling in concurrent code. both approaches cancel in-flight tasks rather than waiting for them to finish. -->
 
 ---
 
 # "But I want to return without waiting!" (continued)
 
 - On Trio: `trio.lowlevel.spawn_system_task()` spawns into a system nursery (Trio's name for a TaskGroup) that lives for the entire `trio.run()`
-- AnyIO can't provide a portable `anyio.spawn_system_task()` — asyncio has no equivalent global supervised task group, only the unstructured `asyncio.create_task()`
+- AnyIO can't provide a portable `anyio.spawn_system_task()` - asyncio has no equivalent global supervised task group, only the unstructured `asyncio.create_task()`
 
-<!-- trio has spawn_system_task for this pattern natively. anyio can't abstract over it because asyncio has no equivalent — there's no global supervised nursery, only the unstructured create_task. the FastAPI lifespan pattern is the asyncio-compatible solution. -->
+<!-- trio has spawn_system_task for this pattern natively. anyio can't abstract over it because asyncio has no equivalent - there's no global supervised nursery, only the unstructured create_task. the FastAPI lifespan pattern is the asyncio-compatible solution. -->
 
 ---
 
@@ -434,15 +434,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
 ["Go To Statement Considered Harmful" (1968)](https://graingert.co.uk/dijkstra68)\
 `graingert.co.uk/dijkstra68`
 
-<!-- njs's blog post is the definitive argument for structured concurrency. and Dijkstra's original paper is a surprisingly easy read — it's only a page long. -->
+<!-- njs's blog post is the definitive argument for structured concurrency. and Dijkstra's original paper is a surprisingly easy read - it's only a page long. -->
 
 ---
 
 # Two most important reasons to use AnyIO
-* incrementally adoptable — drop into an existing asyncio codebase, and your code automatically works on Trio too
+* incrementally adoptable - drop into an existing asyncio codebase, and your code automatically works on Trio too
 * cancellations are level-triggered
 
-<!-- two biggest selling points. first: it's additive — you can sprinkle it into an existing asyncio codebase and optionally add Trio support later. second, and this is the one I really care about: cancellations are level-triggered. this is subtle but it prevents real bugs. -->
+<!-- two biggest selling points. first: it's additive - you can sprinkle it into an existing asyncio codebase and optionally add Trio support later. second, and this is the one I really care about: cancellations are level-triggered. this is subtle but it prevents real bugs. -->
 
 ---
 
@@ -471,7 +471,7 @@ anyio.run(example)
 
 # Edge-Triggered Cancellation (asyncio)
 
-With edge cancellation, `CancelledError` is a one-shot event — once consumed, the next await succeeds even inside a cancelled scope.
+With edge cancellation, `CancelledError` is a one-shot event - once consumed, the next await succeeds even inside a cancelled scope.
 
 ```python
 import asyncio
@@ -487,7 +487,7 @@ async def example():
 asyncio.run(example())
 ```
 
-<!-- now look at the same thing with asyncio. the first await raises CancelledError as expected. but in the finally block the cancellation has been consumed — it was edge-triggered, a one-shot event. so await asyncio.sleep(1000) actually waits 1000 seconds. your timeout of 0 becomes a timeout of 1000. this is a real class of bug. -->
+<!-- now look at the same thing with asyncio. the first await raises CancelledError as expected. but in the finally block the cancellation has been consumed - it was edge-triggered, a one-shot event. so await asyncio.sleep(1000) actually waits 1000 seconds. your timeout of 0 becomes a timeout of 1000. this is a real class of bug. -->
 
 ---
 <style scoped>section { padding-top: 20px; }</style>
@@ -520,13 +520,13 @@ async def main():
 
 asyncio.run(main())
 ```
-<!-- edge cancellation doesn't just cause slowdowns — it can deadlock. here's a real example that hangs. -->
+<!-- edge cancellation doesn't just cause slowdowns - it can deadlock. here's a real example that hangs. -->
 
 ---
 
 # asyncio Output
 
-<!-- walk through it: task_with_finally sleeps, then in its finally block awaits a Future that never completes. crash_soon raises after 1 second. the TaskGroup cancels task_with_finally, but because cancellation is edge-triggered, the finally block's `await never` is NOT cancelled — it just hangs forever. you have to Ctrl+C multiple times to kill it. -->
+<!-- walk through it: task_with_finally sleeps, then in its finally block awaits a Future that never completes. crash_soon raises after 1 second. the TaskGroup cancels task_with_finally, but because cancellation is edge-triggered, the finally block's `await never` is NOT cancelled - it just hangs forever. you have to Ctrl+C multiple times to kill it. -->
 
 ```sh
 $ python demo.py
@@ -583,7 +583,7 @@ Traceback (most recent call last):
 KeyboardInterrupt
 ```
 
-<!-- that's a lot of traceback just to say "your program hung and you had to kill it". the program didn't exit cleanly — we had to interrupt it multiple times. the actual error from crash_soon only surfaces after we force-kill the process. -->
+<!-- that's a lot of traceback just to say "your program hung and you had to kill it". the program didn't exit cleanly - we had to interrupt it multiple times. the actual error from crash_soon only surfaces after we force-kill the process. -->
 
 ---
 
@@ -656,7 +656,7 @@ awaiting never-completing future (WILL NOT HANG)
     +------------------------------------
 ```
 
-<!-- clean exit, clear traceback, no hanging, no Ctrl+C. the program terminates immediately with the actual error. notice "WILL NOT HANG" — the await never was properly cancelled by level-triggered cancellation. -->
+<!-- clean exit, clear traceback, no hanging, no Ctrl+C. the program terminates immediately with the actual error. notice "WILL NOT HANG" - the await never was properly cancelled by level-triggered cancellation. -->
 
 ---
 
@@ -664,10 +664,10 @@ awaiting never-completing future (WILL NOT HANG)
 
 <style scoped>section { padding-top: 20px; }</style>
 
-- Cancellation fires inside `process()` — but the `async with` still runs `__aexit__`
+- Cancellation fires inside `process()` - but the `async with` still runs `__aexit__`
 - WebSocket `__aexit__` does a TLS shutdown, which **awaits I/O**
 - With edge cancellation, that await **succeeds** even in a cancelled state
-- So the timeout is bypassed — your 10-second limit can hang forever
+- So the timeout is bypassed - your 10-second limit can hang forever
 
 ```python
 async def consume_ws():
@@ -687,15 +687,15 @@ async def example():
 
 # Shielding from Cancellation
 
-## When you *can't* just walk away — even after cancelling
+## When you *can't* just walk away - even after cancelling
 
 Sometimes you can cancel the work, but you **must wait for it to finish dying**:
 
-- Subprocesses (`anyio.to_process.run_sync`): you can `terminate()` the process, but you must still `wait()` to join it — otherwise you get zombie processes
-- Waiting for a thread to finish (`loop.run_in_executor`, `anyio.to_thread.run_sync`) — threads can't be interrupted at all
+- Subprocesses (`anyio.to_process.run_sync`): you can `terminate()` the process, but you must still `wait()` to join it - otherwise you get zombie processes
+- Waiting for a thread to finish (`loop.run_in_executor`, `anyio.to_thread.run_sync`) - threads can't be interrupted at all
 - On Windows IOCP (Proactor): cancelled operations complete with `ERROR_OPERATION_ABORTED`, and you must wait for the completion packet before freeing memory
 
-<!-- sometimes you can cancel the work but you can't just walk away. subprocesses are the perfect example: you can terminate the process, but you MUST still join it afterwards. if you don't wait, you get zombie processes. threads are worse — you can't even cancel them. and on Windows IOCP the OS must acknowledge the cancel before you can free memory. this is where shielding comes in. -->
+<!-- sometimes you can cancel the work but you can't just walk away. subprocesses are the perfect example: you can terminate the process, but you MUST still join it afterwards. if you don't wait, you get zombie processes. threads are worse - you can't even cancel them. and on Windows IOCP the OS must acknowledge the cancel before you can free memory. this is where shielding comes in. -->
 
 ---
 
@@ -706,7 +706,7 @@ The async framework can raise `CancelledError` in your coroutine, but:
 - a **terminated subprocess still needs to be joined**
 - **something still needs to wait to be able to clear memory**
 
-You're not cancelling the work — you're just *abandoning* the future that was watching it. 👻
+You're not cancelling the work - you're just *abandoning* the future that was watching it. 👻
 
 <!-- key insight: when you cancel an executor task in asyncio, the thread keeps running. when you cancel a subprocess wrapper, the process might still be alive or needs joining. you've just abandoned the Future. the work is still happening, you just stopped paying attention to it. like hanging up the phone on someone mid-sentence. -->
 
@@ -730,7 +730,7 @@ finally:
 
 ---
 
-# `asyncio.shield` — The Duct-Tape Approach
+# `asyncio.shield` - The Duct-Tape Approach
 
 ```python
 async def run_in_process(fn, *args):
@@ -742,7 +742,7 @@ async def run_in_process(fn, *args):
     except asyncio.CancelledError:
         process.terminate()
         # ⚠️ Edge cancellation: the next await might succeed
-        # even though we're "cancelled" — so we can't reliably
+        # even though we're "cancelled" - so we can't reliably
         # join the process here
         await process.wait()  # might wait forever!
 ```
@@ -756,13 +756,13 @@ async def run_in_process(fn, *args):
 ❌ **Edge-triggered**: a `CancelledError` sneaks through on the *next* checkpoint after the shield exits  
 ❌ **Orphaned inner task**: the shielded `process.wait()` keeps running with no owner  
 ❌ **No scope**: shield applies to one `await`, not a logical block (terminate + join)  
-❌ **Can't compose terminate + join**: need to shield the wait, then join, then re-raise — but edge cancellation makes the join unreliable
+❌ **Can't compose terminate + join**: need to shield the wait, then join, then re-raise - but edge cancellation makes the join unreliable
 
 <!-- four problems. shield only wraps one await. the inner task is orphaned. and the critical issue for subprocesses: you need to terminate AND join as a single logical unit, but shield can't express that. edge cancellation means the join in the except block might not be cancelled, so it waits forever. -->
 
 ---
 
-# AnyIO Shielded Cancel Scopes — The Structured Approach
+# AnyIO Shielded Cancel Scopes - The Structured Approach
 
 ```python
 # Simplified implementation of anyio.to_process.run_sync
@@ -781,14 +781,14 @@ async def to_process_run_sync(fn, *args):
     # Pending cancellation is re-raised after the shielded join
 ```
 
-<!-- AnyIO's approach is fundamentally different. when cancellation hits, we terminate the process, then shield the join. CancelScope with shield=True protects the wait — the process is properly reaped even under cancellation. pending cancellation is deferred and reliably re-raised after we exit the shield. no zombies, no orphans. -->
+<!-- AnyIO's approach is fundamentally different. when cancellation hits, we terminate the process, then shield the join. CancelScope with shield=True protects the wait - the process is properly reaped even under cancellation. pending cancellation is deferred and reliably re-raised after we exit the shield. no zombies, no orphans. -->
 
 ---
 
 # Why It Works
 
-✅ **Level-triggered**: cancellation is *deferred*, not lost — re-fires when you leave the scope  
-✅ **Process-aware**: `terminate()` + shielded `wait()` — kill it, then reap it  
+✅ **Level-triggered**: cancellation is *deferred*, not lost - re-fires when you leave the scope  
+✅ **Process-aware**: `terminate()` + shielded `wait()` - kill it, then reap it  
 ✅ **Scoped**: protect the whole terminate-and-join block, not just one `await`  
 ✅ **No zombies**: structured concurrency means every process is joined
 
@@ -799,11 +799,11 @@ async def to_process_run_sync(fn, *args):
 # Shielding in Detail: asyncio.shield
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_shield.svg" alt="asyncio.shield()" style="display: block; margin: 0 auto;" width="400">
 
-⚠ edge-triggered: outer coroutine receives `CancelledError` immediately, but the next checkpoint may still succeed — cancellation was "used up"
+⚠ edge-triggered: outer coroutine receives `CancelledError` immediately, but the next checkpoint may still succeed - cancellation was "used up"
 
-**one-way valve** — Outer Future cancelled. Inner Task orphaned. Result silently discarded.
+**one-way valve** - Outer Future cancelled. Inner Task orphaned. Result silently discarded.
 
-<!-- in this diagram you can see the orphaned inner task running off on its own — same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
+<!-- in this diagram you can see the orphaned inner task running off on its own - same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
 
 ---
 
@@ -818,13 +818,13 @@ async def to_process_run_sync(fn, *args):
 | Orphaned tasks | ❌ Yes | ✅ Never |
 | Composable | ❌ Not really | ✅ Nests with task groups |
 
-<!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. the process case makes this crystal clear — you need to shield a multi-step cleanup sequence. -->
+<!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. the process case makes this crystal clear - you need to shield a multi-step cleanup sequence. -->
 
 ---
 
 # More AnyIO Features: Backpressure by Default. Structured. Composable.
 
-<!-- ok we've covered the big conceptual stuff — structured concurrency and level-triggered cancellation. now let me show you some practical features I like. -->
+<!-- ok we've covered the big conceptual stuff - structured concurrency and level-triggered cancellation. now let me show you some practical features I like. -->
 
 * AnyIO provides `MemoryObjectSendStream` and `MemoryObjectReceiveStream`
 * like `asyncio.Queue` but you don't need to keep a count of how many producer/consumers you have
@@ -833,7 +833,7 @@ async def to_process_run_sync(fn, *args):
   * Once all the clones of one end of the memory object stream are closed
   iterating the other end will raise StopAsyncIteration.
 
-<!-- memory object streams are like asyncio.Queue but designed right. the killer feature is clone() — each producer/consumer gets their own clone, and when all clones of one end are closed the other end gets a clean StopAsyncIteration. no sentinel values, no manual counting, no shutdown coordination. -->
+<!-- memory object streams are like asyncio.Queue but designed right. the killer feature is clone() - each producer/consumer gets their own clone, and when all clones of one end are closed the other end gets a clean StopAsyncIteration. no sentinel values, no manual counting, no shutdown coordination. -->
 
 ---
 
@@ -843,7 +843,7 @@ async def to_process_run_sync(fn, *args):
 import anyio
 
 async def consume_ws(url, stream):
-    with stream:              # sync — runs before first await
+    with stream:              # sync - runs before first await
         async with await connect_ws(url) as ws:
             async for msg in ws:
                 await stream.send(msg)
@@ -863,7 +863,7 @@ anyio.run(news_and_weather)
 
 <!-- look how clean this is. two WebSocket consumers, each with a clone of the send stream, feeding a single receive stream. when both producers finish their clones close, original tx is already closed, so the async for on rx terminates naturally. fully structured shutdown with zero boilerplate. default buffer size is 0 so you get backpressure for free.
 
-note the synchronous `with stream:` — AnyIO guarantees every start_soon'd task runs to its first await point before cancellation is delivered. the sync with runs before any await, so __exit__ always fires and the clone is always closed. no leaked clones, no phantom senders keeping rx open forever. -->
+note the synchronous `with stream:` - AnyIO guarantees every start_soon'd task runs to its first await point before cancellation is delivered. the sync with runs before any await, so __exit__ always fires and the clone is always closed. no leaked clones, no phantom senders keeping rx open forever. -->
 
 ---
 
@@ -877,20 +877,20 @@ note the synchronous `with stream:` — AnyIO guarantees every start_soon'd task
 
 -   ✅ `aclose()` or `close()` signals end-of-stream
 
--   ✅ `clone()` enables multiple consumers safely — use `async with` or sync `with` to gain ownership and automatically close:
+-   ✅ `clone()` enables multiple consumers safely - use `async with` or sync `with` to gain ownership and automatically close:
 
     ```python
     async def consume_ws(url, stream):
-        with stream:          # sync — runs before first await
+        with stream:          # sync - runs before first await
             async with await connect_ws(url) as ws:
                 ...
 
     tg.start_soon(consume_ws, url, tx.clone())
     ```
 
--   ✅ Structured shutdown — tasks always run to their first `await` before cancellation, so `with stream:` always closes the clone
+-   ✅ Structured shutdown - tasks always run to their first `await` before cancellation, so `with stream:` always closes the clone
 
-<!-- five properties you want from inter-task communication. you get them all for free just by using memory object streams instead of asyncio.Queue. the clone pattern is safe because AnyIO guarantees start_soon'd tasks reach their first checkpoint before cancellation — and the synchronous with stream runs before any await, so the clone is always closed. -->
+<!-- five properties you want from inter-task communication. you get them all for free just by using memory object streams instead of asyncio.Queue. the clone pattern is safe because AnyIO guarantees start_soon'd tasks reach their first checkpoint before cancellation - and the synchronous with stream runs before any await, so the clone is always closed. -->
 
 ---
 
@@ -898,7 +898,7 @@ note the synchronous `with stream:` — AnyIO guarantees every start_soon'd task
 
 <style scoped>section { padding-top: 20px; }</style>
 
-- `async with` = `with` for streams — automatic cleanup
+- `async with` = `with` for streams - automatic cleanup
 - Combine streams, task groups, etc. in one `async with`:
 
 ```python
@@ -917,7 +917,7 @@ async def news_and_weather():
             print(item)
 ```
 
-<!-- async with gives you automatic cleanup of streams just like files. stacking tx, rx, and the task group into a single async with means you get structured ownership — everything is closed and joined together, in the right order, even under cancellation or exceptions. note: `async with stream` is safe here — MemoryObjectStream.__aenter__ just returns self without yielding, so it's not a real checkpoint and the structured shutdown guarantee from the previous slide still holds. -->
+<!-- async with gives you automatic cleanup of streams just like files. stacking tx, rx, and the task group into a single async with means you get structured ownership - everything is closed and joined together, in the right order, even under cancellation or exceptions. note: `async with stream` is safe here - MemoryObjectStream.__aenter__ just returns self without yielding, so it's not a real checkpoint and the structured shutdown guarantee from the previous slide still holds. -->
 
 ---
 
@@ -941,7 +941,7 @@ async def main():
             print("got", item)
 ```
 
-<!-- here's the equivalent with asyncio.Queue. notice the problems immediately: unbounded by default, no async iteration, and — how do you signal completion? there's no mechanism. you end up with sentinel values or manual counters. -->
+<!-- here's the equivalent with asyncio.Queue. notice the problems immediately: unbounded by default, no async iteration, and - how do you signal completion? there's no mechanism. you end up with sentinel values or manual counters. -->
 
 ---
 
@@ -1016,13 +1016,13 @@ Most people assume this. But AnyIO adds real value even on the Trio backend.
 
 -   ✅ Thread/subprocess/subinterpreter helpers
 
-<!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include — buffered streams, memory object streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
+<!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include - buffered streams, memory object streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
 
 ---
 
 # Trio vs AnyIO
 
-- Trio is a minimal framework — only gives you what is mandatory of a network framework
+- Trio is a minimal framework - only gives you what is mandatory of a network framework
 - AnyIO is a portability + abstraction layer with batteries included.
 
 If you write a library directly against Trio:
@@ -1135,7 +1135,7 @@ But you must manually:
 ---
 # Can You Spot the Bug?
 
-I asked ChatGPT for an example — can you spot the bug?
+I asked ChatGPT for an example - can you spot the bug?
 
 ```python
 buffer = bytearray()
@@ -1186,9 +1186,9 @@ This is a real ergonomic upgrade.
 
 # Further Reading
 
--   [github.com/python-trio/trio/issues/796](https://github.com/python-trio/trio/issues/796) — Provide standard mechanism for splitting a stream into lines
--   [github.com/groove-x/trio-util/issues/22](https://github.com/groove-x/trio-util/issues/22) — Add a LineReader?
--   [github.com/python-trio/trio/issues/562](https://github.com/python-trio/trio/issues/562) — Get N items from Channel
+-   [github.com/python-trio/trio/issues/796](https://github.com/python-trio/trio/issues/796) - Provide standard mechanism for splitting a stream into lines
+-   [github.com/groove-x/trio-util/issues/22](https://github.com/groove-x/trio-util/issues/22) - Add a LineReader?
+-   [github.com/python-trio/trio/issues/562](https://github.com/python-trio/trio/issues/562) - Get N items from Channel
 
 <!-- these are the Trio issues where buffered streams were discussed and ultimately not added to Trio itself. AnyIO fills this gap. -->
 
@@ -1281,7 +1281,7 @@ async def test_something():
     assert await something() == "result"
 ```
 
-<!-- AnyIO ships with its own pytest plugin — the same one it uses to test itself. so if you already depend on AnyIO you don't need pytest-asyncio. just @pytest.mark.anyio and you're done. -->
+<!-- AnyIO ships with its own pytest plugin - the same one it uses to test itself. so if you already depend on AnyIO you don't need pytest-asyncio. just @pytest.mark.anyio and you're done. -->
 
 ---
 # Limiting the Plugin to asyncio
@@ -1298,33 +1298,33 @@ def anyio_backend():
 <!-- by default the plugin runs tests on both asyncio and Trio, which is great for catching backend-specific bugs. if you're still migrating and only need asyncio, add this fixture to your conftest. -->
 ---
 
-# But `await` there's more! — Networking & I/O
+# But `await` there's more! - Networking & I/O
 
 | Feature | Benefit |
 |---|---|
 | **TCP/UDP/UNIX sockets** | Happy Eyeballs built in; async/await UDP (no Transports/Protocols) |
 | **TLS streams** | `TLSStream` wraps any byte stream with TLS, not just sockets |
 | **Subprocesses** | `run_process()` / `open_process()` with async stream I/O on stdin/stdout/stderr |
-| **Signal handling** | `open_signal_receiver()` — async iterator over OS signals |
+| **Signal handling** | `open_signal_receiver()` - async iterator over OS signals |
 
 <!-- but await, there's more. AnyIO has a full networking stack. TCP, UDP, Unix sockets with Happy Eyeballs built in. TLS that wraps any byte stream, not just sockets. subprocesses with async stream I/O. signal handling as an async iterator. -->
 
 ---
 
-# But `await` there's more! — Streams & Concurrency
+# But `await` there's more! - Streams & Concurrency
 
 | Feature | Benefit |
 |---|---|
 | **`TextReceiveStream`** | Incremental UTF-8 decoding over any byte stream |
 | **`StapledStream`** | Combine separate send/receive streams into one bidirectional stream |
-| **`tg.start()`** | `await tg.start(server_fn)` — blocks until the task signals it's ready |
-| **Synchronization primitives** | `Lock`, `Condition`, `Event`, `Semaphore`, `CapacityLimiter` — portable across backends |
+| **`tg.start()`** | `await tg.start(server_fn)` - blocks until the task signals it's ready |
+| **Synchronization primitives** | `Lock`, `Condition`, `Event`, `Semaphore`, `CapacityLimiter` - portable across backends |
 
-<!-- more batteries: TextReceiveStream for incremental UTF-8 decoding, StapledStream for combining send/receive, tg.start() which blocks until a task signals it's ready — great for server startup — and all the sync primitives you'd expect, portable across backends. -->
+<!-- more batteries: TextReceiveStream for incremental UTF-8 decoding, StapledStream for combining send/receive, tg.start() which blocks until a task signals it's ready - great for server startup - and all the sync primitives you'd expect, portable across backends. -->
 
 ---
 
-# But `await` there's more! — Threads, Testing & Beyond
+# But `await` there's more! - Threads, Testing & Beyond
 
 | Feature | Benefit |
 |---|---|
@@ -1344,7 +1344,7 @@ or 3.12:
 
 https://docs.python.org/3/whatsnew/3.13.html#asyncio
 
-<!-- practical advantage of AnyIO being a pip-installable package. in Python 3.13 important TaskGroup bugfixes landed — like fixing deadlocks when nested task groups both have failing children. but these were considered breaking changes and weren't backported to 3.11 or 3.12. -->
+<!-- practical advantage of AnyIO being a pip-installable package. in Python 3.13 important TaskGroup bugfixes landed - like fixing deadlocks when nested task groups both have failing children. but these were considered breaking changes and weren't backported to 3.11 or 3.12. -->
 
 > Improve the behavior of
 > [TaskGroup](https://docs.python.org/3/library/asyncio-task.html#asyncio.TaskGroup)
@@ -1368,14 +1368,14 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 # Asyncio is not bad
 
 * it's better than Twisted (I once spent a week fixing a missing `six` call
-  — a whole class of bug that doesn't exist with asyncio)
+  - a whole class of bug that doesn't exist with asyncio)
 * but try making an LDAP server without Twisted!
 * *some* of the mistakes Twisted made were copied into asyncio
 * Curio is good! Unfortunately it's archived
 * Trio isn't perfect: it's slower than asyncio, especially with uvloop
 * AnyIO gives you options and batteries to play with
 
-<!-- I want to be fair: asyncio is not bad. it's a huge improvement over Twisted — I once spent a week debugging a missing `six` call, a whole class of bug that can't exist with asyncio. but try making an LDAP server without Twisted! Curio was great but it's archived. Trio is excellent but slower than asyncio. AnyIO gives you options. -->
+<!-- I want to be fair: asyncio is not bad. it's a huge improvement over Twisted - I once spent a week debugging a missing `six` call, a whole class of bug that can't exist with asyncio. but try making an LDAP server without Twisted! Curio was great but it's archived. Trio is excellent but slower than asyncio. AnyIO gives you options. -->
 
 ---
 
@@ -1386,7 +1386,7 @@ Normally at this stage of my talk I'd ask you to go run
 but if you're in this room you probably already have it in your virtual
 environments!
 
-<!-- normally at this point I'd tell you to go pip install AnyIO. but that's the punchline — you probably already have it. if you've installed httpx, FastAPI, Jupyter, MCP, or any number of popular packages, AnyIO is already in your virtualenv. -->
+<!-- normally at this point I'd tell you to go pip install AnyIO. but that's the punchline - you probably already have it. if you've installed httpx, FastAPI, Jupyter, MCP, or any number of popular packages, AnyIO is already in your virtualenv. -->
 
 ---
 
@@ -1450,20 +1450,20 @@ anyio==4.12.1
             └── jupyter==1.1.1 [requires: jupyterlab]
 ```
 
-<!-- look at this tree. starlette, FastAPI, MCP, httpx, Jupyter — they all depend on AnyIO. if you're using any modern Python web framework or data science tool you already have it installed. might as well use it. -->
+<!-- look at this tree. starlette, FastAPI, MCP, httpx, Jupyter - they all depend on AnyIO. if you're using any modern Python web framework or data science tool you already have it installed. might as well use it. -->
 
 ---
 
 # If you've installed any of these...
 
-- `httpx` — the HTTP client
-- `fastapi` — async web framework
-- `jupyter` — data science notebooks
-- `mcp` — Anthropic's Model Context Protocol SDK
+- `httpx` - the HTTP client
+- `fastapi` - async web framework
+- `jupyter` - data science notebooks
+- `mcp` - Anthropic's Model Context Protocol SDK
 
 ...AnyIO was already there.
 
-<!-- the point isn't just that it's popular — it's that you've been benefiting from AnyIO's correctness guarantees without knowing it. might as well start using it intentionally. -->
+<!-- the point isn't just that it's popular - it's that you've been benefiting from AnyIO's correctness guarantees without knowing it. might as well start using it intentionally. -->
 
 ---
 
@@ -1484,14 +1484,14 @@ anyio==4.12.1
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 
 **Further reading:**
-- [graingert.co.uk/trio-sc](https://graingert.co.uk/trio-sc) — Go statement considered harmful (njs)
-- [graingert.co.uk/dijkstra68](https://graingert.co.uk/dijkstra68) — Go To Statement Considered Harmful (1968)
-- [graingert.co.uk/dabeaz-gen](https://graingert.co.uk/dabeaz-gen) — Generator Tricks for Systems Programmers
-- [graingert.co.uk/dabeaz-coro](https://graingert.co.uk/dabeaz-coro) — A Curious Course on Coroutines and Concurrency
-- [graingert.co.uk/dabeaz-final](https://graingert.co.uk/dabeaz-final) — Generators: The Final Frontier
-- [docs.python.org/3/whatsnew/3.13.html#asyncio](https://docs.python.org/3/whatsnew/3.13.html#asyncio) — Python 3.13 asyncio changes
-- [github.com/python-trio/trio/issues/796](https://github.com/python-trio/trio/issues/796) — Provide standard mechanism for splitting a stream into lines
-- [github.com/groove-x/trio-util/issues/22](https://github.com/groove-x/trio-util/issues/22) — Add a LineReader?
-- [github.com/python-trio/trio/issues/562](https://github.com/python-trio/trio/issues/562) — Get N items from Channel
+- [graingert.co.uk/trio-sc](https://graingert.co.uk/trio-sc) - Go statement considered harmful (njs)
+- [graingert.co.uk/dijkstra68](https://graingert.co.uk/dijkstra68) - Go To Statement Considered Harmful (1968)
+- [graingert.co.uk/dabeaz-gen](https://graingert.co.uk/dabeaz-gen) - Generator Tricks for Systems Programmers
+- [graingert.co.uk/dabeaz-coro](https://graingert.co.uk/dabeaz-coro) - A Curious Course on Coroutines and Concurrency
+- [graingert.co.uk/dabeaz-final](https://graingert.co.uk/dabeaz-final) - Generators: The Final Frontier
+- [docs.python.org/3/whatsnew/3.13.html#asyncio](https://docs.python.org/3/whatsnew/3.13.html#asyncio) - Python 3.13 asyncio changes
+- [github.com/python-trio/trio/issues/796](https://github.com/python-trio/trio/issues/796) - Provide standard mechanism for splitting a stream into lines
+- [github.com/groove-x/trio-util/issues/22](https://github.com/groove-x/trio-util/issues/22) - Add a LineReader?
+- [github.com/python-trio/trio/issues/562](https://github.com/python-trio/trio/issues/562) - Get N items from Channel
 
 <!-- thanks! happy to take questions. I'm graingert on GitHub. -->
