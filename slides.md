@@ -386,7 +386,9 @@ anyio.run(example)
 
 ---
 
-# The asyncio Equivalent
+# Edge-Triggered Cancellation (asyncio)
+
+With edge cancellation, `CancelledError` is a one-shot event — once consumed, the next await succeeds even inside a cancelled scope.
 
 ```python
 import asyncio
