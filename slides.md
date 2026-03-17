@@ -1102,9 +1102,11 @@ citation:
 
 ```python
 from pathlib import Path
+
 async def amain():
     # ⚠️ These all BLOCK the event loop!
     path = Path("data.txt")
+
     path.write_text("Hello!")      # Blocks
     content = path.read_text()     # Blocks
     exists = path.exists()         # Blocks
@@ -1118,6 +1120,7 @@ async def amain():
 
 ```python
 import anyio
+
 async def amain():
     # ✅ All truly async - doesn't block!
     path = anyio.Path("data.txt")
@@ -1138,9 +1141,11 @@ async def amain():
 # Process multiple files in parallel
 data_dir = anyio.Path("training_data")
 results = []
+
 async def process_and_append(p):
     content = await p.read_text()
     results.append(parse_csv(content))
+
 async with anyio.create_task_group() as tg:
     async for path in data_dir.iterdir():
         if await path.is_file() and path.suffix == '.csv':
