@@ -701,6 +701,8 @@ async def to_process_run_sync(fn, *args):
 
 <!-- in this diagram you can see the orphaned inner task running off on its own — same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
 
+---
+
 # Comparison
 
 | | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
