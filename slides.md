@@ -368,6 +368,20 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
 
 ---
 
+# Zooming in: the lifespan context (alternative)
+
+```python
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
+    async with anyio.create_task_group() as tg:
+        yield State(tg=tg)
+        tg.cancel_scope.cancel()
+```
+
+<!-- simpler alternative: cancel_scope.cancel() directly cancels the task group's scope on shutdown, so child tasks receive Cancelled and stop immediately. no exception propagates out of the async with block — no except* needed. this is the idiomatic AnyIO way to stop a task group. the Done/except* version is more verbose but demonstrates Python 3.11's ExceptionGroup and except* syntax, which is worth knowing for error handling in concurrent code. both approaches cancel in-flight tasks rather than waiting for them to finish. -->
+
+---
+
 # "But I want to return without waiting!" (continued)
 
 - On Trio: `trio.lowlevel.spawn_system_task()` spawns into a system nursery (Trio's name for a TaskGroup) that lives for the entire `trio.run()`
