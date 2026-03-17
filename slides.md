@@ -136,7 +136,7 @@ async def sleep_for_one_loop_cycle():
 
 <!-- ok this is the core of the talk. asyncio.create_task is what njs calls a "go statement". it's a one-way jump that splits control flow and it's fundamentally broken for the same reasons goto was broken. -->
 
-------------------------------------------------------------------------
+---
 
 ## What's a "go statement"?
 
@@ -158,7 +158,7 @@ threading.Thread(target=myfunc).start()  # Also same
 
 <!-- it's the same pattern everywhere — asyncio.create_task, Go's `go` keyword, threading.Thread.start. parent spawns a child and immediately moves on. child runs off unsupervised. no guaranteed reunion point. this one-way jump is the root of all the problems. -->
 
-------------------------------------------------------------------------
+---
 
 ## Problem 1: Functions Aren't Black Boxes Anymore
 
@@ -177,7 +177,7 @@ Every function call might secretly spawn tasks that outlive the function
 
 <!-- this is devastating for maintainability. when you call a function you have no idea whether it spawned background tasks still running after it returns. you'd have to read every line of source, transitively, to know. completely breaks functions as black boxes. -->
 
-------------------------------------------------------------------------
+---
 
 ## Problem 2: Resource Cleanup Breaks
 
@@ -199,7 +199,7 @@ async def process_file(f):
 
 <!-- concrete example. you open a file in an async with block, pass the handle to process_file, block exits, file closes. but if process_file secretly spawned a background task still reading from that handle — boom, error on a closed file. async with can't protect you because it doesn't know about the orphaned task. context managers are broken. -->
 
-------------------------------------------------------------------------
+---
 
 ## Problem 3: Error Handling Breaks
 
@@ -229,7 +229,7 @@ my_function()  # Exception propagates to caller automatically
 
 <!-- compare: in sync Python when a function raises, the exception propagates to the caller. that's just how the call stack works. create_task breaks this. -->
 
-------------------------------------------------------------------------
+---
 
 ## Problem 4: You Can't Tell If Code Is Finished
 
@@ -248,7 +248,7 @@ result = await mystery_function()
 
 <!-- when mystery_function returns "done", is it actually done? no way to know without reading every line of code it calls. the return statement lies to you. this is the most insidious problem. -->
 
-------------------------------------------------------------------------
+---
 
 ## The Root Cause: Unstructured Concurrency
 
@@ -260,7 +260,7 @@ consider: `asyncio.TaskGroup` or explicit awaiting
 
 <!-- this diagram shows it. create_task launches a task that runs off on its own with no structural connection back to the parent. no guaranteed reunion point. unstructured concurrency — the concurrent equivalent of goto spaghetti. -->
 
-------------------------------------------------------------------------
+---
 
 ## Real-World Consequences
 
@@ -280,7 +280,7 @@ invisible\
 
 <!-- these aren't theoretical. people hit these in production every day. resource leaks, silent failures, shutdown hangs, operations on closed files. and for data pipelines: timeouts are meaningless because you can't cancel tasks you've lost track of. -->
 
-------------------------------------------------------------------------
+---
 
 ## The Solution: Structured Concurrency with Task Groups
 
@@ -320,7 +320,7 @@ cancellation · exception propagation · task supervision included
 
 <!-- compare this with the previous diagram. tasks are contained within the task group scope. they fan out, do work, fan back in. structured and predictable. -->
 
-------------------------------------------------------------------------
+---
 
 ## Dijkstra Was Right (Again)
 
@@ -347,7 +347,7 @@ groups)
 
 <!-- same solution. in the 60s we removed goto and replaced it with structured control flow. now we remove create_task and replace it with task groups. -->
 
-------------------------------------------------------------------------
+---
 
 ## Key Takeaway
 
@@ -366,7 +366,7 @@ groups)
 
 <!-- this is the slide I want you to remember. create_task is goto. task groups are if/while/for. if someone told you to use goto in 2025 you'd laugh. start treating create_task the same way. -->
 
-------------------------------------------------------------------------
+---
 
 ## Further Reading 
 
@@ -380,7 +380,7 @@ groups)
 
 <!-- njs's blog post is the definitive argument for structured concurrency. and Dijkstra's original paper is a surprisingly easy read — it's only a page long. -->
 
-------------------------------------------------------------------------
+---
 
 # Two most important reasons to use AnyIO
 * you can mix it with asyncio and optionally/incrementally add Trio
@@ -742,7 +742,7 @@ async def to_process_run_sync(fn, *args):
 
 <!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. the process case makes this crystal clear — you need to shield a multi-step cleanup sequence. -->
 
-------------------------------------------------------------------------
+---
 
 # More AnyIO Features
 
@@ -870,7 +870,7 @@ async def main():
 
 <!-- every one of these is a footgun. unbounded means memory grows without limit. no async iteration means you write while True loops. no structured close means you invent your own shutdown protocol. -->
 
-------------------------------------------------------------------------
+---
 
 # asyncio.Queue.shutdown() (3.13+)
 
@@ -892,7 +892,7 @@ But:
 
 <!-- Python 3.13 added Queue.shutdown() which is progress, but it's only on the latest Python, doesn't have cloning, doesn't compose with structured concurrency. AnyIO gives you all of this on Python 3.9+. -->
 
-------------------------------------------------------------------------
+---
 # Conceptual Comparison
 
 | Feature | AnyIO Stream | asyncio.Queue |
@@ -908,7 +908,7 @@ predates it.
 
 <!-- the table tells the story. AnyIO streams were designed with structured concurrency in mind. asyncio.Queue predates it and it shows. -->
 
-------------------------------------------------------------------------
+---
 # "If I'm already using Trio, I don't need AnyIO."
 
 Most people assume this. But AnyIO adds real value even on the Trio backend.
@@ -931,7 +931,7 @@ Most people assume this. But AnyIO adds real value even on the Trio backend.
 
 <!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include — buffered streams, memory object streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
 
-------------------------------------------------------------------------
+---
 
 # Trio vs AnyIO
 
@@ -953,7 +953,7 @@ If you write against AnyIO:
 
 <!-- if you write against Trio directly you lock out asyncio users. if you write against AnyIO, everyone benefits. Trio users get full Trio semantics, asyncio users can incrementally adopt structured concurrency. it's strictly additive. -->
 
-------------------------------------------------------------------------
+---
 
 # Buffered Byte Streams (AnyIO Feature Trio Lacks)
 
@@ -973,7 +973,7 @@ AnyIO does.
 
 <!-- one of my favourite examples. Trio gives you raw byte streams but if you need line-by-line reading or fixed-size reads you're on your own. AnyIO's BufferedByteReceiveStream handles all the annoying buffering for you. -->
 
-------------------------------------------------------------------------
+---
 
 # Demo --- AnyIO Buffered Byte Streams
 
@@ -1014,7 +1014,7 @@ line2: b'world'
 
 <!-- clean output. the buffered stream handled all the complexity of parsing delimited data from arbitrary chunk boundaries. saves you from writing buggy buffer management code. -->
 
-------------------------------------------------------------------------
+---
 
 # How You'd Do This in Trio
 
@@ -1104,7 +1104,7 @@ citation:
 
 <!-- these are the Trio issues where buffered streams were discussed and ultimately not added to Trio itself. AnyIO fills this gap. -->
 
-------------------------------------------------------------------------
+---
 
 # anyio.Path: Async File Operations
 
@@ -1143,7 +1143,7 @@ async def amain():
 
 <!-- anyio.Path is a drop-in async replacement for pathlib. same API but every operation is awaitable and runs in a thread pool. minimal code changes, maximum benefit. -->
 
-------------------------------------------------------------------------
+---
 
 ## Real Power: Parallel File Operations
 
@@ -1163,7 +1163,7 @@ anyio.run(concurrently_chmod_all_csvs)
 
 <!-- and because it's async you can combine it with task groups for parallel file I/O. process all CSVs in a directory concurrently, with structured concurrency ensuring everything completes before you continue. -->
 
-------------------------------------------------------------------------
+---
 
 ## Key Features
 
@@ -1180,7 +1180,7 @@ async/await
 
 <!-- anyio.Path gives you everything pathlib does but without blocking the event loop. genuine drop-in replacement. -->
 
-------------------------------------------------------------------------
+---
 
 # pytest plugin
 
@@ -1287,7 +1287,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 
 <!-- I want to be fair: asyncio is not bad. it's a huge improvement over Twisted — I once spent a week debugging a missing `six` call, a whole class of bug that can't exist with asyncio. but try making an LDAP server without Twisted! Curio was great but it's archived. Trio is excellent but slower than asyncio. AnyIO gives you options. -->
 
-------------------------------------------------------------------------
+---
 
 Normally at this stage of my talk I'd ask you to go run
 
@@ -1358,7 +1358,7 @@ anyio==4.12.1
 
 <!-- look at this tree. starlette, FastAPI, MCP, httpx, Jupyter — they all depend on AnyIO. if you're using any modern Python web framework or data science tool you already have it installed. might as well use it. -->
 
-------------------------------------------------------------------------
+---
 
 * I've given you a whistle-stop tour of some of my favourite features, there's loads more
    * and more being added all the time
