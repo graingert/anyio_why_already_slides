@@ -6,7 +6,7 @@
   </defs>
 
   <!-- Background -->
-  <rect width="580" height="500" fill="#1e1e2e" rx="12"/>
+  <rect width="580" height="370" fill="#1e1e2e" rx="12"/>
 
   <!-- Title -->
   <text x="290" y="28" text-anchor="middle" font-size="14" font-weight="bold" fill="#f38ba8">asyncio.shield + run_in_executor</text>
