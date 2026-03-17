@@ -2,7 +2,7 @@
 
 ## Regenerating the PDFs
 
-Use the following commands to regenerate the PDFs:
+Use the following commands to regenerate the PDFs, running them one at a time:
 
 ```
 npx @marp-team/marp-cli@latest lightning.md --pdf
