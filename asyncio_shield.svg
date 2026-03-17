@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 370" width="580" height="370" font-family="'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,monospace">
   <defs>
-    <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#89b4fa"/></marker>
-    <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#f38ba8"/></marker>
-    <marker id="arr-muted" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#585b70"/></marker>
+    <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#1e66f5"/></marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#d20f39"/></marker>
+    <marker id="arr-muted" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#9ca0b0"/></marker>
   </defs>
 
   <!-- Background -->
-  <rect width="580" height="370" fill="#1e1e2e" rx="12"/>
+  <rect width="580" height="370" fill="#eff1f5" rx="12"/>
 
   <!-- Title -->
-  <text x="290" y="28" text-anchor="middle" font-size="14" font-weight="bold" fill="#f38ba8">asyncio.shield + run_in_executor</text>
-  <line x1="18" y1="36" x2="562" y2="36" stroke="#f38ba8" stroke-width="1" opacity="0.4"/>
+  <text x="290" y="28" text-anchor="middle" font-size="14" font-weight="bold" fill="#d20f39">asyncio.shield + run_in_executor</text>
+  <line x1="18" y1="36" x2="562" y2="36" stroke="#d20f39" stroke-width="1" opacity="0.4"/>
 
   <!--
     Layout grid (main flow centered at x=213):
@@ -29,59 +29,59 @@
   <!-- ══ Row 1: coroutine ──shield()──► outer Future ══ -->
 
   <!-- coroutine box: x=18, w=115, right edge x=133 -->
-  <rect x="18" y="50" width="115" height="48" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
-  <text x="75" y="70" text-anchor="middle" font-size="10" fill="#a6adc8">outer</text>
-  <text x="75" y="87" text-anchor="middle" font-size="12" fill="#89b4fa">coroutine</text>
+  <rect x="18" y="50" width="115" height="48" rx="5" fill="#dce0e8" stroke="#1e66f5" stroke-width="1.5"/>
+  <text x="75" y="70" text-anchor="middle" font-size="10" fill="#6c6f85">outer</text>
+  <text x="75" y="87" text-anchor="middle" font-size="12" fill="#1e66f5">coroutine</text>
 
   <!-- shield() arrow: x=133 → x=154 -->
-  <line x1="133" y1="74" x2="153" y2="74" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#arr-blue)"/>
-  <text x="143" y="67" text-anchor="middle" font-size="9" fill="#cba6f7">shield()</text>
+  <line x1="133" y1="74" x2="153" y2="74" stroke="#1e66f5" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+  <text x="143" y="67" text-anchor="middle" font-size="9" fill="#8839ef">shield()</text>
 
   <!-- outer Future box: x=155, w=115, right edge x=270 -->
-  <rect x="155" y="50" width="115" height="48" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
-  <text x="212" y="70" text-anchor="middle" font-size="10" fill="#a6adc8">shield</text>
-  <text x="212" y="87" text-anchor="middle" font-size="12" fill="#89b4fa">outer Future</text>
+  <rect x="155" y="50" width="115" height="48" rx="5" fill="#dce0e8" stroke="#1e66f5" stroke-width="1.5"/>
+  <text x="212" y="70" text-anchor="middle" font-size="10" fill="#6c6f85">shield</text>
+  <text x="212" y="87" text-anchor="middle" font-size="12" fill="#1e66f5">outer Future</text>
 
   <!-- Red ✗ badge at top-right of outer Future -->
-  <circle cx="270" cy="51" r="11" fill="#f38ba8"/>
-  <text x="270" y="56" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e1e2e">✗</text>
+  <circle cx="270" cy="51" r="11" fill="#d20f39"/>
+  <text x="270" y="56" text-anchor="middle" font-size="13" font-weight="bold" fill="#eff1f5">✗</text>
 
   <!-- outer cancel dashed arrow: right edge → badge (x=562 → x=283) at y=74 -->
-  <line x1="562" y1="74" x2="283" y2="74" stroke="#f38ba8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-red)"/>
+  <line x1="562" y1="74" x2="283" y2="74" stroke="#d20f39" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-red)"/>
   <!-- annotation in far-right column (x=390+), well clear of Future box right edge x=270 -->
-  <text x="392" y="63" font-size="11" fill="#f38ba8">outer cancel</text>
-  <text x="392" y="88" font-size="11" fill="#f38ba8">arrives</text>
+  <text x="392" y="63" font-size="11" fill="#d20f39">outer cancel</text>
+  <text x="392" y="88" font-size="11" fill="#d20f39">arrives</text>
 
   <!-- ══ Connector: outer Future → inner Task ══ -->
   <!-- outer Future center-x=212; line from y=98 to y=140 -->
-  <line x1="212" y1="98" x2="212" y2="138" stroke="#585b70" stroke-width="1.5" marker-end="url(#arr-muted)"/>
-  <text x="222" y="124" font-size="10" fill="#a6adc8">spawns</text>
+  <line x1="212" y1="98" x2="212" y2="138" stroke="#9ca0b0" stroke-width="1.5" marker-end="url(#arr-muted)"/>
+  <text x="222" y="124" font-size="10" fill="#6c6f85">spawns</text>
 
   <!-- ══ Row 2: inner Task ══ -->
   <!-- inner Task box: x=107, w=210, right edge x=317 -->
-  <rect x="107" y="140" width="210" height="48" rx="5" fill="#2a1a3a" stroke="#cba6f7" stroke-width="1.5"/>
-  <text x="212" y="160" text-anchor="middle" font-size="10" fill="#a6adc8">inner</text>
-  <text x="212" y="178" text-anchor="middle" font-size="12" fill="#cba6f7">Task  (still alive)</text>
+  <rect x="107" y="140" width="210" height="48" rx="5" fill="#e8d9ff" stroke="#8839ef" stroke-width="1.5"/>
+  <text x="212" y="160" text-anchor="middle" font-size="10" fill="#6c6f85">inner</text>
+  <text x="212" y="178" text-anchor="middle" font-size="12" fill="#8839ef">Task  (still alive)</text>
 
   <!-- right annotation: starts at x=328 (11px gap after box right edge x=317) -->
-  <text x="328" y="158" font-size="11" fill="#f38ba8">cancel NOT</text>
-  <text x="328" y="175" font-size="11" fill="#f38ba8">forwarded ✗</text>
+  <text x="328" y="158" font-size="11" fill="#d20f39">cancel NOT</text>
+  <text x="328" y="175" font-size="11" fill="#d20f39">forwarded ✗</text>
 
   <!-- ══ Connector: inner Task → orphan thread ══ -->
-  <line x1="212" y1="188" x2="212" y2="222" stroke="#585b70" stroke-width="1.5" marker-end="url(#arr-muted)"/>
+  <line x1="212" y1="188" x2="212" y2="222" stroke="#9ca0b0" stroke-width="1.5" marker-end="url(#arr-muted)"/>
 
   <!-- ══ Row 3: orphan thread (dashed = unconstrained) ══ -->
   <!-- x=40, w=344, right edge x=384 -->
-  <rect x="40" y="224" width="344" height="62" rx="5" fill="#2a1525" stroke="#fab387" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="212" y="248" text-anchor="middle" font-size="12" fill="#fab387">run_in_executor thread  👻</text>
-  <text x="212" y="268" text-anchor="middle" font-size="11" fill="#a6adc8">orphan — runs to OS completion, unwatched</text>
+  <rect x="40" y="224" width="344" height="62" rx="5" fill="#ffd7cf" stroke="#fe640b" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="212" y="248" text-anchor="middle" font-size="12" fill="#fe640b">run_in_executor thread  👻</text>
+  <text x="212" y="268" text-anchor="middle" font-size="11" fill="#6c6f85">orphan — runs to OS completion, unwatched</text>
 
   <!-- ══ Connector: orphan thread → result ══ -->
-  <line x1="212" y1="286" x2="212" y2="318" stroke="#585b70" stroke-width="1.5" marker-end="url(#arr-muted)"/>
+  <line x1="212" y1="286" x2="212" y2="318" stroke="#9ca0b0" stroke-width="1.5" marker-end="url(#arr-muted)"/>
 
   <!-- ══ Row 4: result void ══ -->
   <!-- x=102, w=220, right edge x=322 -->
-  <rect x="102" y="320" width="220" height="38" rx="5" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1.5"/>
-  <text x="212" y="344" text-anchor="middle" font-size="13" fill="#f38ba8">result → void  ❌</text>
+  <rect x="102" y="320" width="220" height="38" rx="5" fill="#eff1f5" stroke="#d20f39" stroke-width="1.5"/>
+  <text x="212" y="344" text-anchor="middle" font-size="13" fill="#d20f39">result → void  ❌</text>
 
 </svg>

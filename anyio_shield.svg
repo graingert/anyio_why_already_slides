@@ -1,19 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 570 540" width="570" height="540" font-family="'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,monospace">
   <defs>
-    <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#89b4fa"/></marker>
-    <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#a6e3a1"/></marker>
-    <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#f38ba8"/></marker>
-    <marker id="arr-amber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#f9e2af"/></marker>
-    <marker id="arr-muted" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#585b70"/></marker>
+    <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#1e66f5"/></marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#40a02b"/></marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#d20f39"/></marker>
+    <marker id="arr-amber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#df8e1d"/></marker>
+    <marker id="arr-muted" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#9ca0b0"/></marker>
   </defs>
 
   <!-- Background -->
-  <rect width="570" height="540" fill="#1e1e2e" rx="12"/>
+  <rect width="570" height="540" fill="#eff1f5" rx="12"/>
 
   <!-- Title -->
-  <text x="285" y="28" text-anchor="middle" font-size="14" font-weight="bold" fill="#a6e3a1">anyio CancelScope(shield=True)</text>
-  <line x1="18" y1="36" x2="552" y2="36" stroke="#a6e3a1" stroke-width="1" opacity="0.4"/>
-  <text x="285" y="51" text-anchor="middle" font-size="11" fill="#a6adc8">canonical use: cleanup in finally/except, or uncancellable I/O</text>
+  <text x="285" y="28" text-anchor="middle" font-size="14" font-weight="bold" fill="#40a02b">anyio CancelScope(shield=True)</text>
+  <line x1="18" y1="36" x2="552" y2="36" stroke="#40a02b" stroke-width="1" opacity="0.4"/>
+  <text x="285" y="51" text-anchor="middle" font-size="11" fill="#6c6f85">canonical use: cleanup in finally/except, or uncancellable I/O</text>
 
   <!--
     Layout grid (main flow centered at x=274):
@@ -36,71 +36,71 @@
   -->
 
   <!-- ══ Coroutine box: x=18, w=115, right edge x=133 ══ -->
-  <rect x="18" y="60" width="115" height="40" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
-  <text x="75" y="85" text-anchor="middle" font-size="12" fill="#89b4fa">coroutine</text>
+  <rect x="18" y="60" width="115" height="40" rx="5" fill="#dce0e8" stroke="#1e66f5" stroke-width="1.5"/>
+  <text x="75" y="85" text-anchor="middle" font-size="12" fill="#1e66f5">coroutine</text>
 
   <!-- enters arrow: x=133 → x=155 -->
-  <line x1="133" y1="80" x2="153" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#arr-green)"/>
-  <text x="143" y="73" text-anchor="middle" font-size="9" fill="#a6e3a1">enters</text>
+  <line x1="133" y1="80" x2="153" y2="80" stroke="#40a02b" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="143" y="73" text-anchor="middle" font-size="9" fill="#40a02b">enters</text>
 
   <!-- ══ CancelScope dashed boundary: x=157–385, y=54–258 ══ -->
-  <rect x="157" y="54" width="228" height="204" rx="7" fill="#0d1f14" stroke="#a6e3a1" stroke-width="1.5" stroke-dasharray="7,4"/>
-  <text x="271" y="70" text-anchor="middle" font-size="11" fill="#a6e3a1">CancelScope(shield=True)</text>
-  <text x="271" y="84" text-anchor="middle" font-size="10" fill="#94e2b8">also: fail_after(n, shield=True)</text>
+  <rect x="157" y="54" width="228" height="204" rx="7" fill="#cff0d8" stroke="#40a02b" stroke-width="1.5" stroke-dasharray="7,4"/>
+  <text x="271" y="70" text-anchor="middle" font-size="11" fill="#40a02b">CancelScope(shield=True)</text>
+  <text x="271" y="84" text-anchor="middle" font-size="10" fill="#287a34">also: fail_after(n, shield=True)</text>
 
   <!-- thread box inside scope: x=169, y=90, w=214, h=62, right edge x=383 -->
-  <rect x="169" y="90" width="214" height="62" rx="5" fill="#1a3a1a" stroke="#a6e3a1" stroke-width="1.5"/>
-  <text x="276" y="116" text-anchor="middle" font-size="12" fill="#a6e3a1">to_thread.run_sync(fn)</text>
-  <text x="276" y="136" text-anchor="middle" font-size="10" fill="#94e2b8">cancellable=False (default)</text>
+  <rect x="169" y="90" width="214" height="62" rx="5" fill="#b8e6b8" stroke="#40a02b" stroke-width="1.5"/>
+  <text x="276" y="116" text-anchor="middle" font-size="12" fill="#40a02b">to_thread.run_sync(fn)</text>
+  <text x="276" y="136" text-anchor="middle" font-size="10" fill="#287a34">cancellable=False (default)</text>
 
   <!-- thread finishes label: well below thread box bottom (y=152), above scope bottom (y=258) -->
-  <line x1="276" y1="152" x2="276" y2="164" stroke="#a6e3a1" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="276" y="180" text-anchor="middle" font-size="11" fill="#a6e3a1">thread finishes ✓</text>
+  <line x1="276" y1="152" x2="276" y2="164" stroke="#40a02b" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="276" y="180" text-anchor="middle" font-size="11" fill="#40a02b">thread finishes ✓</text>
 
   <!-- ══ Right annotation column: x=394+ ══ -->
   <!-- Shield wall glyph on right edge of scope (x=385) -->
-  <rect x="386" y="108" width="7" height="34" rx="2" fill="#a6e3a1" opacity="0.9"/>
+  <rect x="386" y="108" width="7" height="34" rx="2" fill="#40a02b" opacity="0.9"/>
 
   <!-- outer cancel arrow: x=550 → x=395, y=124 -->
-  <line x1="550" y1="124" x2="395" y2="124" stroke="#f38ba8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-red)"/>
+  <line x1="550" y1="124" x2="395" y2="124" stroke="#d20f39" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-red)"/>
 
   <!-- "outer cancel arrives" labels — well above/below arrow y=124 -->
-  <text x="400" y="113" font-size="11" fill="#f38ba8">outer cancel</text>
-  <text x="400" y="140" font-size="11" fill="#f38ba8">arrives</text>
+  <text x="400" y="113" font-size="11" fill="#d20f39">outer cancel</text>
+  <text x="400" y="140" font-size="11" fill="#d20f39">arrives</text>
 
   <!-- deferred label — far below the "arrives" text -->
-  <text x="400" y="202" font-size="11" fill="#f9e2af">⏸ held outside</text>
-  <text x="400" y="219" font-size="11" fill="#f9e2af">   scope boundary</text>
+  <text x="400" y="202" font-size="11" fill="#df8e1d">⏸ held outside</text>
+  <text x="400" y="219" font-size="11" fill="#df8e1d">   scope boundary</text>
 
   <!-- ══ Scope exit arrow: x=276, y=258 → y=292 ══ -->
-  <line x1="276" y1="258" x2="276" y2="290" stroke="#585b70" stroke-width="1.5" marker-end="url(#arr-muted)"/>
-  <text x="286" y="278" font-size="10" fill="#a6adc8">scope exits</text>
+  <line x1="276" y1="258" x2="276" y2="290" stroke="#9ca0b0" stroke-width="1.5" marker-end="url(#arr-muted)"/>
+  <text x="286" y="278" font-size="10" fill="#6c6f85">scope exits</text>
 
   <!-- ══ Result delivered box: x=146, y=292, w=260, h=38 ══ -->
-  <rect x="146" y="292" width="260" height="38" rx="5" fill="#0d1f14" stroke="#a6e3a1" stroke-width="1.5"/>
-  <text x="276" y="316" text-anchor="middle" font-size="13" fill="#a6e3a1">result delivered  ✓</text>
+  <rect x="146" y="292" width="260" height="38" rx="5" fill="#cff0d8" stroke="#40a02b" stroke-width="1.5"/>
+  <text x="276" y="316" text-anchor="middle" font-size="13" fill="#40a02b">result delivered  ✓</text>
 
   <!-- arrow: y=330 → y=352 -->
-  <line x1="276" y1="330" x2="276" y2="350" stroke="#585b70" stroke-width="1.5" marker-end="url(#arr-amber)"/>
+  <line x1="276" y1="330" x2="276" y2="350" stroke="#9ca0b0" stroke-width="1.5" marker-end="url(#arr-amber)"/>
 
   <!-- ══ Cancel re-raised box: x=146, y=352, w=260, h=38 ══ -->
-  <rect x="146" y="352" width="260" height="38" rx="5" fill="#1f1a0a" stroke="#f9e2af" stroke-width="1.5"/>
-  <text x="276" y="376" text-anchor="middle" font-size="13" fill="#f9e2af">cancel re-raised  ✓</text>
+  <rect x="146" y="352" width="260" height="38" rx="5" fill="#fef0cd" stroke="#df8e1d" stroke-width="1.5"/>
+  <text x="276" y="376" text-anchor="middle" font-size="13" fill="#df8e1d">cancel re-raised  ✓</text>
 
   <!-- ══ Warning text ══ -->
-  <text x="285" y="407" text-anchor="middle" font-size="11" fill="#a6adc8">⚠  always re-raise — suppressing cancel causes undefined behaviour</text>
+  <text x="285" y="407" text-anchor="middle" font-size="11" fill="#6c6f85">⚠  always re-raise — suppressing cancel causes undefined behaviour</text>
 
   <!-- ══ Code snippet box: x=18, y=420, w=534, h=104 ══ -->
-  <rect x="18" y="420" width="534" height="104" rx="6" fill="#181825" stroke="#45475a" stroke-width="1"/>
-  <text x="28" y="438" font-size="10" fill="#a6adc8">cleanup pattern:</text>
+  <rect x="18" y="420" width="534" height="104" rx="6" fill="#e6e9ef" stroke="#8c8fa1" stroke-width="1"/>
+  <text x="28" y="438" font-size="10" fill="#6c6f85">cleanup pattern:</text>
   <!-- except get_cancelled_exc_class(): -->
-  <text x="28" y="456" font-size="11" fill="#cba6f7">except </text>
-  <text x="80" y="456" font-size="11" fill="#89b4fa">get_cancelled_exc_class():</text>
+  <text x="28" y="456" font-size="11" fill="#8839ef">except </text>
+  <text x="80" y="456" font-size="11" fill="#1e66f5">get_cancelled_exc_class():</text>
   <!--     with CancelScope(shield=True): -->
-  <text x="50" y="474" font-size="11" fill="#a6e3a1">with CancelScope(shield=True):</text>
+  <text x="50" y="474" font-size="11" fill="#40a02b">with CancelScope(shield=True):</text>
   <!--         await some_cleanup_function() -->
-  <text x="76" y="492" font-size="11" fill="#cdd6f4">await some_cleanup_function()</text>
+  <text x="76" y="492" font-size="11" fill="#4c4f69">await some_cleanup_function()</text>
   <!--     raise  # always! -->
-  <text x="50" y="510" font-size="11" fill="#f38ba8">raise</text>
-  <text x="116" y="510" font-size="10" fill="#a6adc8"># always!</text>
+  <text x="50" y="510" font-size="11" fill="#d20f39">raise</text>
+  <text x="116" y="510" font-size="10" fill="#6c6f85"># always!</text>
 </svg>

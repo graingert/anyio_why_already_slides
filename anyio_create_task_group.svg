@@ -1,54 +1,54 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 445" width="750" height="445" font-family="'Courier New', monospace">
   <defs>
     <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0d1117"/>
-      <stop offset="100%" stop-color="#161b22"/>
+      <stop offset="0%" stop-color="#f6f8fa"/>
+      <stop offset="100%" stop-color="#ffffff"/>
     </linearGradient>
 
     <linearGradient id="parentGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1f6feb"/>
-      <stop offset="100%" stop-color="#1158c7"/>
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
     </linearGradient>
 
     <linearGradient id="childGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#238636"/>
-      <stop offset="100%" stop-color="#196127"/>
+      <stop offset="0%" stop-color="#86efac"/>
+      <stop offset="100%" stop-color="#4ade80"/>
     </linearGradient>
 
     <linearGradient id="tgGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#6e40c9"/>
-      <stop offset="100%" stop-color="#553098"/>
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
     </linearGradient>
 
     <linearGradient id="exitGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#9e6a03"/>
-      <stop offset="100%" stop-color="#7a5100"/>
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
     </linearGradient>
 
     <filter id="blueGlow">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feGaussianBlur stdDeviation="2" result="blur"/>
       <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
     <filter id="greenGlow">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feGaussianBlur stdDeviation="2" result="blur"/>
       <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
     <filter id="purpleGlow">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feGaussianBlur stdDeviation="2" result="blur"/>
       <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
 
     <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
     </marker>
     <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#3fb950"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
     </marker>
     <marker id="arrowPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#bc8cff"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
     </marker>
     <marker id="arrowGold" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#e3b341"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/>
     </marker>
   </defs>
 
@@ -56,7 +56,7 @@
   <rect width="750" height="445" fill="url(#bgGrad)" rx="12"/>
 
   <!-- Subtle grid -->
-  <g opacity="0.035" stroke="#3fb950" stroke-width="1">
+  <g opacity="0.035" stroke="#16a34a" stroke-width="1">
     <line x1="0" y1="40"  x2="750" y2="40"/>
     <line x1="0" y1="80"  x2="750" y2="80"/>
     <line x1="0" y1="120" x2="750" y2="120"/>
@@ -71,79 +71,79 @@
   </g>
 
   <!-- Title -->
-  <text x="375" y="32" text-anchor="middle" fill="#e6edf3" font-size="13" font-weight="700" font-family="'Courier New', monospace" letter-spacing="0.5">anyio.create_task_group() control flow</text>
-  <line x1="20" y1="52" x2="730" y2="52" stroke="#30363d" stroke-width="1"/>
+  <text x="375" y="32" text-anchor="middle" fill="#1f2328" font-size="13" font-weight="700" font-family="'Courier New', monospace" letter-spacing="0.5">anyio.create_task_group() control flow</text>
+  <line x1="20" y1="52" x2="730" y2="52" stroke="#d0d7de" stroke-width="1"/>
 
   <!-- ── Parent task box ── center=375 -->
-  <rect x="290" y="66" width="170" height="54" rx="6" fill="url(#parentGrad)" filter="url(#blueGlow)" opacity="0.95"/>
-  <rect x="290" y="66" width="170" height="54" rx="6" fill="none" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="375" y="89" text-anchor="middle" fill="#e6edf3" font-size="13" font-weight="700" font-family="'Courier New', monospace">Parent task</text>
-  <text x="375" y="108" text-anchor="middle" fill="#a5d3ff" font-size="10" font-family="'Courier New', monospace">async def main():</text>
+  <rect x="290" y="66" width="170" height="54" rx="6" fill="#dbeafe" filter="url(#blueGlow)" opacity="0.95"/>
+  <rect x="290" y="66" width="170" height="54" rx="6" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="375" y="89" text-anchor="middle" fill="#1f2328" font-size="13" font-weight="700" font-family="'Courier New', monospace">Parent task</text>
+  <text x="375" y="108" text-anchor="middle" fill="#1e40af" font-size="10" font-family="'Courier New', monospace">async def main():</text>
 
   <!-- Arrow down: parent → async with -->
-  <line x1="375" y1="120" x2="375" y2="148" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="375" y1="120" x2="375" y2="148" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
 
   <!-- ── async with create_task_group() ── center=375 -->
-  <rect x="210" y="152" width="330" height="42" rx="6" fill="url(#tgGrad)" filter="url(#purpleGlow)" opacity="0.95"/>
-  <rect x="210" y="152" width="330" height="42" rx="6" fill="none" stroke="#bc8cff" stroke-width="1.5"/>
-  <text x="375" y="170" text-anchor="middle" fill="#e5d0ff" font-size="11" font-weight="700" font-family="'Courier New', monospace">async with</text>
-  <text x="375" y="186" text-anchor="middle" fill="#d2b0ff" font-size="11" font-family="'Courier New', monospace">create_task_group() as tg</text>
+  <rect x="210" y="152" width="330" height="42" rx="6" fill="#ede9fe" filter="url(#purpleGlow)" opacity="0.95"/>
+  <rect x="210" y="152" width="330" height="42" rx="6" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="375" y="170" text-anchor="middle" fill="#4c1d95" font-size="11" font-weight="700" font-family="'Courier New', monospace">async with</text>
+  <text x="375" y="186" text-anchor="middle" fill="#4c1d95" font-size="11" font-family="'Courier New', monospace">create_task_group() as tg</text>
 
   <!-- Arrow down from TaskGroup to fork (through start_soon labels) -->
-  <line x1="375" y1="194" x2="375" y2="248" stroke="#bc8cff" stroke-width="2"/>
+  <line x1="375" y1="194" x2="375" y2="248" stroke="#7c3aed" stroke-width="2"/>
 
   <!-- tg.start_soon labels on the arrow -->
-  <rect x="249" y="200" width="252" height="40" rx="4" fill="#0d1117" opacity="0.82"/>
-  <text x="375" y="216" text-anchor="middle" fill="#f0883e" font-size="11" font-family="'Courier New', monospace" font-weight="600">tg.start_soon(task1)</text>
-  <text x="375" y="233" text-anchor="middle" fill="#f0883e" font-size="11" font-family="'Courier New', monospace" font-weight="600">tg.start_soon(task2)</text>
+  <rect x="249" y="200" width="252" height="40" rx="4" fill="#f8fafc" opacity="0.82"/>
+  <text x="375" y="216" text-anchor="middle" fill="#ea580c" font-size="11" font-family="'Courier New', monospace" font-weight="600">tg.start_soon(task1)</text>
+  <text x="375" y="233" text-anchor="middle" fill="#ea580c" font-size="11" font-family="'Courier New', monospace" font-weight="600">tg.start_soon(task2)</text>
 
   <!-- Fork horizontal line: y=248, x=70 to x=680 -->
-  <line x1="70" y1="248" x2="680" y2="248" stroke="#bc8cff" stroke-width="2"/>
+  <line x1="70" y1="248" x2="680" y2="248" stroke="#7c3aed" stroke-width="2"/>
 
   <!-- Left branch: parent continues at x=145 -->
-  <line x1="145" y1="248" x2="145" y2="280" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="145" y1="248" x2="145" y2="280" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
 
   <!-- Center branch: child 1 at x=375 -->
-  <line x1="375" y1="248" x2="375" y2="280" stroke="#3fb950" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <line x1="375" y1="248" x2="375" y2="280" stroke="#16a34a" stroke-width="2" marker-end="url(#arrowGreen)"/>
 
   <!-- Right branch: child 2 at x=610 -->
-  <line x1="610" y1="248" x2="610" y2="280" stroke="#3fb950" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <line x1="610" y1="248" x2="610" y2="280" stroke="#16a34a" stroke-width="2" marker-end="url(#arrowGreen)"/>
 
   <!-- ── Parent body continues ── center=145 -->
-  <rect x="56" y="283" width="178" height="52" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="145" y="304" text-anchor="middle" fill="#8b949e" font-size="11" font-family="'Courier New', monospace">Parent body continues</text>
-  <text x="145" y="323" text-anchor="middle" fill="#58a6ff" font-size="10" font-family="'Courier New', monospace">(runs concurrently)</text>
+  <rect x="56" y="283" width="178" height="52" rx="6" fill="#f8fafc" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="145" y="304" text-anchor="middle" fill="#57606a" font-size="11" font-family="'Courier New', monospace">Parent body continues</text>
+  <text x="145" y="323" text-anchor="middle" fill="#3b82f6" font-size="10" font-family="'Courier New', monospace">(runs concurrently)</text>
 
   <!-- ── Child task 1 ── center=375 -->
-  <rect x="285" y="283" width="180" height="55" rx="6" fill="url(#childGrad)" filter="url(#greenGlow)" opacity="0.95"/>
-  <rect x="285" y="283" width="180" height="55" rx="6" fill="none" stroke="#3fb950" stroke-width="1.5"/>
-  <text x="375" y="307" text-anchor="middle" fill="#d2ffd8" font-size="13" font-weight="700" font-family="'Courier New', monospace">Child task 1</text>
-  <text x="375" y="325" text-anchor="middle" fill="#56d364" font-size="11" font-family="'Courier New', monospace">→ task1()</text>
+  <rect x="285" y="283" width="180" height="55" rx="6" fill="#dcfce7" filter="url(#greenGlow)" opacity="0.95"/>
+  <rect x="285" y="283" width="180" height="55" rx="6" fill="none" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="375" y="307" text-anchor="middle" fill="#14532d" font-size="13" font-weight="700" font-family="'Courier New', monospace">Child task 1</text>
+  <text x="375" y="325" text-anchor="middle" fill="#14532d" font-size="11" font-family="'Courier New', monospace">→ task1()</text>
 
   <!-- ── Child task 2 ── center=610 -->
-  <rect x="520" y="283" width="180" height="55" rx="6" fill="url(#childGrad)" filter="url(#greenGlow)" opacity="0.95"/>
-  <rect x="520" y="283" width="180" height="55" rx="6" fill="none" stroke="#3fb950" stroke-width="1.5"/>
-  <text x="610" y="307" text-anchor="middle" fill="#d2ffd8" font-size="13" font-weight="700" font-family="'Courier New', monospace">Child task 2</text>
-  <text x="610" y="325" text-anchor="middle" fill="#56d364" font-size="11" font-family="'Courier New', monospace">→ task2()</text>
+  <rect x="520" y="283" width="180" height="55" rx="6" fill="#dcfce7" filter="url(#greenGlow)" opacity="0.95"/>
+  <rect x="520" y="283" width="180" height="55" rx="6" fill="none" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="610" y="307" text-anchor="middle" fill="#14532d" font-size="13" font-weight="700" font-family="'Courier New', monospace">Child task 2</text>
+  <text x="610" y="325" text-anchor="middle" fill="#14532d" font-size="11" font-family="'Courier New', monospace">→ task2()</text>
 
   <!-- Convergence lines -->
-  <line x1="145" y1="335" x2="145" y2="363" stroke="#58a6ff" stroke-width="2"/>
-  <line x1="375" y1="338" x2="375" y2="363" stroke="#3fb950" stroke-width="2"/>
-  <line x1="610" y1="338" x2="610" y2="363" stroke="#3fb950" stroke-width="2"/>
-  <line x1="145" y1="363" x2="610" y2="363" stroke="#e3b341" stroke-width="2"/>
-  <line x1="375" y1="363" x2="375" y2="380" stroke="#e3b341" stroke-width="2" marker-end="url(#arrowGold)"/>
+  <line x1="145" y1="335" x2="145" y2="363" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="375" y1="338" x2="375" y2="363" stroke="#16a34a" stroke-width="2"/>
+  <line x1="610" y1="338" x2="610" y2="363" stroke="#16a34a" stroke-width="2"/>
+  <line x1="145" y1="363" x2="610" y2="363" stroke="#d97706" stroke-width="2"/>
+  <line x1="375" y1="363" x2="375" y2="380" stroke="#d97706" stroke-width="2" marker-end="url(#arrowGold)"/>
 
   <!-- Barrier wait label -->
-  <rect x="262" y="344" width="226" height="19" rx="4" fill="#0d1117" opacity="0.85"/>
-  <text x="375" y="357" text-anchor="middle" fill="#e3b341" font-size="10" font-family="'Courier New', monospace" font-weight="600">__aexit__ waits for all tasks</text>
+  <rect x="262" y="344" width="226" height="19" rx="4" fill="#f8fafc" opacity="0.85"/>
+  <text x="375" y="357" text-anchor="middle" fill="#d97706" font-size="10" font-family="'Courier New', monospace" font-weight="600">__aexit__ waits for all tasks</text>
 
   <!-- ── TaskGroup exit / reunion ── center=375 -->
-  <rect x="210" y="383" width="330" height="42" rx="6" fill="url(#exitGrad)" opacity="0.95"/>
-  <rect x="210" y="383" width="330" height="42" rx="6" fill="none" stroke="#e3b341" stroke-width="1.5"/>
-  <text x="375" y="401" text-anchor="middle" fill="#ffe08a" font-size="11" font-weight="700" font-family="'Courier New', monospace">TaskGroup exits cleanly</text>
-  <text x="375" y="417" text-anchor="middle" fill="#d4a92a" font-size="10" font-family="'Courier New', monospace">all tasks joined ✓</text>
+  <rect x="210" y="383" width="330" height="42" rx="6" fill="#fef3c7" opacity="0.95"/>
+  <rect x="210" y="383" width="330" height="42" rx="6" fill="none" stroke="#d97706" stroke-width="1.5"/>
+  <text x="375" y="401" text-anchor="middle" fill="#78350f" font-size="11" font-weight="700" font-family="'Courier New', monospace">TaskGroup exits cleanly</text>
+  <text x="375" y="417" text-anchor="middle" fill="#78350f" font-size="10" font-family="'Courier New', monospace">all tasks joined ✓</text>
 
   <!-- Corner labels -->
-  <text x="14" y="439" fill="#30363d" font-size="10" font-family="'Courier New', monospace">anyio</text>
-  <text x="683" y="439" fill="#30363d" font-size="10" font-family="'Courier New', monospace">trio/asyncio</text>
+  <text x="14" y="439" fill="#9ca3af" font-size="10" font-family="'Courier New', monospace">anyio</text>
+  <text x="683" y="439" fill="#9ca3af" font-size="10" font-family="'Courier New', monospace">trio/asyncio</text>
 </svg>
