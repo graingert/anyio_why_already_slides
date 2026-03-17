@@ -1371,6 +1371,19 @@ anyio==4.12.1
 
 ---
 
+# If you've installed any of these...
+
+- `httpx` — the HTTP client
+- `fastapi` — async web framework
+- `jupyter` — data science notebooks
+- `mcp` — Anthropic's Model Context Protocol SDK
+
+...AnyIO was already there.
+
+<!-- the point isn't just that it's popular — it's that you've been benefiting from AnyIO's correctness guarantees without knowing it. might as well start using it intentionally. -->
+
+---
+
 # Wrap Up
 
 * I've given you a whistle-stop tour of some of my favourite features, there's loads more
