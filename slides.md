@@ -299,7 +299,49 @@ cancellation · exception propagation · task supervision included
 
 ---
 
-# Further Reading 
+# "But I want to return without waiting!"
+
+Sometimes you genuinely need to kick off work and respond immediately — e.g. a web endpoint that accepts a job and returns `202 Accepted`.
+
+The answer: a **long-lived task group** scoped to the application lifetime.
+
+---
+
+# An Example with FastAPI
+
+```python
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+import anyio
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with anyio.create_task_group() as tg:
+        app.tg = tg
+        yield
+
+app = FastAPI(lifespan=lifespan)
+
+@app.post("/process")
+async def process(data: str):
+    app.tg.start_soon(background_job, data)
+    return {"status": "accepted"}
+```
+
+<!-- the task group lives for the lifetime of the app. individual requests can start_soon without waiting — fire and forget from the endpoint's point of view. but the tasks are still supervised: errors propagate, and on shutdown the lifespan context waits for all tasks to finish before the server exits. -->
+
+---
+
+# "But I want to return without waiting!" (continued)
+
+- On Trio: `trio.lowlevel.spawn_system_task()` spawns into a system nursery that lives for the entire `trio.run()`
+- AnyIO can't provide a portable `anyio.spawn_system_task()` — asyncio has no equivalent global supervised task group, only the unstructured `asyncio.create_task()`
+
+<!-- trio has spawn_system_task for this pattern natively. anyio can't abstract over it because asyncio has no equivalent — there's no global supervised nursery, only the unstructured create_task. the FastAPI lifespan pattern is the asyncio-compatible solution. -->
+
+---
+
+# Further Reading
 
 **Nathaniel J. Smith (Trio author):**\
 ["Notes on structured concurrency, or: Go statement considered harmful"](https://graingert.co.uk/trio-sc)\
