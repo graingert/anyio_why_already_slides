@@ -756,23 +756,29 @@ async def to_process_run_sync(fn, *args):
 ```python
 import anyio
 async def consume_ws(url, stream):
-    async with stream, await connect_ws(url) as ws:
-        async for msg in ws:
-            await stream.send(msg)
+    with stream:              # sync — runs before first await
+        async with await connect_ws(url) as ws:
+            async for msg in ws:
+                await stream.send(msg)
 async def news_and_weather():
     tx, rx = anyio.create_memory_object_stream[bytes]()  # default buffer size = 0
-    async with tx, rx, anyio.create_task_group() as tg:
-        tg.start_soon(consume_ws, "ws://example.com/news", tx.clone())
-        tg.start_soon(consume_ws, "ws://example.com/weather", tx.clone())
-        tx.close()
-        async for item in rx:
-            print(item)
+    with tx, rx:
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(consume_ws, "ws://example.com/news", tx.clone())
+            tg.start_soon(consume_ws, "ws://example.com/weather", tx.clone())
+            tx.close()
+            async for item in rx:
+                print(item)
 anyio.run(news_and_weather)
 ```
 
-<!-- look how clean this is. two WebSocket consumers, each with a clone of the send stream, feeding a single receive stream. when both producers finish their clones close, original tx is already closed, so the async for on rx terminates naturally. fully structured shutdown with zero boilerplate. default buffer size is 0 so you get backpressure for free. -->
+<!-- look how clean this is. two WebSocket consumers, each with a clone of the send stream, feeding a single receive stream. when both producers finish their clones close, original tx is already closed, so the async for on rx terminates naturally. fully structured shutdown with zero boilerplate. default buffer size is 0 so you get backpressure for free.
+
+note the synchronous `with stream:` — AnyIO guarantees every start_soon'd task runs to its first await point before cancellation is delivered. the sync with runs before any await, so __exit__ always fires and the clone is always closed. no leaked clones, no phantom senders keeping rx open forever. -->
 
 ---
+
+<style scoped>section { padding-top: 10px; padding-bottom: 40px; }</style>
 
 ### Key properties
 
@@ -780,13 +786,44 @@ anyio.run(news_and_weather)
 
 -   ✅ `async for` works naturally
 
--   ✅ `aclose()` signals end-of-stream
+-   ✅ `aclose()` or `close()` signals end-of-stream
 
--   ✅ `clone()` enables multiple consumers safely
+-   ✅ `clone()` enables multiple consumers safely — use `async with` or sync `with` to gain ownership and automatically close:
 
--   ✅ Structured shutdown
+    ```python
+    async def consume_ws(url, stream):
+        with stream:          # sync — runs before first await
+            async with await connect_ws(url) as ws:
+                ...
 
-<!-- five properties you want from inter-task communication. you get them all for free just by using memory object streams instead of asyncio.Queue. -->
+    tg.start_soon(consume_ws, url, tx.clone())
+    ```
+
+-   ✅ Structured shutdown — tasks always run to their first `await` before cancellation, so `with stream:` always closes the clone
+
+<!-- five properties you want from inter-task communication. you get them all for free just by using memory object streams instead of asyncio.Queue. the clone pattern is safe because AnyIO guarantees start_soon'd tasks reach their first checkpoint before cancellation — and the synchronous with stream runs before any await, so the clone is always closed. -->
+
+---
+
+### `async with` or sync `with` closes streams automatically so there's a shortcut
+
+```python
+async def consume_ws(url, stream):
+    async with stream, await connect_ws(url) as ws:
+        async for msg in ws:
+            await stream.send(msg)
+
+async def news_and_weather():
+    tx, rx = anyio.create_memory_object_stream[bytes]()
+    async with tx, rx, anyio.create_task_group() as tg:
+        tg.start_soon(consume_ws, "ws://example.com/news", tx.clone())
+        tg.start_soon(consume_ws, "ws://example.com/weather", tx.clone())
+        tx.close()
+        async for item in rx:
+            print(item)
+```
+
+<!-- async with gives you automatic cleanup of streams just like files. stacking tx, rx, and the task group into a single async with means you get structured ownership — everything is closed and joined together, in the right order, even under cancellation or exceptions. -->
 
 ---
 

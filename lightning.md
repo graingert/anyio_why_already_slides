@@ -133,16 +133,43 @@ with anyio.CancelScope(shield=True):
 
 ---
 
-# Batteries Included
+<style scoped>section { padding-top: 10px; padding-bottom: 40px; }</style>
+
+# Batteries Included: Memory Object Streams
 
 - **Memory object streams** — `asyncio.Queue` but with backpressure, `clone()`, structured shutdown, and `async for`
+
+```python
+async def consume_ws(url, stream):
+    with stream:              # sync — runs before first await
+        async with await connect_ws(url) as ws:
+            async for msg in ws:
+                await stream.send(msg)
+
+tx, rx = anyio.create_memory_object_stream[bytes]()
+async with tx, rx, anyio.create_task_group() as tg:
+    tg.start_soon(consume_ws, "ws://news", tx.clone())
+    tg.start_soon(consume_ws, "ws://weather", tx.clone())
+    tx.close()
+    async for item in rx:
+        print(item)
+```
+
+AnyIO runs tasks to their first `await` before cancellation — so `with stream:` always closes the clone
+
+<!-- memory streams: each producer gets a clone, synchronous `with stream:` runs before any await so the clone is always closed even under cancellation — AnyIO guarantees tasks reach their first await before cancellation is delivered. -->
+
+---
+
+# Batteries Included: More
+
 - **`BufferedByteReceiveStream`** — `receive_until(delimiter)`, `receive_exactly(n)` — even Trio doesn't have this
 - **`anyio.Path`** — async drop-in for `pathlib` (no more blocking the event loop)
 - **Built-in pytest plugin** — `@pytest.mark.anyio`, no need for `pytest-asyncio`
 - **Networking** — TCP/UDP/TLS/subprocesses with Happy Eyeballs built in
 - **PyPI-shipped bugfixes** — don't wait for a new Python release to fix TaskGroup
 
-<!-- rapid fire: memory streams with backpressure, buffered byte reads Trio doesn't have, async pathlib, built-in pytest plugin, full networking stack, and bugfixes that ship on PyPI instead of waiting for a CPython release. -->
+<!-- buffered byte reads Trio doesn't have, async pathlib, built-in pytest plugin, full networking stack, and bugfixes that ship on PyPI. -->
 
 ---
 
