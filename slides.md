@@ -33,7 +33,7 @@ https://graingert.co.uk/why-anyio-already
 * `asyncio.shield` vs shielded CancelScopes
 * some of my favourite AnyIO features
     * channels (memory object streams) > `asyncio.Queue`
-    * `BufferedByteReceiveStream` AnyIO > Trio
+    * `BufferedByteReceiveStream`
     * `anyio.Path`
     * pytest plugin built in
     * summary of features not covered so far
@@ -210,7 +210,7 @@ my_function()  # Exception propagates to caller automatically
 
 # Problem 4: You Can't Tell If Code Is Finished
 
-``` python
+```python
 async def mystery_function():
     await do_something()
     return "done"
@@ -243,11 +243,9 @@ consider: `asyncio.TaskGroup` or explicit awaiting
 
 ### In asyncio programs:
 
-❌ **Resource leaks** - Files/sockets stay open because cleanup is
-manual\
+❌ **Resource leaks** - Files/sockets stay open because cleanup is manual\
 ❌ **Silent failures** - Errors in background tasks get dropped\
-❌ **Shutdown hangs** - Can't wait for "done" because tasks are
-invisible\
+❌ **Shutdown hangs** - Can't wait for "done" because tasks are invisible\
 ❌ **Operations on closed files** - Tasks outlive the data they operate on
 
 ### In data pipelines specifically:
@@ -261,7 +259,7 @@ invisible\
 
 # Structured Concurrency with Task Groups
 
-``` python
+```python
 # asyncio - UNSTRUCTURED (bad)
 async def unstructured():
     asyncio.create_task(myfunc())  # Fire and forget
@@ -319,10 +317,8 @@ In 2018, we learned that **go statements do the same thing**
 
 # The Same Solution
 
-* **Solution then:** Remove goto, add structured control flow
-(if/while/functions)
-* **Solution now:** Remove create_task, add structured concurrency (task
-groups)
+* **Solution then:** Remove goto, add structured control flow (if/while/functions)
+* **Solution now:** Remove create_task, add structured concurrency (task groups)
 
 <!-- same solution. in the 60s we removed goto and replaced it with structured control flow. now we remove create_task and replace it with task groups. -->
 
@@ -362,9 +358,8 @@ groups)
 ---
 
 # Two most important reasons to use AnyIO
-* you can mix it with asyncio and optionally/incrementally add Trio
-support
-* cancellations are level-triggered.
+* you can mix it with asyncio and optionally/incrementally add Trio support
+* cancellations are level-triggered
 
 <!-- two biggest selling points. first: it's additive — you can sprinkle it into an existing asyncio codebase and optionally add Trio support later. second, and this is the one I really care about: cancellations are level-triggered. this is subtle but it prevents real bugs. -->
 
@@ -524,7 +519,7 @@ async def main():
             await asyncio.sleep(10)
         finally:
             print("task_with_finally in finally")
-            print("awaiting never-completing future (WILL HANG)")
+            print("awaiting never-completing future (WILL NOT HANG)")
             await never
             print("never reached")
 
@@ -836,7 +831,7 @@ async def news_and_weather():
             print(item)
 ```
 
-<!-- async with gives you automatic cleanup of streams just like files. stacking tx, rx, and the task group into a single async with means you get structured ownership — everything is closed and joined together, in the right order, even under cancellation or exceptions. -->
+<!-- async with gives you automatic cleanup of streams just like files. stacking tx, rx, and the task group into a single async with means you get structured ownership — everything is closed and joined together, in the right order, even under cancellation or exceptions. note: `async with stream` is safe here — MemoryObjectStream.__aenter__ just returns self without yielding, so it's not a real checkpoint and the structured shutdown guarantee from the previous slide still holds. -->
 
 ---
 
