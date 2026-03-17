@@ -290,7 +290,7 @@ cancellation · exception propagation · task supervision included
 
 **AnyIO task groups are the `if/while/for` of concurrency**
 
--   They're structured
+-   Tasks can't outlive their scope
 -   They preserve abstractions
 -   They make the language features work again
 -   **They let you reason about your code**
