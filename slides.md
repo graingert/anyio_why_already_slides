@@ -402,13 +402,11 @@ asyncio.run(example())
 
 ---
 
+<style scoped>section { padding-top: 20px; }</style>
+
 ## Edge cancellation can result in deadlocks on asyncio
 
 For example, the following program hangs:
-
-<!-- edge cancellation doesn't just cause slowdowns — it can deadlock. here's a real example that hangs. -->
-
----
 
 ```python
 import asyncio
@@ -432,6 +430,7 @@ async def main():
         tg.create_task(crash_soon())
 asyncio.run(main())
 ```
+<!-- edge cancellation doesn't just cause slowdowns — it can deadlock. here's a real example that hangs. -->
 
 ---
 
