@@ -307,25 +307,36 @@ The answer: a **long-lived task group** scoped to the application lifetime.
 
 ---
 
+<style scoped>section { padding-top: 20px; }</style>
+
 # An Example with FastAPI
 
 ```python
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+from typing import TypedDict
 import anyio
+import anyio.abc
+
+class State(TypedDict):
+    tg: anyio.abc.TaskGroup
+
+class ProcessResponse(BaseModel):
+    status: str
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
     async with anyio.create_task_group() as tg:
-        app.tg = tg
-        yield
+        yield State(tg=tg)
 
 app = FastAPI(lifespan=lifespan)
 
 @app.post("/process")
-async def process(data: str):
-    app.tg.start_soon(background_job, data)
-    return {"status": "accepted"}
+async def process(data: str, request: Request[State]) -> ProcessResponse:
+    request.state["tg"].start_soon(background_job, data)
+    return ProcessResponse(status="accepted")
 ```
 
 <!-- the task group lives for the lifetime of the app. individual requests can start_soon without waiting — fire and forget from the endpoint's point of view. but the tasks are still supervised: errors propagate, and on shutdown the lifespan context waits for all tasks to finish before the server exits. -->
