@@ -1148,7 +1148,7 @@ async/await
 
 ---
 
-# pytest plugin
+# pytest Plugin
 
 * AnyIO ships with a pytest plugin that it uses to test itself.
 * This means if you already depend on AnyIO you don't need pytest-asyncio as well.
@@ -1162,6 +1162,7 @@ async def test_something():
 <!-- AnyIO ships with its own pytest plugin — the same one it uses to test itself. so if you already depend on AnyIO you don't need pytest-asyncio. just @pytest.mark.anyio and you're done. -->
 
 ---
+# Limiting the Plugin to asyncio
 * By default the plugin runs your tests under both asyncio and Trio
 * if you're still gradually migrating to AnyIO and still call asyncio APIs directly
 * you can run your tests in asyncio mode only by adding the following to your root `conftest.py`
