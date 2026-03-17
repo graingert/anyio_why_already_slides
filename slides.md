@@ -94,9 +94,8 @@ list(gen)  # [1, 2, 3]  — no asyncio, no event loop
 
 # How AnyIO Dispatches to the Right Backend
 
-AnyIO calls either the asyncio API or the Trio API depending on what library is currently in use:
-
-This is similar in approach to libraries like `six` which let you write
+AnyIO calls either the asyncio API or the Trio API depending on what library is
+currently in use, this is similar in approach to libraries like `six` which let you write
 code compatible with Python 2 and Python 3
 
 <!-- so how does AnyIO work? it uses sniffio to detect which async framework is running, then dispatches to the right API. similar to how the old `six` library worked for Python 2/3 compat — write once, run on both asyncio and Trio. -->
@@ -392,7 +391,7 @@ support
 
 ---
 
-with level cancellation every async operation in a CancelScope will fail
+with level cancellation every async operation in a cancelled CancelScope will fail
 with a CancelledError
 
 ```python
@@ -522,6 +521,8 @@ KeyboardInterrupt
 <!-- that's a lot of traceback just to say "your program hung and you had to kill it". the program didn't exit cleanly — we had to interrupt it multiple times. the actual error from crash_soon only surfaces after we force-kill the process. -->
 
 ---
+
+<style scoped>section { padding-top: 20px; }</style>
 
 # The Same Example with AnyIO
 
@@ -713,11 +714,7 @@ async def to_process_run_sync(fn, *args):
 
 ---
 
-# Shielding in Detail
-
----
-
-## asyncio.shield
+# Shielding in Detail: asyncio.shield
 <img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_shield.svg" alt="asyncio.shield()" style="display: block; margin: 0 auto;" width="400">
 
 <!-- in this diagram you can see the orphaned inner task running off on its own — same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
@@ -745,13 +742,9 @@ async def to_process_run_sync(fn, *args):
 
 ---
 
-# More AnyIO Features
+# More AnyIO Features: Backpressure by Default. Structured. Composable.
 
 <!-- ok we've covered the big conceptual stuff — structured concurrency and level-triggered cancellation. now let me show you some practical features I like. -->
-
----
-
-# Backpressure by Default. Structured. Composable.
 
 * AnyIO provides `MemoryObjectSendStream` and `MemoryObjectReceiveStream`
 * like `asyncio.Queue` but you don't need to keep a count of how many producer/consumers you have
@@ -1088,6 +1081,8 @@ newlines, this is O(n²) in the number of bytes.
 This is a real ergonomic upgrade.
 
 <!-- receive_exactly, receive_until, proper EOF, efficient buffering, works on both backends. real ergonomic upgrade. -->
+
+---
 
 # Further Reading
 
