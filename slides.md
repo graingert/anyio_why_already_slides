@@ -252,7 +252,7 @@ result = await mystery_function()
 
 ## The Root Cause: Unstructured Concurrency
 
-![create_task running off on its own](asyncio_create_task.svg)
+![create_task running off on its own](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_create_task.svg)
 **One-way jump = no guaranteed cleanup, no error propagation, no
 completion tracking**
 
@@ -306,7 +306,13 @@ async def structured():
 
 ---
 
-![anyio create task group](anyio_create_task_group.svg)
+<style scoped>section { padding-top: 10px; }</style>
+
+## The Fix: Structured Concurrency
+
+![anyio create task group](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_create_task_group.svg)
+
+**Scoped join = guaranteed cleanup, automatic error propagation, completion tracking built-in**
 
 <!-- compare this with the previous diagram. tasks are contained within the task group scope. they fan out, do work, fan back in. structured and predictable. -->
 
@@ -707,13 +713,13 @@ async def to_process_run_sync(fn, *args):
 ---
 
 ## asyncio.shield
-![asyncio.shield()](asyncio_shield.svg)
+![asyncio.shield()](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_shield.svg)
 
 <!-- in this diagram you can see the orphaned inner task running off on its own — same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
 
 ---
 ## CancelScope(shield=True)
-![CancelScope(shield=True)](anyio_shield.svg)
+![CancelScope(shield=True)](https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/anyio_shield.svg)
 
 <!-- compare: AnyIO shield wraps the entire scope. everything inside is protected. cancellation is held at the boundary and re-raised cleanly when you exit. structured and predictable. -->
 
