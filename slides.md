@@ -339,7 +339,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
 
 app = FastAPI(lifespan=lifespan)
 
-@app.post("/process")
+@app.post("/process", status_code=202)
 async def process(data: str, request: Request[State]) -> ProcessResponse:
     request.state["tg"].start_soon(background_job, data)
     return ProcessResponse(status="accepted")
