@@ -1103,9 +1103,9 @@ This is a real ergonomic upgrade.
 
 # Further Reading
 
--   https://github.com/python-trio/trio/issues/796
--   https://github.com/groove-x/trio-util/issues/22
--   https://github.com/python-trio/trio/issues/562
+-   [github.com/python-trio/trio/issues/796](https://github.com/python-trio/trio/issues/796) — Provide standard mechanism for splitting a stream into lines
+-   [github.com/groove-x/trio-util/issues/22](https://github.com/groove-x/trio-util/issues/22) — Add a LineReader?
+-   [github.com/python-trio/trio/issues/562](https://github.com/python-trio/trio/issues/562) — Get N items from Channel
 
 <!-- these are the Trio issues where buffered streams were discussed and ultimately not added to Trio itself. AnyIO fills this gap. -->
 
