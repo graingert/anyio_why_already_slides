@@ -582,20 +582,22 @@ awaiting never-completing future (WILL NOT HANG)
 
 # Edge Cancellation with WebSockets over TLS
 
-```python
-import asyncio
+<style scoped>section { padding-top: 20px; }</style>
 
+- Cancellation fires inside `process()` — but the `async with` still runs `__aexit__`
+- WebSocket `__aexit__` does a TLS shutdown, which **awaits I/O**
+- With edge cancellation, that await **succeeds** even in a cancelled state
+- So the timeout is bypassed — your 10-second limit can hang forever
+
+```python
 async def consume_ws():
     async with await connect_ws("wss://example.com/news") as ws:
         async for message in ws:
             await process(message)  # cancellation happens here
      # cancellation doesn't happen as we `__aexit__()` the context manager
-
 async def example():
     async with asyncio.timeout(10):
         await consume_ws()  # could hang forever
-
-asyncio.run(example())
 ```
 
 <!-- this isn't contrived. if you're using WebSockets over TLS, the TLS shutdown in __aexit__ involves awaiting I/O. with edge cancellation that await succeeds even though you're in a cancelled state, so your timeout becomes meaningless. your 10-second timeout could hang forever. -->
