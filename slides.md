@@ -356,7 +356,7 @@ async def process(data: str):
 ---
 
 # Two most important reasons to use AnyIO
-* you can mix it with asyncio and optionally/incrementally add Trio support
+* incrementally adoptable — drop into an existing asyncio codebase, and your code automatically works on Trio too
 * cancellations are level-triggered
 
 <!-- two biggest selling points. first: it's additive — you can sprinkle it into an existing asyncio codebase and optionally add Trio support later. second, and this is the one I really care about: cancellations are level-triggered. this is subtle but it prevents real bugs. -->
