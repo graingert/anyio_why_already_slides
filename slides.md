@@ -752,13 +752,14 @@ async def run_in_process(fn, *args):
         # ... but process.wait() keeps running as an orphaned task
     except asyncio.CancelledError:
         process.terminate()
-        # ⚠️ Edge cancellation: the next await might succeed
-        # even though we're "cancelled" - so we can't reliably
-        # join the process here
-        await process.wait()  # might wait forever!
+        # ⚠️ Edge cancellation: nested asyncio.timeout blocks or
+        # multiple task.cancel() calls can cancel this await again
+        # before the process exits - leaving it un-joined
+        await process.wait()  # might be cancelled before process exits!
+        raise
 ```
 
-<!-- asyncio.shield is the standard answer to "how do I protect work from cancellation". but it's duct tape. it wraps a single await, creates an orphaned task. and because of edge cancellation, the process.wait() in the except block might actually wait forever since the cancellation was consumed. -->
+<!-- asyncio.shield is the standard answer to "how do I protect work from cancellation". but it's duct tape. it wraps a single await, creates an orphaned task. and because of edge cancellation - from nested asyncio.timeout blocks or multiple task.cancel() calls - the process.wait() in the except block can be cancelled again before the process exits, leaving it un-joined. -->
 
 ---
 
@@ -769,7 +770,7 @@ async def run_in_process(fn, *args):
 ❌ **No scope**: shield applies to one `await`, not a logical block (terminate + join)  
 ❌ **Can't compose terminate + join**: need to shield the wait, then join, then re-raise - but edge cancellation makes the join unreliable
 
-<!-- four problems. shield only wraps one await. the inner task is orphaned. and the critical issue for subprocesses: you need to terminate AND join as a single logical unit, but shield can't express that. edge cancellation means the join in the except block might not be cancelled, so it waits forever. -->
+<!-- four problems. shield only wraps one await. the inner task is orphaned. and the critical issue for subprocesses: you need to terminate AND join as a single logical unit, but shield can't express that. edge cancellation - from nested asyncio.timeout blocks or multiple task.cancel() calls - means the join in the except block can be cancelled again before the process exits, leaving it un-joined. -->
 
 ---
 
@@ -782,7 +783,7 @@ async def to_process_run_sync(fn, *args):
     try:
         await process.wait()
         return process.returncode
-    except BaseException:
+    except anyio.get_cancelled_exc_class():
         process.terminate()
         # Shield the join: we MUST wait for the process to exit
         # even though we've been cancelled
