@@ -29,9 +29,9 @@ https://graingert.co.uk/why-anyio-already
 
 - `async`/`await` is **syntactic sugar over generators** - decoupled from asyncio
 - Twisted, Trio, Curio all use the same syntax with different event loops
-- AnyIO uses `sniffio` to detect which framework is running, dispatches to the right API
+- AnyIO works on both asyncio and Trio - like `six` for async frameworks
 
-<!-- first: async/await is NOT asyncio. it's just generators. multiple frameworks use the same syntax - AnyIO detects which one you're running and does the right thing. like `six` for async frameworks. -->
+<!-- first: async/await is NOT asyncio. it's just generators. multiple frameworks use the same syntax - AnyIO works on both asyncio and Trio, doing the right thing automatically. like `six` for async frameworks. -->
 
 ---
 
@@ -53,9 +53,7 @@ asyncio.create_task(myfunc())  # Fire and forget!
 
 ---
 
-# The Fix: Structured Concurrency with Task Groups
-
-*"structured" = tasks have a guaranteed reunion point with their parent*
+*The fix: "structured" = tasks have a guaranteed reunion point with their parent*
 
 ```python
 # asyncio - UNSTRUCTURED 😰
@@ -63,7 +61,9 @@ async def unstructured():
     asyncio.create_task(myfunc())  # fire and forget
     asyncio.create_task(other())   # errors go nowhere
     return  # are we done? who knows!
+```
 
+```python
 # AnyIO - STRUCTURED 😌
 async def structured():
     async with anyio.create_task_group() as tg:
@@ -123,7 +123,7 @@ Edge cancellation = **your 0s timeout becomes a 1000s timeout**. With level canc
 A CancelScope is a scoped region of code that can be cancelled or given a deadline.
 
 ```python
-# asyncio.shield - wraps ONE await, orphans process.wait(), edge-triggered 😬
+# asyncio.shield - wraps ONE await, detaches process.wait() from cancellation, edge-triggered 😬
 await asyncio.shield(process.wait())
 # can't reliably terminate + join: edge cancellation breaks the cleanup
 ```
@@ -136,7 +136,7 @@ with anyio.CancelScope(shield=True):
 # Pending cancellation reliably re-raised here
 ```
 
-<!-- asyncio.shield wraps one await and orphans the task. with subprocesses you need to terminate AND join - but edge cancellation makes the join unreliable. AnyIO CancelScope shields the join, reaps the process, and defers cancellation cleanly. no zombies. -->
+<!-- asyncio.shield wraps one await and detaches it from the caller's cancellation. with subprocesses you need to terminate AND join - but edge cancellation makes the join unreliable. AnyIO CancelScope shields the join, reaps the process, and defers cancellation cleanly. no zombies. -->
 
 ---
 
@@ -208,4 +208,4 @@ httpx? FastAPI? Jupyter? MCP? **AnyIO is already in your virtualenv.**
 
 ### graingert on GitHub · `graingert.co.uk/why-anyio-already`
 
-<!-- structured concurrency, level cancellation, great batteries, already installed. give it a go - it won't leave you hanging. thanks! -->
+<!-- structured concurrency, level cancellation, great batteries, already installed. give it a go. thanks! -->
