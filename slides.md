@@ -269,6 +269,28 @@ async def structured():
 
 ---
 
+# Callables, Not Coroutines
+
+Trio and AnyIO never require you to create a coroutine — you pass async functions, the framework calls them:
+
+```python
+# AnyIO / Trio - pass the function itself ✅
+tg.start_soon(myfunc)
+anyio.run(main); trio.run(main)
+```
+
+```python
+# asyncio - pass a coroutine object ❌
+asyncio.create_task(myfunc())
+asyncio.run(main())
+```
+
+No bare coroutine objects → no `RuntimeWarning: coroutine '...' was never awaited`
+
+<!-- start_soon takes myfunc, not myfunc(). the Trio tutorial deliberately never mentions "coroutine" - you don't need to understand coroutine objects to use structured concurrency. bonus: since you never create coroutine objects yourself, you can't forget to await them. -->
+
+---
+
 <style scoped>section { padding-top: 40px; }</style>
 
 # The Fix: Structured Concurrency
@@ -486,9 +508,10 @@ async def example():
     # raises TimeoutError.... eventually
 
 asyncio.run(example())
+# Note: not asyncio.run(example) - asyncio.run takes a coroutine, not a callable
 ```
 
-<!-- now look at the same thing with asyncio. the first await raises CancelledError as expected. but in the finally block the cancellation has been consumed - it was edge-triggered, a one-shot event. so await asyncio.sleep(1000) actually waits 1000 seconds. your timeout of 0 becomes a timeout of 1000. this is a real class of bug. -->
+<!-- now look at the same thing with asyncio. the first await raises CancelledError as expected. but in the finally block the cancellation has been consumed - it was edge-triggered, a one-shot event. so await asyncio.sleep(1000) actually waits 1000 seconds. your timeout of 0 becomes a timeout of 1000. this is a real class of bug. note: asyncio.run takes a coroutine, not a callable - so it's asyncio.run(example()) with parentheses, the opposite of anyio.run. -->
 
 ---
 <style scoped>section { padding-top: 20px; }</style>
