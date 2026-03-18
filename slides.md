@@ -546,39 +546,46 @@ crash_soon raising
 task_with_finally in finally
 awaiting never-completing future (WILL HANG)
 ^C^Cunhandled exception during asyncio.run() shutdown
-task: <Task finished name='Task-1' coro=<main() done, defined at /home/graingert/projects/django/demo.py:4> exception=ExceptionGroup('unhandled errors in a TaskGroup', [RuntimeError('boom')])>
+task: <Task finished name='Task-1' coro=<main() done, defined at /home/graingert/projects/anyio_why_already_slides/demo_asyncio.py:3> exception=ExceptionGroup('unhandled errors in a TaskGroup', [RuntimeError('boom')])>
   + Exception Group Traceback (most recent call last):
-  |   File "/home/graingert/projects/django/demo.py", line 22, in main
+  |   File "/home/graingert/projects/anyio_why_already_slides/demo_asyncio.py", line 21, in main
   |     async with asyncio.TaskGroup() as tg:
-  |   File "/usr/lib/python3.12/asyncio/taskgroups.py", line 145, in __aexit__
-  |     raise me from None
+  |                ~~~~~~~~~~~~~~~~~^^
+  |   File "/usr/lib/python3.14/asyncio/taskgroups.py", line 72, in __aexit__
+  |     return await self._aexit(et, exc)
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |   File "/usr/lib/python3.14/asyncio/taskgroups.py", line 174, in _aexit
+  |     raise BaseExceptionGroup(
+  |     ...<2 lines>...
+  |     ) from None
   | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
   +-+---------------- 1 ----------------
     | Traceback (most recent call last):
-    |   File "/home/graingert/projects/django/demo.py", line 20, in crash_soon
+    |   File "/home/graingert/projects/anyio_why_already_slides/demo_asyncio.py", line 19, in crash_soon
     |     raise RuntimeError("boom")
     | RuntimeError: boom
     +------------------------------------
 Traceback (most recent call last):
-  File "/home/graingert/projects/django/demo.py", line 27, in <module>
+  File "/home/graingert/projects/anyio_why_already_slides/demo_asyncio.py", line 25, in <module>
     asyncio.run(main())
-  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    ~~~~~~~~~~~^^^^^^^^
+  File "/usr/lib/python3.14/asyncio/runners.py", line 204, in run
     return runner.run(main)
-           ^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+           ~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.14/asyncio/runners.py", line 127, in run
     return self._loop.run_until_complete(task)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/asyncio/base_events.py", line 674, in run_until_complete
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.14/asyncio/base_events.py", line 706, in run_until_complete
     self.run_forever()
-  File "/usr/lib/python3.12/asyncio/base_events.py", line 641, in run_forever
+    ~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/asyncio/base_events.py", line 677, in run_forever
     self._run_once()
-  File "/usr/lib/python3.12/asyncio/base_events.py", line 1949, in _run_once
+    ~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/asyncio/base_events.py", line 2008, in _run_once
     event_list = self._selector.select(timeout)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/selectors.py", line 468, in select
+  File "/usr/lib/python3.14/selectors.py", line 452, in select
     fd_event_list = self._selector.poll(timeout, max_ev)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/asyncio/runners.py", line 157, in _on_sigint
+  File "/usr/lib/python3.14/asyncio/runners.py", line 166, in _on_sigint
     raise KeyboardInterrupt()
 KeyboardInterrupt
 ```
@@ -632,25 +639,29 @@ crash_soon raising
 task_with_finally in finally
 awaiting never-completing future (WILL NOT HANG)
   + Exception Group Traceback (most recent call last):
-  |   File "/home/graingert/projects/django/demo.py", line 27, in <module>
+  |   File "/home/graingert/projects/anyio_why_already_slides/demo_anyio.py", line 26, in <module>
   |     asyncio.run(main())
-  |   File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+  |     ~~~~~~~~~~~^^^^^^^^
+  |   File "/usr/lib/python3.14/asyncio/runners.py", line 204, in run
   |     return runner.run(main)
-  |            ^^^^^^^^^^^^^^^^
-  |   File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+  |            ~~~~~~~~~~^^^^^^
+  |   File "/usr/lib/python3.14/asyncio/runners.py", line 127, in run
   |     return self._loop.run_until_complete(task)
-  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  |   File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+  |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  |   File "/usr/lib/python3.14/asyncio/base_events.py", line 719, in run_until_complete
   |     return future.result()
-  |            ^^^^^^^^^^^^^^^
-  |   File "/home/graingert/projects/django/demo.py", line 22, in main
+  |            ~~~~~~~~~~~~~^^
+  |   File "/home/graingert/projects/anyio_why_already_slides/demo_anyio.py", line 22, in main
   |     async with anyio.create_task_group() as tg:
-  |   File "/home/graingert/.virtualenvs/anyio_pipdeptree/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 783, in __aexit__
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "/home/graingert/projects/anyio_why_already_slides/.venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py", line 783, in __aexit__
   |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
   | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
   +-+---------------- 1 ----------------
     | Traceback (most recent call last):
-    |   File "/home/graingert/projects/django/demo.py", line 20, in crash_soon
+    |   File "/home/graingert/projects/anyio_why_already_slides/demo_anyio.py", line 20, in crash_soon
     |     raise RuntimeError("boom")
     | RuntimeError: boom
     +------------------------------------
