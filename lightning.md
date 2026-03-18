@@ -27,6 +27,8 @@ https://graingert.co.uk/why-anyio-already
 
 # Misconception: `asyncio` == `async`/`await`
 
+*This is the most important take-away of this presentation*
+
 - `async`/`await` is **syntactic sugar over generators** - decoupled from asyncio
 - Twisted, Trio, Curio all use the same syntax with different event loops
 - AnyIO works on both asyncio and Trio - like `six` for async frameworks
@@ -162,7 +164,7 @@ async with tx, rx, anyio.create_task_group() as tg:
         print(item)
 ```
 
-AnyIO runs tasks to their first `await` before cancellation - so `with stream:` always closes the clone
+Unlike asyncio, AnyIO tasks always run to their first `await` before cancellation - so `with stream:` always closes the clone
 
 <!-- memory streams: each producer gets a clone, synchronous `with stream:` runs before any await so the clone is always closed even under cancellation - AnyIO guarantees tasks reach their first await before cancellation is delivered. -->
 
@@ -201,10 +203,11 @@ httpx? FastAPI? Jupyter? MCP? **AnyIO is already in your virtualenv.**
 
 # TL;DR
 
-1. `asyncio.create_task()` is `goto` - use **task groups** instead
-2. **Level-triggered cancellation** prevents real bugs that edge cancellation causes
-3. **Batteries included** - streams, paths, pytest, networking
-4. **You already have it installed** - start using it on purpose
+1. `asyncio` != `async`/`await` - other async frameworks exist, AnyIO works across asyncio and Trio
+2. `asyncio.create_task()` is `goto` - use **task groups** instead
+3. **Level-triggered cancellation** prevents real bugs that edge cancellation causes
+4. **Batteries included** - streams, paths, pytest, networking
+5. **You already have it installed** - start using it on purpose
 
 ### graingert on GitHub · `graingert.co.uk/why-anyio-already`
 

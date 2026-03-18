@@ -974,7 +974,7 @@ the [bytes] on create_memory_object_stream is for static type checking - create_
     tg.start_soon(consume_ws, url, tx.clone())
     ```
 
--   ✅ Structured shutdown - tasks always run to their first `await` before cancellation, so `with stream:` always closes the clone
+-   ✅ Structured shutdown - unlike asyncio, AnyIO tasks always run to their first `await` before cancellation, so `with stream:` always closes the clone
 
 <!-- five properties you want from inter-task communication. you get them all for free just by using memory object streams instead of asyncio.Queue. the clone pattern is safe because AnyIO guarantees start_soon'd tasks reach their first checkpoint before cancellation - and the synchronous with stream runs before any await, so the clone is always closed. -->
 
