@@ -749,7 +749,7 @@ async def run_in_process(fn, *args):
     try:
         await asyncio.shield(process.wait())
         # ⚠️ If cancelled, shield absorbs the cancel...
-        # ... but process.wait() keeps running as an orphaned task
+        # ... but process.wait() keeps running as a detached task
     except asyncio.CancelledError:
         process.terminate()
         # ⚠️ Edge cancellation: nested asyncio.timeout blocks or
