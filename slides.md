@@ -219,7 +219,7 @@ my_function()  # Exception propagates to caller automatically
 
 ⚠ no await, no supervision, no cancellation - exceptions silently swallowed
 
-consider: `asyncio.TaskGroup` or explicit awaiting
+consider: `anyio.create_task_group()` for structured concurrency
 
 <!-- this diagram shows it. create_task launches a task that runs off on its own with no structural connection back to the parent. no guaranteed reunion point. unstructured concurrency - the concurrent equivalent of goto spaghetti. -->
 
