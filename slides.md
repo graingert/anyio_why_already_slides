@@ -1413,8 +1413,9 @@ def anyio_backend():
 | **`to_thread` / `from_thread`** | Bidirectional sync↔async bridging with structured cancellation |
 | **Subinterpreters** | `anyio.to_interpreter.run_sync` subinterpreter helpers for true parallelism (Python 3.13+) |
 | **Async `functools`** | `anyio.functools.lru_cache` for async functions |
+| **Fully typed** | Great IDE autocompletion and type checker support |
 
-<!-- and more: bidirectional sync/async bridging with structured cancellation, subinterpreter support for true parallelism on 3.13+, and async functools like lru_cache. -->
+<!-- and more: bidirectional sync/async bridging with structured cancellation, subinterpreter support for true parallelism on 3.13+, async functools like lru_cache, and the whole API is fully typed for great IDE and type checker support. -->
 
 ---
 
