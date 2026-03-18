@@ -1227,7 +1227,7 @@ while True:
     while b"\n" in buffer:
         line, _, rest = buffer.partition(b"\n")
         print(line + b"\n")
-        buffer = bytearray(rest)
+        buffer = bytearray(rest)  # copies remaining bytes every iteration
 ```
 
 <!-- I asked ChatGPT to write this and it has a bug. can anyone spot it? -->
