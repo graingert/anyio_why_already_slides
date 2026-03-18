@@ -1363,7 +1363,7 @@ def anyio_backend():
 <!-- by default the plugin runs tests on both asyncio and Trio, which is great for catching backend-specific bugs. if you're still migrating and only need asyncio, add this fixture to your conftest. -->
 ---
 
-# But `await` there's more! - Networking & I/O
+# Networking & I/O
 
 | Feature | Benefit |
 |---|---|
@@ -1372,11 +1372,11 @@ def anyio_backend():
 | **Subprocesses** | `run_process()` / `open_process()` with async stream I/O on stdin/stdout/stderr |
 | **Signal handling** | `open_signal_receiver()` - async iterator over OS signals |
 
-<!-- but await, there's more. AnyIO has a full networking stack. TCP, UDP, Unix sockets with Happy Eyeballs built in. TLS that wraps any byte stream, not just sockets. subprocesses with async stream I/O. signal handling as an async iterator. -->
+<!-- AnyIO has a full networking stack. TCP, UDP, Unix sockets with Happy Eyeballs built in. TLS that wraps any byte stream, not just sockets. subprocesses with async stream I/O. signal handling as an async iterator. -->
 
 ---
 
-# But `await` there's more! - Streams & Concurrency
+# Streams & Concurrency
 
 | Feature | Benefit |
 |---|---|
@@ -1389,7 +1389,7 @@ def anyio_backend():
 
 ---
 
-# But `await` there's more! - Threads, Testing & Beyond
+# Threads, Testing & Beyond
 
 | Feature | Benefit |
 |---|---|
