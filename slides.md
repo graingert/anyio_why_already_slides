@@ -808,8 +808,10 @@ async def to_process_run_sync(fn, *args):
 
 ---
 
+<style scoped>section { padding-top: 10px; }</style>
+
 # Shielding in Detail: asyncio.shield
-<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_shield.svg" alt="asyncio.shield()" style="display: block; margin: 0 auto;" width="400">
+<img src="https://raw.githubusercontent.com/graingert/anyio_why_already_slides/refs/heads/default/asyncio_shield.svg" alt="asyncio.shield()" style="display: block; margin: 0 auto;" width="650">
 
 ⚠ edge-triggered: outer coroutine receives `CancelledError` immediately, but the next checkpoint may still succeed - cancellation was "used up"
 
