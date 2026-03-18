@@ -49,6 +49,8 @@ https://graingert.co.uk/why-anyio-already
 
 # asyncio != async/await
 
+*This is the most important take-away of this presentation*
+
 - `async`/`await` is syntactic sugar over generators - completely decoupled from any event loop
 - Twisted, Trio, and Curio all use `async`/`await` with their own event loops
 - You can even use `async`/`await` with no event loop at all
@@ -1555,12 +1557,13 @@ anyio==4.12.1
 
 # Wrap Up
 
+* remember: `asyncio` != `async`/`await` - other async frameworks exist (Twisted, Trio, Curio) and AnyIO works across asyncio and Trio
 * I've given you a whistle-stop tour of some of my favourite features, there's loads more
    * and more being added all the time
 * I hope I've persuaded you to give AnyIO a try
 * you might as well give it a go if you already have it installed
 
-<!-- to wrap up: structured concurrency, level-triggered cancellation, great batteries, works everywhere. you've probably already got it installed. give it a go. -->
+<!-- to wrap up: asyncio is not the only async framework - async/await is decoupled from any event loop and other frameworks like Twisted, Trio, and Curio all use the same syntax. AnyIO works across asyncio and Trio. structured concurrency, level-triggered cancellation, great batteries. you've probably already got it installed. give it a go. -->
 ---
 
 <style scoped>section { font-size: 22px; }</style>
