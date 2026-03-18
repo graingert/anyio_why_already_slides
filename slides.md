@@ -269,28 +269,6 @@ async def structured():
 
 ---
 
-# Callables, Not Coroutines
-
-Trio and AnyIO never require you to create a coroutine — you pass async functions, the framework calls them:
-
-```python
-# AnyIO / Trio - pass the function itself ✅
-tg.start_soon(myfunc)
-anyio.run(main); trio.run(main)
-```
-
-```python
-# asyncio - pass a coroutine object ❌
-asyncio.create_task(myfunc())
-asyncio.run(main())
-```
-
-No bare coroutine objects → no `RuntimeWarning: coroutine '...' was never awaited`
-
-<!-- start_soon takes myfunc, not myfunc(). the Trio tutorial deliberately never mentions "coroutine" - you don't need to understand coroutine objects to use structured concurrency. bonus: since you never create coroutine objects yourself, you can't forget to await them. -->
-
----
-
 <style scoped>section { padding-top: 40px; }</style>
 
 # The Fix: Structured Concurrency
@@ -321,6 +299,28 @@ cancellation · exception propagation · task supervision included
 -   **They let you reason about your code**
 
 <!-- this is the slide I want you to remember. create_task is goto. task groups are if/while/for. if someone told you to use goto today you'd laugh. start treating create_task the same way. -->
+
+---
+
+# Callables, Not Coroutines
+
+Trio and AnyIO never require you to create a coroutine — you pass async functions, the framework calls them:
+
+```python
+# AnyIO / Trio - pass the function itself ✅
+tg.start_soon(myfunc)
+anyio.run(main); trio.run(main)
+```
+
+```python
+# asyncio - pass a coroutine object ❌
+asyncio.create_task(myfunc())
+asyncio.run(main())
+```
+
+No bare coroutine objects → no `RuntimeWarning: coroutine '...' was never awaited`
+
+<!-- start_soon takes myfunc, not myfunc(). the Trio tutorial deliberately never mentions "coroutine" - you don't need to understand coroutine objects to use structured concurrency. bonus: since you never create coroutine objects yourself, you can't forget to await them. -->
 
 ---
 
