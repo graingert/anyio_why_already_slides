@@ -252,7 +252,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from typing import TypedDict
-import anyio
 import anyio.abc
 
 class State(TypedDict):
