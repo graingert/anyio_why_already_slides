@@ -302,6 +302,21 @@ cancellation · exception propagation · task supervision included
 
 ---
 
+# "But asyncio has TaskGroup too!"
+
+Yes! Python 3.11 added `asyncio.TaskGroup`. But:
+
+- Still uses **edge-triggered cancellation** (as we'll see shortly, this causes real bugs)
+- Bugfixes are tied to your Python version — not backported (3.13 fixed deadlocks that still exist in 3.11/3.12)
+- No `CancelScope(shield=True)` — can't shield cleanup work from cancellation
+- No `start()` — can't wait for a task to signal it's ready
+
+`asyncio.TaskGroup` is a step forward. AnyIO takes it the rest of the way.
+
+<!-- you're probably thinking "asyncio has TaskGroup too, why do I need AnyIO?" and yes, Python 3.11 added asyncio.TaskGroup. but it still uses edge-triggered cancellation, which as I'll show you causes real bugs including deadlocks. bugfixes are tied to your Python version. and it's missing CancelScope(shield=True) and start(). asyncio.TaskGroup is progress, but AnyIO finishes the job. -->
+
+---
+
 # Callables, Not Coroutines
 
 Trio and AnyIO never require you to create a coroutine — you pass async functions, the framework calls them:
