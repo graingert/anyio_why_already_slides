@@ -759,7 +759,7 @@ async def run_in_process(fn, *args):
         raise
 ```
 
-<!-- asyncio.shield is the standard answer to "how do I protect work from cancellation". but it's duct tape. it wraps a single await, creates an orphaned task. and because of edge cancellation - from nested asyncio.timeout blocks or multiple task.cancel() calls - the process.wait() in the except block can be cancelled again before the process exits, leaving it un-joined. -->
+<!-- asyncio.shield is the standard answer to "how do I protect work from cancellation". but it's duct tape. it wraps a single await, creates a detached task. and because of edge cancellation - from nested asyncio.timeout blocks or multiple task.cancel() calls - the process.wait() in the except block can be cancelled again before the process exits, leaving it un-joined. -->
 
 ---
 
