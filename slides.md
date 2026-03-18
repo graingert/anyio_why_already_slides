@@ -1411,7 +1411,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 # Asyncio is not bad
 
 * it's better than Twisted (I once spent a week fixing a missing `six` call
-  - a whole class of bug that doesn't exist with asyncio)
+  - `six` was a Python 2/3 compatibility library; asyncio is Python 3 only so this class of bug can't exist - though Trollius was a Python 2 backport of asyncio that did need `six`)
 * but try making an LDAP server without Twisted!
 * *some* of the mistakes Twisted made were copied into asyncio
 * Curio is good! Unfortunately it's archived
