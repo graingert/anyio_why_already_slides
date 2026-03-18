@@ -487,7 +487,7 @@ anyio.run(news_and_weather)
 # Key Properties
 
 - ✅ Buffer size defaults to 0 → automatic backpressure
-- ✅ `clone()` + structured shutdown - tasks always run to their first `await` before cancellation, so `with stream:` always closes the clone
+- ✅ `clone()` + structured shutdown - unlike asyncio, AnyIO tasks always run to their first `await` before cancellation, so `with stream:` always closes the clone
 - ✅ `async for` works naturally, `close()` signals end-of-stream
 
 <!-- default buffer size is 0 so you get backpressure for free. the synchronous `with stream:` runs before any await, so __exit__ always fires and the clone is always closed. -->
