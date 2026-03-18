@@ -298,7 +298,7 @@ cancellation · exception propagation · task supervision included
 -   They make the language features work again
 -   **They let you reason about your code**
 
-<!-- this is the slide I want you to remember. create_task is goto. task groups are if/while/for. if someone told you to use goto in 2025 you'd laugh. start treating create_task the same way. -->
+<!-- this is the slide I want you to remember. create_task is goto. task groups are if/while/for. if someone told you to use goto today you'd laugh. start treating create_task the same way. -->
 
 ---
 
