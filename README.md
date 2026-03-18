@@ -2,9 +2,10 @@
 
 ## Slides
 
-This repository contains two sets of slides built with [Marp](https://marp.app/):
+This repository contains three sets of slides built with [Marp](https://marp.app/):
 
-- **`slides.md`** — Full 40-minute talk: "Why you should use AnyIO and why you might already have it installed"
+- **`slides.md`** — Full-length talk: "Why you should use AnyIO and why you might already have it installed"
+- **`slides_40.md`** — Trimmed 40-minute version (including Q&A) of the full talk
 - **`lightning.md`** — Lightning talk edition: "Why You Should Use AnyIO (and Why You Already Have It Installed)"
 
 ### Generating PDFs
@@ -12,6 +13,7 @@ This repository contains two sets of slides built with [Marp](https://marp.app/)
 ```
 npx @marp-team/marp-cli@latest lightning.md --pdf --html
 npx @marp-team/marp-cli@latest slides.md --pdf --html
+npx @marp-team/marp-cli@latest slides_40.md --pdf --html
 ```
 
 ## Abstract
