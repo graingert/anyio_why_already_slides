@@ -284,6 +284,48 @@ async def process(data: str, request: Request[State]) -> ProcessResponse:
 
 ---
 
+# Zooming in: the lifespan context
+
+```python
+class Done(Exception): pass
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
+    try:
+        async with anyio.create_task_group() as tg:
+            yield State(tg=tg)
+            raise Done
+    except* Done:
+        pass
+```
+
+<!-- `yield` - app is running, tasks can be started. `raise Done` - on shutdown, raises Done inside the task group, which wraps it in an ExceptionGroup. `except* Done` - the except* syntax unpacks the ExceptionGroup and handles Done branches, cleanly absorbing the shutdown signal so it doesn't propagate as an error. -->
+
+---
+
+# Zooming in: the lifespan context (alternative)
+
+```python
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[State]:
+    async with anyio.create_task_group() as tg:
+        yield State(tg=tg)
+        tg.cancel_scope.cancel()
+```
+
+<!-- simpler alternative: cancel_scope.cancel() directly cancels the task group's scope on shutdown, so child tasks receive Cancelled and stop immediately. no exception propagates out of the async with block - no except* needed. this is the idiomatic AnyIO way to stop a task group. the Done/except* version is more verbose but demonstrates Python 3.11's ExceptionGroup and except* syntax, which is worth knowing for error handling in concurrent code. both approaches cancel in-flight tasks rather than waiting for them to finish. -->
+
+---
+
+# "But I want to return without waiting!" (continued)
+
+- On Trio: `trio.lowlevel.spawn_system_task()` spawns into a system nursery (Trio's name for a TaskGroup) that lives for the entire `trio.run()`
+- AnyIO can't provide a portable `anyio.spawn_system_task()` - asyncio has no equivalent global supervised task group, only the unstructured `asyncio.create_task()`
+
+<!-- trio has spawn_system_task for this pattern natively. anyio can't abstract over it because asyncio has no equivalent - there's no global supervised nursery, only the unstructured create_task. the FastAPI lifespan pattern is the asyncio-compatible solution. -->
+
+---
+
 # Two most important reasons to use AnyIO
 * incrementally adoptable - drop into an existing asyncio codebase, and your code automatically works on Trio too
 * cancellations are level-triggered
