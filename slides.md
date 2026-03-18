@@ -463,9 +463,10 @@ async def example():
     # raises TimeoutError as you leave the scope
 
 anyio.run(example)
+# Note: not anyio.run(example()) - anyio.run takes a callable, not a coroutine
 ```
 
-<!-- with level cancellation, once a CancelScope is cancelled, EVERY await inside it raises CancelledError. even in the finally block. the cancellation is a state, not an event. so fail_after(0) means every single await in that scope fails immediately. predictable and safe. -->
+<!-- with level cancellation, once a CancelScope is cancelled, EVERY await inside it raises CancelledError. even in the finally block. the cancellation is a state, not an event. so fail_after(0) means every single await in that scope fails immediately. predictable and safe. note: anyio.run takes a callable, not a coroutine - so no parentheses on example. -->
 
 ---
 
