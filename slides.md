@@ -108,6 +108,28 @@ list(gen)  # [1, 2, 3]  - no asyncio, no event loop
 
 ---
 
+# Callables, Not Coroutines
+
+Trio and AnyIO never require you to create a coroutine — you pass async functions, the framework calls them:
+
+```python
+# AnyIO / Trio - pass the function itself ✅
+tg.start_soon(myfunc)
+anyio.run(main); trio.run(main)
+```
+
+```python
+# asyncio - pass a coroutine object ❌
+asyncio.create_task(myfunc())
+asyncio.run(main())
+```
+
+No bare coroutine objects → no `RuntimeWarning: coroutine '...' was never awaited`
+
+<!-- start_soon takes myfunc, not myfunc(). the Trio tutorial deliberately never mentions "coroutine" - you don't need to understand coroutine objects to use structured concurrency. bonus: since you never create coroutine objects yourself, you can't forget to await them. -->
+
+---
+
 # The Problems with `asyncio.create_task()`
 
 ## It's a "go statement" - and go statements break everything
@@ -314,28 +336,6 @@ Yes! Python 3.11 added `asyncio.TaskGroup`. But:
 `asyncio.TaskGroup` is a step forward. AnyIO takes it the rest of the way.
 
 <!-- you're probably thinking "asyncio has TaskGroup too, why do I need AnyIO?" and yes, Python 3.11 added asyncio.TaskGroup. but it still uses edge-triggered cancellation, which as I'll show you causes real bugs including deadlocks. bugfixes are tied to your Python version. and it's missing CancelScope(shield=True) and start(). asyncio.TaskGroup is progress, but AnyIO finishes the job. -->
-
----
-
-# Callables, Not Coroutines
-
-Trio and AnyIO never require you to create a coroutine — you pass async functions, the framework calls them:
-
-```python
-# AnyIO / Trio - pass the function itself ✅
-tg.start_soon(myfunc)
-anyio.run(main); trio.run(main)
-```
-
-```python
-# asyncio - pass a coroutine object ❌
-asyncio.create_task(myfunc())
-asyncio.run(main())
-```
-
-No bare coroutine objects → no `RuntimeWarning: coroutine '...' was never awaited`
-
-<!-- start_soon takes myfunc, not myfunc(). the Trio tutorial deliberately never mentions "coroutine" - you don't need to understand coroutine objects to use structured concurrency. bonus: since you never create coroutine objects yourself, you can't forget to await them. -->
 
 ---
 
