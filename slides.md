@@ -1004,7 +1004,7 @@ async def main():
 
 # asyncio.Queue.shutdown() (3.13+)
 
-Python 3.13 introduces:
+Python 3.13 added:
 
 ```python
 q.shutdown()
