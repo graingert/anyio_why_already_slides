@@ -945,7 +945,9 @@ anyio.run(news_and_weather)
 
 <!-- look how clean this is. two WebSocket consumers, each with a clone of the send stream, feeding a single receive stream. when both producers finish their clones close, original tx is already closed, so the async for on rx terminates naturally. fully structured shutdown with zero boilerplate. default buffer size is 0 so you get backpressure for free.
 
-note the synchronous `with stream:` - AnyIO guarantees every start_soon'd task runs to its first await point before cancellation is delivered. the sync with runs before any await, so __exit__ always fires and the clone is always closed. no leaked clones, no phantom senders keeping rx open forever. -->
+note the synchronous `with stream:` - AnyIO guarantees every start_soon'd task runs to its first await point before cancellation is delivered. the sync with runs before any await, so __exit__ always fires and the clone is always closed. no leaked clones, no phantom senders keeping rx open forever.
+
+the [bytes] on create_memory_object_stream is for static type checking - create_memory_object_stream is a generic tuple subclass, so [bytes] specialises the type. no runtime effect, but your type checker and IDE will know the stream carries bytes. -->
 
 ---
 
