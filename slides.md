@@ -102,7 +102,7 @@ list(gen)  # [1, 2, 3]  - no asyncio, no event loop
 
 - Uses `sniffio` to detect which async framework is currently running
 - Dispatches to the right backend API - asyncio or Trio
-- Similar in approach to `six`: write once, run on both
+- Similar in approach to `six` (the Python 2/3 compatibility library): write once, run on both
 
 <!-- so how does AnyIO work? it uses sniffio to detect which async framework is running, then dispatches to the right API. similar to how the old `six` library worked for Python 2/3 compat - write once, run on both asyncio and Trio. -->
 
@@ -1411,7 +1411,7 @@ https://docs.python.org/3/whatsnew/3.13.html#asyncio
 # Asyncio is not bad
 
 * it's better than Twisted (I once spent a week fixing a missing `six` call
-  - `six` was a Python 2/3 compatibility library; asyncio is Python 3 only so this class of bug can't exist - though Trollius was a Python 2 backport of asyncio that did need `six`)
+  - asyncio is Python 3 only so this class of bug can't exist - though Trollius was a Python 2 backport of asyncio that did need `six`)
 * but try making an LDAP server without Twisted!
 * *some* of the mistakes Twisted made were copied into asyncio
 * Curio is good! Unfortunately it's archived
