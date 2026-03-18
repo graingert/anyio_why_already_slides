@@ -1051,15 +1051,13 @@ Most people assume this. But AnyIO adds real value even on the Trio backend.
 
 -   ✅ High-level stream utilities
 
--   ✅ Memory object streams
-
 -   ✅ Buffered byte streams
 
 -   ✅ Stapled streams
 
 -   ✅ Thread/subprocess/subinterpreter helpers
 
-<!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include - buffered streams, memory object streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
+<!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include - buffered byte streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
 
 ---
 
