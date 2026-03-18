@@ -685,7 +685,7 @@ async def consume_ws():
     async with await connect_ws("wss://example.com/news") as ws:
         async for message in ws:
             await process(message)  # cancellation happens here
-     # cancellation doesn't happen as we `__aexit__()` the context manager
+    # cancellation doesn't happen as we `__aexit__()` the context manager
 
 async def example():
     async with asyncio.timeout(10):
