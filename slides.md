@@ -861,6 +861,8 @@ async def to_process_run_sync(fn, *args):
 
 ---
 
+<style scoped>section { padding-top: 15px; }</style>
+
 # Comparison
 
 | | `asyncio.shield` | `anyio.CancelScope(shield=True)` |

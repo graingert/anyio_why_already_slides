@@ -471,6 +471,8 @@ except anyio.get_cancelled_exc_class():
 
 ---
 
+<style scoped>section { padding-top: 15px; }</style>
+
 # Comparison
 
 | | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
