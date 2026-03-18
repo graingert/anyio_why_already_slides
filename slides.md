@@ -74,7 +74,7 @@ async def async_range():
     await _async_yield(3)
 ```
 
-<!-- types.coroutine bridges the generator protocol to the coroutine protocol. _async_yield is a raw coroutine that just yields a value. async_range is a normal async function built on top - no asyncio anywhere. -->
+<!-- @types.coroutine: marks a generator function as a coroutine function. When the function is called, the resulting generator iterator is also considered a coroutine object and is awaitable. Bridges yield-from generators with async/await. _async_yield is a raw coroutine that just yields a value. async_range is a normal async function built on top - no asyncio anywhere. -->
 
 ---
 

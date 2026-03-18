@@ -72,7 +72,7 @@ gen = coro.__await__()
 list(gen)  # [1, 2, 3]  - no asyncio, no event loop
 ```
 
-<!-- types.coroutine bridges the generator protocol to the coroutine protocol. _async_yield is a raw coroutine that just yields a value. async_range is a normal async function built on top - no asyncio anywhere. grab the __await__ iterator, drain it into a list. no event loop, no scheduler, just generators. this is how multiple async frameworks can coexist. -->
+<!-- @types.coroutine: marks a generator function as a coroutine function. When the function is called, the resulting generator iterator is also considered a coroutine object and is awaitable. Bridges yield-from generators with async/await. _async_yield is a raw coroutine that just yields a value. async_range is a normal async function built on top - no asyncio anywhere. grab the __await__ iterator, drain it into a list. no event loop, no scheduler, just generators. this is how multiple async frameworks can coexist. -->
 
 ---
 
