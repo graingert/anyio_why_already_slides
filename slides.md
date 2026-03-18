@@ -1406,7 +1406,7 @@ def anyio_backend():
 
 ---
 
-# Threads, Testing & Beyond
+# Threads & Beyond
 
 | Feature | Benefit |
 |---|---|
