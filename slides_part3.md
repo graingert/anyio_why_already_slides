@@ -269,9 +269,7 @@ q.shutdown()
 
 But:
 
--   Only on *new* Python
-
--   Not widely deployed yet
+-   Only on Python 3.13+
 
 -   Still no cloning
 
