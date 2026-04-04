@@ -1265,8 +1265,6 @@ the [bytes] on create_memory_object_stream is for static type checking - create_
 
 # `async with` shortcut
 
-<style scoped>section { padding-top: 20px; }</style>
-
 - `async with` = `with` for streams - automatic cleanup
 - Combine streams, task groups, etc. in one `async with`:
 
@@ -1286,9 +1284,19 @@ async def news_and_weather():
             print(item)
 ```
 
-Three resources enter one `async with`: the send stream, receive stream, and task group. They're all closed/joined together on exit — in the right order, even under exceptions or cancellation.
+<!-- async with gives you automatic cleanup of streams just like files. stacking tx, rx, and the task group into a single async with means you get structured ownership. -->
 
-<!-- async with gives you automatic cleanup of streams just like files. stacking tx, rx, and the task group into a single async with means you get structured ownership - everything is closed and joined together, in the right order, even under cancellation or exceptions. note: `async with stream` is safe here - MemoryObjectStream.__aenter__ just returns self without yielding, so it's not a real checkpoint and the structured shutdown guarantee from the previous slide still holds. -->
+---
+
+# `async with` shortcut — why it's safe
+
+Three resources enter one `async with`: the send stream, receive stream, and task group. They're all closed/joined together on exit — **in the right order, even under exceptions or cancellation**.
+
+- `tx` and `rx` are closed first (stopping new work)
+- the task group is joined last (waiting for running tasks to finish)
+- `MemoryObjectStream.__aenter__` returns `self` without yielding — not a real checkpoint — so the structured shutdown guarantee still holds
+
+<!-- the key insight: async with on a MemoryObjectStream doesn't yield to the event loop, so it's safe to use inside a task group even with cancellation. everything closes in structured order. -->
 
 ---
 

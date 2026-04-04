@@ -30,9 +30,12 @@ jobs:
 
       - name: Generate PDFs
         run: |
-          npx @marp-team/marp-cli@latest slides.md    --pdf --html
-          npx @marp-team/marp-cli@latest slides_40.md --pdf --html
-          npx @marp-team/marp-cli@latest lightning.md --pdf --html
+          npx @marp-team/marp-cli@latest slides.md        --pdf --html
+          npx @marp-team/marp-cli@latest slides_40.md     --pdf --html
+          npx @marp-team/marp-cli@latest lightning.md     --pdf --html
+          npx @marp-team/marp-cli@latest slides_part1.md  --pdf --html
+          npx @marp-team/marp-cli@latest slides_part2.md  --pdf --html
+          npx @marp-team/marp-cli@latest slides_part3.md  --pdf --html
 
       - name: Upload PDFs as artifact
         id: upload
@@ -57,6 +60,9 @@ jobs:
               '| `slides.pdf` | Full talk |',
               '| `slides_40.pdf` | 40-min version |',
               '| `lightning.pdf` | Lightning talk |',
+              '| `slides_part1.pdf` | Part 1: asyncio ≠ async/await + Structured Concurrency |',
+              '| `slides_part2.pdf` | Part 2: Level-Triggered Cancellation + Shielding |',
+              '| `slides_part3.pdf` | Part 3: AnyIO Features + Why You Already Have It |',
               '',
               `[⬇️ Download all PDFs](${artifactUrl})`,
             ].join('\n');
@@ -84,4 +90,7 @@ jobs:
             --notes "${COMMIT_MSG}" \
             slides.pdf \
             slides_40.pdf \
-            lightning.pdf
+            lightning.pdf \
+            slides_part1.pdf \
+            slides_part2.pdf \
+            slides_part3.pdf
