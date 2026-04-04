@@ -200,7 +200,7 @@ asyncio.run(main())
 
 ---
 
-# asyncio Output
+# asyncio Output *(Python 3.14 — deadlock affects all current versions)*
 
 <!-- walk through it: task_with_finally sleeps, then in its finally block awaits a Future that never completes. crash_soon raises after 1 second. the TaskGroup cancels task_with_finally, but because cancellation is edge-triggered, the finally block's `await never` is NOT cancelled - it just hangs forever. you have to Ctrl+C multiple times to kill it. -->
 
