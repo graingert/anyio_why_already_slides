@@ -47,11 +47,10 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const marker = '<!-- slides-pdf-comment -->';
             const artifactUrl = '${{ steps.upload.outputs.artifact-url }}';
+            const sha = context.payload.pull_request.head.sha.slice(0, 7);
             const body = [
-              marker,
-              '📄 **Slides PDFs generated**',
+              '📄 **Slides PDFs generated** for ' + sha,
               '',
               '| File | Description |',
               '|---|---|',
@@ -62,28 +61,12 @@ jobs:
               `[⬇️ Download all PDFs](${artifactUrl})`,
             ].join('\n');
 
-            const { data: comments } = await github.rest.issues.listComments({
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
+              body,
             });
-
-            const existing = comments.find(c => c.body.includes(marker));
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body,
-              });
-            }
 
       - name: Create release
         if: github.event_name != 'pull_request'
