@@ -30,6 +30,7 @@ https://graingert.co.uk/why-anyio-already
 *This is the most important take-away of this presentation*
 
 - `async`/`await` is **syntactic sugar over generators** - decoupled from asyncio
+- `async`/`await` also doesn't require async I/O — **three separate things:** async I/O (concept) · `asyncio` (module) · `async`/`await` (syntax)
 - Twisted, Trio, Curio all use the same syntax with different event loops
 - AnyIO works on both asyncio and Trio - like `six` for async frameworks
 
