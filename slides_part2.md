@@ -546,6 +546,38 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 
 ---
 
+<style scoped>section { font-size: 22px; padding-top: 20px; }</style>
+
+# Mixing Native asyncio Cancellation
+
+❌ `task.cancel()` injects `CancelledError` directly, bypassing AnyIO's cancel scope stack — the shield cannot defer it:
+
+```python
+async def ham():
+    with anyio.CancelScope(shield=True):
+        await spam()  # shield does NOT protect against task.cancel()
+
+async def bad():
+    task = asyncio.create_task(ham())
+    task.cancel()   # bypasses AnyIO's cancel scope machinery entirely
+    await task      # CancelledError — task never started
+```
+
+✅ `tg.cancel_scope.cancel()` goes through AnyIO's machinery — the shield defers it correctly:
+
+```python
+async def main():
+    async with anyio.create_task_group() as tg:
+        tg.cancel_scope.cancel()
+        tg.start_soon(ham)  # spam() runs to completion ✅
+```
+
+AnyIO guarantees every `start_soon`'d task runs to its first `await` before cancellation is delivered — so `with anyio.CancelScope(shield=True):` (synchronous) is always entered first.
+
+<!-- task.cancel() is a raw asyncio operation that bypasses AnyIO's cancel scope stack entirely. CancelScope(shield=True) only defers cancellations delivered through AnyIO's own machinery. tg.cancel_scope.cancel() goes through that machinery, so the shield works. AnyIO's start_soon guarantee means the synchronous with block is always entered before cancellation fires, so the shield is always in place. -->
+
+---
+
 <style scoped>section { padding-top: 15px; }</style>
 
 # Comparison
