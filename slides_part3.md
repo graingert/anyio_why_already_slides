@@ -300,32 +300,15 @@ predates it.
 
 # "If I'm already using Trio, I don't need AnyIO."
 
-Most people assume this. But AnyIO adds real value even on the Trio backend.
+Trio is a minimal framework — only what's mandatory for a network framework. AnyIO is a portability + abstraction layer with batteries included.
 
-### What AnyIO adds on top of Trio
+What AnyIO adds on top of Trio:
 
--   ✅ Backend portability (asyncio, Trio)
-
--   ✅ A stable public API for libraries
-
--   ✅ High-level stream utilities
-
--   ✅ Buffered byte streams
-
--   ✅ Stapled streams
-
+-   ✅ Backend portability (asyncio and Trio) — a stable public API for libraries
+-   ✅ High-level stream utilities: `BufferedByteReceiveStream`, `StapledStream`, `anyio.Path`
 -   ✅ Thread/subprocess/subinterpreter helpers
 
-<!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include - buffered byte streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
-
----
-
-# Trio vs AnyIO
-
-- Trio is a minimal framework - only gives you what is mandatory of a network framework
-- AnyIO is a portability + abstraction layer with batteries included.
-
-What AnyIO adds on top of Trio: buffered byte streams, stapled streams, `anyio.Path`, thread/subprocess helpers, a stable public API for libraries, and backend portability.
+<!-- common pushback: "I already use Trio, why do I need AnyIO?" Trio is deliberately minimal - it only gives you what a network framework must provide. AnyIO is batteries-included on top of that. -->
 
 ---
 
