@@ -1,0 +1,35 @@
+name: Check embedded SVGs
+
+on:
+  pull_request:
+    paths:
+      - "*.svg"
+      - "*.md"
+      - "embed_svgs.py"
+      - ".github/workflows/check-embedded-svgs.yml"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Re-embed SVGs
+        run: python3 embed_svgs.py
+
+      - name: Fail if slides are out of sync with SVG sources
+        run: |
+          if ! git diff --exit-code; then
+            echo ""
+            echo "❌ The embedded SVGs in slides.md / slides_40.md are out of sync"
+            echo "   with the source .svg files."
+            echo ""
+            echo "   Run  python3 embed_svgs.py  and commit the result."
+            exit 1
+          fi
+          echo "✅ Embedded SVGs are up to date."
