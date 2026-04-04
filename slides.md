@@ -1361,7 +1361,7 @@ But:
 
 -   Still no structured fan-out
 
-<!-- Python 3.13 added Queue.shutdown() which is progress, but it's only on the latest Python, doesn't have cloning, doesn't compose with structured concurrency. AnyIO gives you all of this on Python 3.9+. -->
+<!-- Python 3.13 added Queue.shutdown() which is progress, but it's only on the latest Python, doesn't have cloning, doesn't compose with structured concurrency. AnyIO gives you all of this on Python 3.10+. -->
 
 ---
 # Conceptual Comparison
