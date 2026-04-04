@@ -3,7 +3,9 @@ marp: true
 html: true
 ---
 
-# Why you should use AnyIO and why you might already have it installed
+# Why you should use AnyIO
+
+### ...and why you probably already have it installed
 
 https://graingert.co.uk/why-anyio-already
 
@@ -27,12 +29,13 @@ https://graingert.co.uk/why-anyio-already
 # Agenda
 
 * misconception: `asyncio` == `async`/`await`
-* the problems with `asyncio.create_task`
-* why you should use structured concurrency
+* the problems with `asyncio.create_task` (and the fix: structured concurrency)
 * getting a result from a task with `nonlocal`
 * "But I want to return without waiting!": application scoped task groups
-* the two most important reasons to use AnyIO: incrementally adoptable, cancellations are level-triggered
-* `asyncio.shield` vs shielded CancelScopes
+* the two most important reasons to use AnyIO
+  * incrementally adoptable — drop into any asyncio codebase
+  * cancellations are level-triggered (not edge-triggered like asyncio)
+* `asyncio.shield` vs shielded `CancelScope`s
 * some of my favourite AnyIO features
 * why you already have AnyIO installed
 
@@ -45,6 +48,8 @@ https://graingert.co.uk/why-anyio-already
 *This is the most important take-away of this presentation*
 
 - `async`/`await` is syntactic sugar over generators - completely decoupled from any event loop
+- `async`/`await` also doesn't require async I/O — it's just a way to write coroutines
+- **Three separate things:** async I/O (the concept) · `asyncio` (Python's stdlib module) · `async`/`await` (the syntax)
 - Twisted, Trio, and Curio all use `async`/`await` with their own event loops
 - You can even use `async`/`await` with no event loop at all
 - AnyIO works on both asyncio and Trio - like `six` for async frameworks
@@ -588,6 +593,7 @@ from the [Python 3.13 changelog](https://docs.python.org/3/whatsnew/3.13.html#as
 * *some* of the mistakes Twisted made were copied into asyncio
 * Curio is good! Unfortunately it's archived
 * Trio isn't perfect: it's slower than asyncio, especially with uvloop
+  * but better abstractions mean you're *more likely* to use async correctly — e.g. `anyio.Path` instead of blocking pathlib — so your real-world throughput may actually be higher
 * AnyIO gives you options and batteries to play with
 
 <!-- I want to be fair: asyncio is not bad. it's a huge improvement over Twisted - I once spent a week debugging a missing `six` call, a whole class of bug that can't exist with asyncio. but try making an LDAP server without Twisted! Curio was great but it's archived. Trio is excellent but slower than asyncio. AnyIO gives you options. -->
