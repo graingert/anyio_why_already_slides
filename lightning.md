@@ -15,12 +15,21 @@ html: true
 
 # About Me
 
-<img src="https://avatars.githubusercontent.com/u/413772" alt="graingert" style="display: block; margin: 0 auto;" width="200">
+<img src="https://avatars.githubusercontent.com/u/413772" alt="graingert" style="display: block; margin: 0 auto;" width="150">
 
+<style scoped>section { font-size: 22px; }</style>
+
+**Networking & async:**
 - Core developer of AnyIO, Twisted, and Trio
-- Contributed to CPython asyncio happy eyeballs + TaskGroup fixes
+- CPython triager — asyncio fixes: `TaskGroup` cancellation + refcycles, `asyncio.Timeout` zero-deadline delivery, `staggered_race` task leaks, happy eyeballs refcycles, `sock_connect` UDP
+- Proposed asyncio child watcher deprecation (3.12); contributed to asyncio policy system deprecation (3.14)
 
-<!-- I'm Thomas Grainger, graingert on GitHub. -->
+**Other open source:**
+- Member of `PyPy`, `pytest-dev`, `PyCQA`, `Dask`, `jazzband`, `sqlalchemy-redshift`, `canvg` orgs
+- Mars 2020 Helicopter Mission contributor
+- 1 CVE security advisory credit
+
+<!-- I'm Thomas Grainger, graingert on GitHub. I'm a core dev on AnyIO, Twisted, and Trio. I've contributed to CPython asyncio itself - the happy eyeballs implementation and various TaskGroup fixes. -->
 
 ---
 
