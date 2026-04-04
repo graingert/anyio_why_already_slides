@@ -919,6 +919,7 @@ anyio==4.12.1
 - [graingert.co.uk/dabeaz-gen](https://graingert.co.uk/dabeaz-gen) - Generator Tricks for Systems Programmers
 - [graingert.co.uk/dabeaz-coro](https://graingert.co.uk/dabeaz-coro) - A Curious Course on Coroutines and Concurrency
 - [graingert.co.uk/dabeaz-final](https://graingert.co.uk/dabeaz-final) - Generators: The Final Frontier
+- [anyio.readthedocs.io](https://anyio.readthedocs.io) — AnyIO documentation
 - [docs.python.org/3/whatsnew/3.13.html#asyncio](https://docs.python.org/3/whatsnew/3.13.html#asyncio) - Python 3.13 asyncio changes
 
 <!-- thanks! happy to take questions. I'm graingert on GitHub. -->
