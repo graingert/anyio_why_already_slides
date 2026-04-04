@@ -213,8 +213,8 @@ async def news_and_weather():
 
 Three resources enter one `async with`: the send stream, receive stream, and task group. They're all closed/joined together on exit — **in the right order, even under exceptions or cancellation**.
 
-- `tx` and `rx` are closed first (stopping new work)
-- the task group is joined last (waiting for running tasks to finish)
+- `tx.close()` is called explicitly in the body — this is what signals end-of-stream to tasks
+- `async with tx, rx` exits in *reverse* entry order: `tg.__aexit__` first (joins tasks), then `rx`, then `tx` — the explicit close is what actually stops new work before the tasks finish
 - `MemoryObjectStream.__aenter__` returns `self` without yielding — not a real checkpoint — so the structured shutdown guarantee still holds
 
 <!-- the key insight: async with on a MemoryObjectStream doesn't yield to the event loop, so it's safe to use inside a task group even with cancellation. everything closes in structured order. -->
