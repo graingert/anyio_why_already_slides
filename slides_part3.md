@@ -594,7 +594,7 @@ def anyio_backend():
 
 | Feature | Benefit |
 |---|---|
-| **TCP/UDP/UNIX sockets** | Happy Eyeballs built in; async/await UDP (no Transports/Protocols) |
+| **TCP/UDP/UNIX sockets** | Happy Eyeballs built in (fixed refcycles in CPython's implementation); async/await UDP — no Transports/Protocols |
 | **TLS streams** | `TLSStream` wraps any byte stream with TLS, not just sockets |
 | **Subprocesses** | `run_process()` / `open_process()` with async stream I/O on stdin/stdout/stderr |
 | **Signal handling** | `open_signal_receiver()` - async iterator over OS signals |
