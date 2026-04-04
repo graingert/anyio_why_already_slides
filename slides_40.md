@@ -910,6 +910,7 @@ anyio==4.12.1
 * you might as well give it a go if you already have it installed
 
 <!-- to wrap up: asyncio is not the only async framework - async/await is decoupled from any event loop and other frameworks like Twisted, Trio, and Curio all use the same syntax. AnyIO works across asyncio and Trio. structured concurrency, level-triggered cancellation, great batteries. you've probably already got it installed. give it a go. -->
+
 ---
 
 # Any questions?
@@ -917,9 +918,9 @@ anyio==4.12.1
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 
 **Further reading:**
+- [anyio.readthedocs.io](https://anyio.readthedocs.io) — AnyIO documentation
 - [graingert.co.uk/trio-sc](https://graingert.co.uk/trio-sc) - Go statement considered harmful (njs)
 - [graingert.co.uk/dijkstra68](https://graingert.co.uk/dijkstra68) - Go To Statement Considered Harmful (1968)
-- [anyio.readthedocs.io](https://anyio.readthedocs.io) — AnyIO documentation
 - [graingert.co.uk/dabeaz-gen](https://graingert.co.uk/dabeaz-gen) - Generator Tricks for Systems Programmers
 - [graingert.co.uk/dabeaz-coro](https://graingert.co.uk/dabeaz-coro) - A Curious Course on Coroutines and Concurrency
 - [graingert.co.uk/dabeaz-final](https://graingert.co.uk/dabeaz-final) - Generators: The Final Frontier
