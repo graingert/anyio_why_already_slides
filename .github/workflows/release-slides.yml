@@ -1,6 +1,11 @@
-name: Release Slides PDFs
+name: Slides PDFs
 
 on:
+  pull_request:
+    paths:
+      - "*.md"
+      - "*.svg"
+      - ".github/workflows/release-slides.yml"
   push:
     branches: [default]
     paths:
@@ -9,12 +14,12 @@ on:
       - ".github/workflows/release-slides.yml"
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +34,59 @@ jobs:
           npx @marp-team/marp-cli@latest slides_40.md --pdf --html
           npx @marp-team/marp-cli@latest lightning.md --pdf --html
 
+      - name: Upload PDFs as artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: slides-pdfs-${{ github.sha }}
+          path: "*.pdf"
+          retention-days: 30
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- slides-pdf-comment -->';
+            const artifactUrl = '${{ steps.upload.outputs.artifact-url }}';
+            const body = [
+              marker,
+              '📄 **Slides PDFs generated**',
+              '',
+              '| File | Description |',
+              '|---|---|',
+              '| `slides.pdf` | Full talk |',
+              '| `slides_40.pdf` | 40-min version |',
+              '| `lightning.pdf` | Lightning talk |',
+              '',
+              `[⬇️ Download all PDFs](${artifactUrl})`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c => c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
       - name: Create release
+        if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
