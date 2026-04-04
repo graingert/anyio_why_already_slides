@@ -66,7 +66,7 @@ https://graingert.co.uk/why-anyio-already
 
 ---
 
-# No event loop required
+# It's Generators All the Way Down
 
 ```python
 import types
@@ -79,13 +79,16 @@ async def async_range():
     await _async_yield(1)
     await _async_yield(2)
     await _async_yield(3)
-
-coro = async_range()
-gen = coro.__await__()
-list(gen)  # [1, 2, 3]  - no asyncio, no event loop
 ```
 
-<!-- @types.coroutine: marks a generator function as a coroutine function. When the function is called, the resulting generator iterator is also considered a coroutine object and is awaitable. Bridges yield-from generators with async/await. _async_yield is a raw coroutine that just yields a value. async_range is a normal async function built on top - no asyncio anywhere. grab the __await__ iterator, drain it into a list. no event loop, no scheduler, just generators. this is how multiple async frameworks can coexist. -->
+```python
+coro = async_range()
+list(coro.__await__())  # [1, 2, 3] — no asyncio, no event loop
+```
+
+`async`/`await` is just the generator protocol. Any framework can drive it.
+
+<!-- grab the __await__ iterator, drain it into a list. no event loop, no scheduler, just generators. this is why multiple async frameworks can use the same async/await syntax. -->
 
 ---
 
