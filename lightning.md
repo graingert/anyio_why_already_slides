@@ -9,6 +9,8 @@ html: true
 
 ⚡ Lightning Talk · https://graingert.co.uk/why-anyio-already
 
+<style>table { display: table !important; width: 100% !important; table-layout: fixed !important; }</style>
+
 <!-- hi everyone, I'm going to give you the speedrun on AnyIO. Why you should use it — and why you probably already have it installed. -->
 
 ---
@@ -85,10 +87,6 @@ async with anyio.create_task_group() as tg:
 ---
 
 # Level Cancellation vs Edge Cancellation
-
-<style scoped>
-table { display: table !important; width: 100% !important; table-layout: fixed !important; }
-</style>
 
 <table>
 <tr>

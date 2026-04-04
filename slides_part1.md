@@ -8,6 +8,8 @@ html: true
 
 https://graingert.co.uk/why-anyio-already
 
+<style>table { display: table !important; width: 100% !important; table-layout: fixed !important; }</style>
+
 <!-- Part 1 of 3 -->
 
 ---

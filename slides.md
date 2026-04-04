@@ -9,6 +9,8 @@ html: true
 
 https://graingert.co.uk/why-anyio-already
 
+<style>table { display: table !important; width: 100% !important; table-layout: fixed !important; }</style>
+
 <!-- right so this is a talk about AnyIO. you probably already have it installed and don't know it. I'm going to try and convince you to actually use it on purpose. -->
 
 ---
@@ -1147,7 +1149,7 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 
 # Comparison
 
-| | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
+| | `asyncio.shield` | anyio.CancelScope(<br>&nbsp;&nbsp;&nbsp;&nbsp;shield=True,<br>) |
 |---|---|---|
 | Cancellation model | Edge (one-shot) | Level (persistent, deferred) |
 | Scope | Single `await` | Entire `with` block |
