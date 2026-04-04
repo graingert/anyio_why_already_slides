@@ -805,7 +805,7 @@ asyncio.run(main())
 
 ---
 
-# asyncio Output
+# asyncio Output *(Python 3.14 — deadlock affects all current versions)*
 
 <!-- walk through it: task_with_finally sleeps, then in its finally block awaits a Future that never completes. crash_soon raises after 1 second. the TaskGroup cancels task_with_finally, but because cancellation is edge-triggered, the finally block's `await never` is NOT cancelled - it just hangs forever. you have to Ctrl+C multiple times to kill it. -->
 
@@ -1166,34 +1166,38 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 
 <!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. the process case makes this crystal clear - you need to shield a multi-step cleanup sequence. -->
 
+
 ---
 
-<style scoped>section { font-size: 22px; }</style>
+<style scoped>section { font-size: 22px; padding-top: 20px; }</style>
 
 # Mixing Native asyncio Cancellation
 
+❌ `task.cancel()` injects `CancelledError` directly, bypassing AnyIO's cancel scope stack — the shield cannot defer it:
+
 ```python
-async def some_coro():
+async def ham():
     with anyio.CancelScope(shield=True):
-        await asyncio.sleep(10)  # ⚠️ shield does NOT protect you
+        await spam()  # shield does NOT protect against task.cancel()
 
-async def bad_cancel():
-    task = asyncio.create_task(some_coro())
-    task.cancel()           # cancel before task even starts
-    await task              # CancelledError - shield had no chance to run
-
-async def bad_timeout():
-    async with asyncio.timeout(5):
-        await some_coro()   # asyncio.timeout cancels the task directly too
+async def bad():
+    task = asyncio.create_task(ham())
+    task.cancel()   # bypasses AnyIO's cancel scope machinery entirely
+    await task      # CancelledError — task never started
 ```
 
-❌ `task.cancel()` and `asyncio.timeout` inject `CancelledError` directly into the task - **bypassing AnyIO's cancel scope stack entirely**
+✅ `tg.cancel_scope.cancel()` goes through AnyIO's machinery — the shield defers it correctly:
 
-❌ `anyio.CancelScope(shield=True)` only intercepts cancellations delivered through **AnyIO's own cancel scope machinery**
+```python
+async def main():
+    async with anyio.create_task_group() as tg:
+        tg.cancel_scope.cancel()
+        tg.start_soon(ham)  # spam() runs to completion ✅
+```
 
-✅ Use AnyIO end-to-end: replace `asyncio.timeout` with `anyio.move_on_after`, replace `task.cancel()` with `tg.cancel_scope.cancel()`
+AnyIO guarantees every `start_soon`'d task runs to its first `await` before cancellation is delivered — so `with anyio.CancelScope(shield=True):` (synchronous) is always entered first.
 
-<!-- this is a critical gotcha. anyio's cancel scope shield works by tracking a scope stack and deferring cancellations that arrive through that stack. but task.cancel() and asyncio.timeout inject CancelledError directly at the current checkpoint via the event loop, completely bypassing AnyIO's machinery. the shield has no chance to intercept it. if you mix native asyncio cancellation primitives with anyio cancel scopes, shielding silently stops working. the only safe approach is to use AnyIO consistently for all cancellation and timeouts. -->
+<!-- task.cancel() is a raw asyncio operation that bypasses AnyIO's cancel scope stack entirely. CancelScope(shield=True) only defers cancellations delivered through AnyIO's own machinery. tg.cancel_scope.cancel() goes through that machinery, so the shield works. AnyIO's start_soon guarantee means the synchronous with block is always entered before cancellation fires, so the shield is always in place. -->
 
 ---
 
@@ -1300,8 +1304,8 @@ async def news_and_weather():
 
 Three resources enter one `async with`: the send stream, receive stream, and task group. They're all closed/joined together on exit — **in the right order, even under exceptions or cancellation**.
 
-- `tx` and `rx` are closed first (stopping new work)
-- the task group is joined last (waiting for running tasks to finish)
+- `tx.close()` is called explicitly in the body — this is what signals end-of-stream to tasks
+- `async with tx, rx` exits in *reverse* entry order: `tg.__aexit__` first (joins tasks), then `rx`, then `tx` — the explicit close is what actually stops new work before the tasks finish
 - `MemoryObjectStream.__aenter__` returns `self` without yielding — not a real checkpoint — so the structured shutdown guarantee still holds
 
 <!-- the key insight: async with on a MemoryObjectStream doesn't yield to the event loop, so it's safe to use inside a task group even with cancellation. everything closes in structured order. -->
@@ -1356,9 +1360,7 @@ q.shutdown()
 
 But:
 
--   Only on *new* Python
-
--   Not widely deployed yet
+-   Only on Python 3.13+
 
 -   Still no cloning
 
@@ -1385,32 +1387,15 @@ predates it.
 ---
 # "If I'm already using Trio, I don't need AnyIO."
 
-Most people assume this. But AnyIO adds real value even on the Trio backend.
+Trio is a minimal framework — only what's mandatory for a network framework. AnyIO is a portability + abstraction layer with batteries included.
 
-### What AnyIO adds on top of Trio
+What AnyIO adds on top of Trio:
 
--   ✅ Backend portability (asyncio, Trio)
-
--   ✅ A stable public API for libraries
-
--   ✅ High-level stream utilities
-
--   ✅ Buffered byte streams
-
--   ✅ Stapled streams
-
+-   ✅ Backend portability (asyncio and Trio) — a stable public API for libraries
+-   ✅ High-level stream utilities: `BufferedByteReceiveStream`, `StapledStream`, `anyio.Path`
 -   ✅ Thread/subprocess/subinterpreter helpers
 
-<!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include - buffered byte streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
-
----
-
-# Trio vs AnyIO
-
-- Trio is a minimal framework - only gives you what is mandatory of a network framework
-- AnyIO is a portability + abstraction layer with batteries included.
-
-What AnyIO adds on top of Trio: buffered byte streams, stapled streams, `anyio.Path`, thread/subprocess helpers, a stable public API for libraries, and backend portability.
+<!-- common pushback: "I already use Trio, why do I need AnyIO?" Trio is deliberately minimal - it only gives you what a network framework must provide. AnyIO is batteries-included on top of that. -->
 
 ---
 
@@ -1693,7 +1678,7 @@ def anyio_backend():
 
 | Feature | Benefit |
 |---|---|
-| **TCP/UDP/UNIX sockets** | Happy Eyeballs built in; async/await UDP (no Transports/Protocols) |
+| **TCP/UDP/UNIX sockets** | Happy Eyeballs built in (fixed refcycles in CPython's implementation); async/await UDP — no Transports/Protocols |
 | **TLS streams** | `TLSStream` wraps any byte stream with TLS, not just sockets |
 | **Subprocesses** | `run_process()` / `open_process()` with async stream I/O on stdin/stdout/stderr |
 | **Signal handling** | `open_signal_receiver()` - async iterator over OS signals |
@@ -1880,6 +1865,7 @@ anyio==4.12.1
 **Further reading:**
 - [graingert.co.uk/trio-sc](https://graingert.co.uk/trio-sc) - Go statement considered harmful (njs)
 - [graingert.co.uk/dijkstra68](https://graingert.co.uk/dijkstra68) - Go To Statement Considered Harmful (1968)
+- [anyio.readthedocs.io](https://anyio.readthedocs.io) — AnyIO documentation
 - [graingert.co.uk/dabeaz-gen](https://graingert.co.uk/dabeaz-gen) - Generator Tricks for Systems Programmers
 - [graingert.co.uk/dabeaz-coro](https://graingert.co.uk/dabeaz-coro) - A Curious Course on Coroutines and Concurrency
 - [graingert.co.uk/dabeaz-final](https://graingert.co.uk/dabeaz-final) - Generators: The Final Frontier

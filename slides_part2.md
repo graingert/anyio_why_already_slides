@@ -200,7 +200,7 @@ asyncio.run(main())
 
 ---
 
-# asyncio Output
+# asyncio Output *(Python 3.14 — deadlock affects all current versions)*
 
 <!-- walk through it: task_with_finally sleeps, then in its finally block awaits a Future that never completes. crash_soon raises after 1 second. the TaskGroup cancels task_with_finally, but because cancellation is edge-triggered, the finally block's `await never` is NOT cancelled - it just hangs forever. you have to Ctrl+C multiple times to kill it. -->
 
@@ -546,6 +546,38 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 
 ---
 
+<style scoped>section { font-size: 22px; padding-top: 20px; }</style>
+
+# Mixing Native asyncio Cancellation
+
+❌ `task.cancel()` injects `CancelledError` directly, bypassing AnyIO's cancel scope stack — the shield cannot defer it:
+
+```python
+async def ham():
+    with anyio.CancelScope(shield=True):
+        await spam()  # shield does NOT protect against task.cancel()
+
+async def bad():
+    task = asyncio.create_task(ham())
+    task.cancel()   # bypasses AnyIO's cancel scope machinery entirely
+    await task      # CancelledError — task never started
+```
+
+✅ `tg.cancel_scope.cancel()` goes through AnyIO's machinery — the shield defers it correctly:
+
+```python
+async def main():
+    async with anyio.create_task_group() as tg:
+        tg.cancel_scope.cancel()
+        tg.start_soon(ham)  # spam() runs to completion ✅
+```
+
+AnyIO guarantees every `start_soon`'d task runs to its first `await` before cancellation is delivered — so `with anyio.CancelScope(shield=True):` (synchronous) is always entered first.
+
+<!-- task.cancel() is a raw asyncio operation that bypasses AnyIO's cancel scope stack entirely. CancelScope(shield=True) only defers cancellations delivered through AnyIO's own machinery. tg.cancel_scope.cancel() goes through that machinery, so the shield works. AnyIO's start_soon guarantee means the synchronous with block is always entered before cancellation fires, so the shield is always in place. -->
+
+---
+
 <style scoped>section { padding-top: 15px; }</style>
 
 # Comparison
@@ -561,34 +593,6 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 
 <!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. the process case makes this crystal clear - you need to shield a multi-step cleanup sequence. -->
 
----
-
-<style scoped>section { font-size: 22px; }</style>
-
-# Mixing Native asyncio Cancellation
-
-```python
-async def some_coro():
-    with anyio.CancelScope(shield=True):
-        await asyncio.sleep(10)  # ⚠️ shield does NOT protect you
-
-async def bad_cancel():
-    task = asyncio.create_task(some_coro())
-    task.cancel()           # cancel before task even starts
-    await task              # CancelledError - shield had no chance to run
-
-async def bad_timeout():
-    async with asyncio.timeout(5):
-        await some_coro()   # asyncio.timeout cancels the task directly too
-```
-
-❌ `task.cancel()` and `asyncio.timeout` inject `CancelledError` directly into the task - **bypassing AnyIO's cancel scope stack entirely**
-
-❌ `anyio.CancelScope(shield=True)` only intercepts cancellations delivered through **AnyIO's own cancel scope machinery**
-
-✅ Use AnyIO end-to-end: replace `asyncio.timeout` with `anyio.move_on_after`, replace `task.cancel()` with `tg.cancel_scope.cancel()`
-
-<!-- this is a critical gotcha. anyio's cancel scope shield works by tracking a scope stack and deferring cancellations that arrive through that stack. but task.cancel() and asyncio.timeout inject CancelledError directly at the current checkpoint via the event loop, completely bypassing AnyIO's machinery. the shield has no chance to intercept it. if you mix native asyncio cancellation primitives with anyio cancel scopes, shielding silently stops working. the only safe approach is to use AnyIO consistently for all cancellation and timeouts. -->
 
 ---
 
@@ -699,6 +703,7 @@ anyio==4.12.1
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 
 **Further reading:**
+- [anyio.readthedocs.io](https://anyio.readthedocs.io) — AnyIO documentation
 - [graingert.co.uk/dabeaz-gen](https://graingert.co.uk/dabeaz-gen) — Generator Tricks for Systems Programmers
 - [graingert.co.uk/dabeaz-coro](https://graingert.co.uk/dabeaz-coro) — A Curious Course on Coroutines and Concurrency
 - [graingert.co.uk/dabeaz-final](https://graingert.co.uk/dabeaz-final) — Generators: The Final Frontier

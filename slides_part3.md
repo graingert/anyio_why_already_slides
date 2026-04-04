@@ -213,8 +213,8 @@ async def news_and_weather():
 
 Three resources enter one `async with`: the send stream, receive stream, and task group. They're all closed/joined together on exit — **in the right order, even under exceptions or cancellation**.
 
-- `tx` and `rx` are closed first (stopping new work)
-- the task group is joined last (waiting for running tasks to finish)
+- `tx.close()` is called explicitly in the body — this is what signals end-of-stream to tasks
+- `async with tx, rx` exits in *reverse* entry order: `tg.__aexit__` first (joins tasks), then `rx`, then `tx` — the explicit close is what actually stops new work before the tasks finish
 - `MemoryObjectStream.__aenter__` returns `self` without yielding — not a real checkpoint — so the structured shutdown guarantee still holds
 
 <!-- the key insight: async with on a MemoryObjectStream doesn't yield to the event loop, so it's safe to use inside a task group even with cancellation. everything closes in structured order. -->
@@ -269,9 +269,7 @@ q.shutdown()
 
 But:
 
--   Only on *new* Python
-
--   Not widely deployed yet
+-   Only on Python 3.13+
 
 -   Still no cloning
 
@@ -300,32 +298,15 @@ predates it.
 
 # "If I'm already using Trio, I don't need AnyIO."
 
-Most people assume this. But AnyIO adds real value even on the Trio backend.
+Trio is a minimal framework — only what's mandatory for a network framework. AnyIO is a portability + abstraction layer with batteries included.
 
-### What AnyIO adds on top of Trio
+What AnyIO adds on top of Trio:
 
--   ✅ Backend portability (asyncio, Trio)
-
--   ✅ A stable public API for libraries
-
--   ✅ High-level stream utilities
-
--   ✅ Buffered byte streams
-
--   ✅ Stapled streams
-
+-   ✅ Backend portability (asyncio and Trio) — a stable public API for libraries
+-   ✅ High-level stream utilities: `BufferedByteReceiveStream`, `StapledStream`, `anyio.Path`
 -   ✅ Thread/subprocess/subinterpreter helpers
 
-<!-- common pushback: "I already use Trio, why do I need AnyIO?" AnyIO adds real value even on Trio. it provides higher-level abstractions Trio intentionally doesn't include - buffered byte streams, stapled streams. Trio is deliberately minimal; AnyIO is batteries-included. -->
-
----
-
-# Trio vs AnyIO
-
-- Trio is a minimal framework - only gives you what is mandatory of a network framework
-- AnyIO is a portability + abstraction layer with batteries included.
-
-What AnyIO adds on top of Trio: buffered byte streams, stapled streams, `anyio.Path`, thread/subprocess helpers, a stable public API for libraries, and backend portability.
+<!-- common pushback: "I already use Trio, why do I need AnyIO?" Trio is deliberately minimal - it only gives you what a network framework must provide. AnyIO is batteries-included on top of that. -->
 
 ---
 
@@ -611,7 +592,7 @@ def anyio_backend():
 
 | Feature | Benefit |
 |---|---|
-| **TCP/UDP/UNIX sockets** | Happy Eyeballs built in; async/await UDP (no Transports/Protocols) |
+| **TCP/UDP/UNIX sockets** | Happy Eyeballs built in (fixed refcycles in CPython's implementation); async/await UDP — no Transports/Protocols |
 | **TLS streams** | `TLSStream` wraps any byte stream with TLS, not just sockets |
 | **Subprocesses** | `run_process()` / `open_process()` with async stream I/O on stdin/stdout/stderr |
 | **Signal handling** | `open_signal_receiver()` - async iterator over OS signals |
@@ -797,6 +778,7 @@ anyio==4.12.1
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 
 **Further reading:**
+- [anyio.readthedocs.io](https://anyio.readthedocs.io) — AnyIO documentation
 - [graingert.co.uk/dabeaz-gen](https://graingert.co.uk/dabeaz-gen) — Generator Tricks for Systems Programmers
 - [graingert.co.uk/dabeaz-coro](https://graingert.co.uk/dabeaz-coro) — A Curious Course on Coroutines and Concurrency
 - [graingert.co.uk/dabeaz-final](https://graingert.co.uk/dabeaz-final) — Generators: The Final Frontier
