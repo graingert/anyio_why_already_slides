@@ -1,0 +1,47 @@
+name: Release Slides PDFs
+
+on:
+  push:
+    branches: [default]
+    paths:
+      - "*.md"
+      - "*.svg"
+      - ".github/workflows/release-slides.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Generate PDFs
+        run: |
+          npx @marp-team/marp-cli@latest slides.md    --pdf --html
+          npx @marp-team/marp-cli@latest slides_40.md --pdf --html
+          npx @marp-team/marp-cli@latest lightning.md --pdf --html
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          DATE=$(date -u +%Y%m%d)
+          TAG="slides-${DATE}-${SHORT_SHA}"
+
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+
+          gh release create "${TAG}" \
+            --title "Slides ${DATE} (${SHORT_SHA})" \
+            --notes "${COMMIT_MSG}" \
+            slides.pdf \
+            slides_40.pdf \
+            lightning.pdf
