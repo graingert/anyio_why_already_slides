@@ -156,7 +156,7 @@ Edge cancellation = **your 0s timeout becomes a 1000s timeout**. Level cancellat
 You probably already have it.
 
 ```
-anyio==4.12.1
+anyio==4.13.0
 ├── starlette → fastapi, mcp
 ├── httpx → mcp, jupyterlab
 ├── jupyter_server → notebook, jupyterlab
