@@ -157,46 +157,10 @@ You probably already have it.
 
 ```
 anyio==4.13.0
-├── starlette==1.0.0 [requires: anyio>=3.6.2,<5]
-│   ├── fastapi==0.135.3 [requires: starlette>=0.46.0]
-│   ├── sse-starlette==3.3.4 [requires: starlette>=0.49.1]
-│   │   └── mcp==1.27.0 [requires: sse-starlette>=1.6.1]
-│   └── mcp==1.27.0 [requires: starlette>=0.27]
-├── jupyter_server==2.17.0 [requires: anyio>=3.1.0]
-│   ├── jupyterlab==4.5.6 [requires: jupyter_server>=2.4.0,<3]
-│   │   ├── notebook==7.5.5 [requires: jupyterlab>=4.5.6,<4.6]
-│   │   │   └── jupyter==1.1.1 [requires: notebook]
-│   │   └── jupyter==1.1.1 [requires: jupyterlab]
-│   ├── jupyter-lsp==2.3.1 [requires: jupyter_server>=1.1.2]
-│   │   └── jupyterlab==4.5.6 [requires: jupyter-lsp>=2.0.0]
-│   │       ├── notebook==7.5.5 [requires: jupyterlab>=4.5.6,<4.6]
-│   │       │   └── jupyter==1.1.1 [requires: notebook]
-│   │       └── jupyter==1.1.1 [requires: jupyterlab]
-│   ├── notebook==7.5.5 [requires: jupyter_server>=2.4.0,<3]
-│   │   └── jupyter==1.1.1 [requires: notebook]
-│   ├── jupyterlab_server==2.28.0 [requires: jupyter_server>=1.21,<3]
-│   │   ├── jupyterlab==4.5.6 [requires: jupyterlab_server>=2.28.0,<3]
-│   │   │   ├── notebook==7.5.5 [requires: jupyterlab>=4.5.6,<4.6]
-│   │   │   │   └── jupyter==1.1.1 [requires: notebook]
-│   │   │   └── jupyter==1.1.1 [requires: jupyterlab]
-│   │   └── notebook==7.5.5 [requires: jupyterlab_server>=2.28.0,<3]
-│   │       └── jupyter==1.1.1 [requires: notebook]
-│   └── notebook_shim==0.2.4 [requires: jupyter_server>=1.8,<3]
-│       ├── jupyterlab==4.5.6 [requires: notebook_shim>=0.2]
-│       │   ├── notebook==7.5.5 [requires: jupyterlab>=4.5.6,<4.6]
-│       │   │   └── jupyter==1.1.1 [requires: notebook]
-│       │   └── jupyter==1.1.1 [requires: jupyterlab]
-│       └── notebook==7.5.5 [requires: notebook_shim>=0.2,<0.3]
-│           └── jupyter==1.1.1 [requires: notebook]
-├── sse-starlette==3.3.4 [requires: anyio>=4.7.0]
-│   └── mcp==1.27.0 [requires: sse-starlette>=1.6.1]
-├── httpx==0.28.1 [requires: anyio]
-│   ├── jupyterlab==4.5.6 [requires: httpx>=0.25.0,<1]
-│   │   ├── notebook==7.5.5 [requires: jupyterlab>=4.5.6,<4.6]
-│   │   │   └── jupyter==1.1.1 [requires: notebook]
-│   │   └── jupyter==1.1.1 [requires: jupyterlab]
-│   └── mcp==1.27.0 [requires: httpx>=0.27.1]
-└── mcp==1.27.0 [requires: anyio>=4.5]
+├── starlette → fastapi, mcp
+├── httpx → mcp, jupyterlab
+├── jupyter_server → notebook, jupyterlab
+└── mcp
 ```
 
 Installed `httpx`, `fastapi`, `jupyter`, or `mcp`? **AnyIO is already in your virtualenv.** Might as well use it on purpose.
