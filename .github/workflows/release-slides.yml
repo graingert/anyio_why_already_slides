@@ -1,4 +1,4 @@
-name: Slides PDFs
+name: Slides PDFs + PPTX
 
 on:
   pull_request:
@@ -30,21 +30,27 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Generate PDFs
+      - name: Generate PDFs and PPTX
         run: |
-          npx @marp-team/marp-cli@latest slides.md        --pdf --html
-          npx @marp-team/marp-cli@latest slides_40.md     --pdf --html
-          npx @marp-team/marp-cli@latest lightning.md     --pdf --html
-          npx @marp-team/marp-cli@latest slides_part1.md  --pdf --html
-          npx @marp-team/marp-cli@latest slides_part2.md  --pdf --html
-          npx @marp-team/marp-cli@latest slides_part3.md  --pdf --html
+          for deck in slides slides_40 lightning slides_part1 slides_part2 slides_part3; do
+            npx @marp-team/marp-cli@latest ${deck}.md --pdf  --html
+            npx @marp-team/marp-cli@latest ${deck}.md --pptx --html
+          done
 
       - name: Upload PDFs as artifact
-        id: upload
+        id: upload-pdf
         uses: actions/upload-artifact@v4
         with:
           name: slides-pdfs-${{ github.sha }}
           path: "*.pdf"
+          retention-days: 30
+
+      - name: Upload PPTX as artifact
+        id: upload-pptx
+        uses: actions/upload-artifact@v4
+        with:
+          name: slides-pptx-${{ github.sha }}
+          path: "*.pptx"
           retention-days: 30
 
       - name: Comment on PR
@@ -52,21 +58,23 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const artifactUrl = '${{ steps.upload.outputs.artifact-url }}';
+            const pdfUrl  = '${{ steps.upload-pdf.outputs.artifact-url }}';
+            const pptxUrl = '${{ steps.upload-pptx.outputs.artifact-url }}';
             const sha = context.payload.pull_request.head.sha.slice(0, 7);
             const body = [
-              '📄 **Slides PDFs generated** for ' + sha,
+              '📄 **Slides generated** for ' + sha,
               '',
               '| File | Description |',
               '|---|---|',
-              '| `slides.pdf` | Full talk |',
-              '| `slides_40.pdf` | 40-min version |',
-              '| `lightning.pdf` | Lightning talk |',
-              '| `slides_part1.pdf` | Part 1: asyncio ≠ async/await + Structured Concurrency |',
-              '| `slides_part2.pdf` | Part 2: Level-Triggered Cancellation + Shielding |',
-              '| `slides_part3.pdf` | Part 3: AnyIO Features + Why You Already Have It |',
+              '| `slides` | Full talk |',
+              '| `slides_40` | 40-min version |',
+              '| `lightning` | Lightning talk |',
+              '| `slides_part1` | Part 1: asyncio ≠ async/await + Structured Concurrency |',
+              '| `slides_part2` | Part 2: Level-Triggered Cancellation + Shielding |',
+              '| `slides_part3` | Part 3: AnyIO Features + Why You Already Have It |',
               '',
-              `[⬇️ Download all PDFs](${artifactUrl})`,
+              `[⬇️ Download PDFs](${pdfUrl})`,
+              `[⬇️ Download PPTX](${pptxUrl})`,
             ].join('\n');
 
             await github.rest.issues.createComment({
@@ -82,17 +90,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           SHORT_SHA=$(git rev-parse --short HEAD)
-          DATE=$(date -u +%Y%m%d)
-          TAG="slides-${DATE}-${SHORT_SHA}"
+          DATETIME=$(date -u +%Y%m%d-%H%M%S)
+          TAG="slides-${DATETIME}-${SHORT_SHA}"
 
           COMMIT_MSG=$(git log -1 --pretty=%s)
 
           gh release create "${TAG}" \
-            --title "Slides ${DATE} (${SHORT_SHA})" \
+            --title "Slides ${DATETIME} (${SHORT_SHA})" \
             --notes "${COMMIT_MSG}" \
-            slides.pdf \
-            slides_40.pdf \
-            lightning.pdf \
-            slides_part1.pdf \
-            slides_part2.pdf \
-            slides_part3.pdf
+            slides.pdf       slides.pptx \
+            slides_40.pdf    slides_40.pptx \
+            lightning.pdf    lightning.pptx \
+            slides_part1.pdf slides_part1.pptx \
+            slides_part2.pdf slides_part2.pptx \
+            slides_part3.pdf slides_part3.pptx
