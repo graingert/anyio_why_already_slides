@@ -6,6 +6,8 @@ on:
       - "*.svg"
       - "*.md"
       - "embed_svgs.py"
+      - "requirements*.txt"
+      - "requirements*.in"
       - ".github/workflows/check-embedded-svgs.yml"
 
 jobs:
@@ -19,8 +21,13 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+
       - name: Re-embed SVGs
-        run: python3 embed_svgs.py
+        run: .venv/bin/python embed_svgs.py
 
       - name: Fail if slides are out of sync with SVG sources
         run: |
