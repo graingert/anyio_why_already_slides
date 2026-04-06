@@ -510,7 +510,7 @@ async def process(data: str, request: Request[State]) -> ProcessResponse:
     return ProcessResponse(status="accepted")
 ```
 
-<!-- the task group lives for the lifetime of the app. individual requests can start_soon without waiting - fire and forget from the endpoint's point of view. but the tasks are still supervised: errors propagate, and on shutdown the lifespan context waits for all tasks to finish before the server exits. -->
+<!-- the task group lives for the lifetime of the app. individual requests can start_soon without waiting - fire and forget from the endpoint's point of view. but the tasks are still supervised: errors propagate, and on shutdown the lifespan context waits for all tasks to finish before the server exits. note: Request[State] generic support requires starlette>=0.37.0. with older versions use request.state.tg (attribute access) instead of request.state["tg"] (dict access). -->
 
 ---
 

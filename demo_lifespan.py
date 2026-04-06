@@ -1,3 +1,9 @@
+"""FastAPI lifespan pattern for long-lived task groups.
+
+Requires starlette>=0.37.0 for generic ``Request[State]`` support.
+With older versions, use ``request.state.tg`` (attribute access) instead
+of ``request.state["tg"]`` (dict access).
+"""
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
