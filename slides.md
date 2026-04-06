@@ -34,6 +34,8 @@ https://graingert.co.uk/why-anyio-already
 ---
 <style scoped>section{font-size:22px; padding-top:10px;}</style>
 
+<style scoped>section { font-size: 22px; }</style>
+
 # Agenda
 
 * misconception: `asyncio` == `async`/`await`
