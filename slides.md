@@ -34,7 +34,7 @@ https://graingert.co.uk/why-anyio-already
 ---
 <style scoped>section{font-size:22px; padding-top:10px;}</style>
 
-<style scoped>section { font-size: 22px; padding-top: 10px; } section ul { columns: 2; column-gap: 2em; } section > ul > li { break-inside: avoid; }</style>
+<style scoped>section { font-size: 22px; padding-top: 10px; } .twocol { columns: 2; column-gap: 1.5em; font-size: 20px; } .twocol li { break-inside: avoid; }</style>
 
 # Agenda
 
@@ -47,13 +47,7 @@ https://graingert.co.uk/why-anyio-already
   * cancellations are level-triggered (not edge-triggered like asyncio)
 * `asyncio.shield` vs shielded `CancelScope`s
 * some of my favourite AnyIO features
-    * memory object streams (`asyncio.Queue` done right)
-    * writing libraries: target AnyIO, not Trio
-    * buffered byte streams — `receive_until` / `receive_exactly`
-    * `anyio.Path`
-    * pytest plugin built in
-    * summary of features
-    * the advantage of being on PyPI
+<ul class="twocol"><li>memory object streams</li><li>writing libraries: target AnyIO, not Trio</li><li>buffered byte streams</li><li><code>anyio.Path</code></li><li>pytest plugin built in</li><li>summary of features</li><li>the advantage of being on PyPI</li></ul>
 * why you already have AnyIO installed
 
 <!-- here's the plan. first I'll clear up the misconception that asyncio IS async/await, then I'll explain why create_task is broken, cover structured concurrency and the "return without waiting" pattern, then the two main reasons to use AnyIO, cancellation semantics, features I like, and finally reveal that you've already got AnyIO installed. -->
