@@ -148,18 +148,15 @@ async def process_file(f):
 </marker>
 </defs>
 <rect fill="#f8fafc" height="180" rx="10" width="600"/>
-<line stroke="#22c55e" stroke-width="3" x1="300" x2="300" y1="10" y2="32"/>
-<circle cx="300" cy="32" fill="#64748b" r="4"/>
-<text fill="#c2410c" font-size="13" font-weight="700" text-anchor="middle" x="300" y="26">create_task()</text>
-<line stroke="#22c55e" stroke-width="3" x1="300" x2="150" y1="32" y2="32"/>
-<line marker-end="url(#asyncio-create-task-arrowGreen)" stroke="#22c55e" stroke-width="3" x1="150" x2="150" y1="32" y2="110"/>
-<line stroke="#ef4444" stroke-width="3" x1="300" x2="450" y1="32" y2="32"/>
-<line marker-end="url(#asyncio-create-task-arrowRed)" stroke="#ef4444" stroke-width="3" x1="450" x2="450" y1="32" y2="110"/>
-<text fill="#22c55e" font-size="14" font-weight="700" text-anchor="middle" x="150" y="132">parent</text>
-<text fill="#64748b" font-size="12" text-anchor="middle" x="150" y="148">returns</text>
-<text fill="#ef4444" font-size="14" font-weight="700" text-anchor="middle" x="450" y="132">myfunc</text>
-<text fill="#64748b" font-size="12" text-anchor="middle" x="450" y="148">orphaned</text>
-<line stroke="#ef4444" stroke-dasharray="5,4" stroke-width="2" x1="450" x2="450" y1="154" y2="176"/>
+<line marker-end="url(#asyncio-create-task-arrowGreen)" stroke="#22c55e" stroke-width="3" x1="150" x2="150" y1="10" y2="150"/>
+<circle cx="150" cy="100" fill="#64748b" r="4"/>
+<text fill="#c2410c" font-size="13" font-weight="700" text-anchor="middle" x="310" y="90">create_task()</text>
+<path d="M 150,100 L 350,100 Q 420,100 470,50" fill="none" marker-end="url(#asyncio-create-task-arrowRed)" stroke="#ef4444" stroke-width="3"/>
+<line stroke="#ef4444" stroke-dasharray="5,4" stroke-width="2" x1="470" x2="520" y1="50" y2="0"/>
+<text fill="#ef4444" font-size="14" font-weight="700" x="520" y="60">myfunc</text>
+<text fill="#64748b" font-size="12" x="520" y="76">orphaned</text>
+<text fill="#22c55e" font-size="13" font-weight="700" text-anchor="middle" x="150" y="164">parent continues</text>
+<text fill="#22c55e" font-size="13" font-weight="700" text-anchor="middle" x="150" y="180">or worse, returns</text>
 </svg>
 
 ⚠ no await, no supervision, no cancellation - exceptions silently swallowed
