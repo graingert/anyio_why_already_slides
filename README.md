@@ -2,18 +2,24 @@
 
 ## Slides
 
-This repository contains three sets of slides built with [Marp](https://marp.app/):
+This repository contains six sets of slides built with [Marp](https://marp.app/):
 
 - **`slides.md`** — Full-length talk: "Why you should use AnyIO and why you might already have it installed"
-- **`slides_40.md`** — Trimmed 40-minute version (including Q&A) of the full talk
-- **`lightning.md`** — Lightning talk edition: "Why You Should Use AnyIO (and Why You Already Have It Installed)"
+- **`slides_40.md`** — Trimmed 40-minute version of the full talk
+- **`lightning.md`** — Lightning talk edition (~4 minutes)
+- **`slides_part1.md`** — Part 1 of 3: asyncio ≠ async/await + Structured Concurrency
+- **`slides_part2.md`** — Part 2 of 3: Level-Triggered Cancellation + Shielding
+- **`slides_part3.md`** — Part 3 of 3: AnyIO Features + Why You Already Have It
 
-### Generating PDFs
+PDF and PPTX files are generated automatically by CI on every push to `default` and attached to a [GitHub Release](https://github.com/graingert/anyio_why_already_slides/releases).
+
+### Generating PDFs and PPTX locally
 
 ```
-npx @marp-team/marp-cli@latest lightning.md --pdf --html
-npx @marp-team/marp-cli@latest slides.md --pdf --html
-npx @marp-team/marp-cli@latest slides_40.md --pdf --html
+for deck in slides slides_40 lightning slides_part1 slides_part2 slides_part3; do
+  npx @marp-team/marp-cli@latest ${deck}.md --pdf  --html
+  npx @marp-team/marp-cli@latest ${deck}.md --pptx --html
+done
 ```
 
 ## Abstract
