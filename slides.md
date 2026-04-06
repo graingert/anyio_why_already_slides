@@ -258,6 +258,8 @@ my_function()  # Exception propagates to caller automatically
 
 ---
 
+<style scoped>section { padding-top: 10px; }</style>
+
 # The Root Cause: Unstructured Concurrency
 
 <svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 420 320" width="700" xmlns="http://www.w3.org/2000/svg">
