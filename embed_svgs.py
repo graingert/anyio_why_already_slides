@@ -6,18 +6,20 @@ Replaces <img src="filename.svg"> tags with the SVG content embedded
 directly. All element IDs are namespaced with the SVG filename stem to
 prevent collisions when multiple diagrams appear in the same document.
 
-Blank lines are stripped from the embedded SVG because CommonMark HTML
-blocks (type 6) terminate at the first blank line — any blank line
-inside an SVG causes Marp's parser to exit the HTML block and silently
-drop <defs>, breaking all gradient/marker/filter references.
+HTML comments are removed because Marp treats them as speaker notes.
+The lxml XML serialiser produces compact output with no blank lines,
+which is required because CommonMark HTML blocks (type 6) terminate at
+the first blank line.
 
 Usage:
-    python3 embed_svgs.py              # processes slides.md, slides_40.md, lightning.md
+    python3 embed_svgs.py              # processes all slide decks
     python3 embed_svgs.py slides.md    # process specific files
 """
 import re
 import sys
 from pathlib import Path
+
+from bs4 import BeautifulSoup, Comment
 
 SVG_DIR = Path(__file__).parent
 
@@ -34,39 +36,61 @@ DEFAULT_MD_FILES = [
 IMG_PATTERN = re.compile(r'<img\s+src="([\w]+\.svg)"([^>]*)>')
 
 
-def strip_blank_lines(svg_text: str) -> str:
-    """Remove blank lines from SVG content.
+def _namespace_svg(soup: BeautifulSoup, prefix: str) -> None:
+    """Prefix every ``id`` and every reference to those IDs with *prefix*."""
+    # Build old → new mapping
+    id_map: dict[str, str] = {}
+    for tag in soup.find_all(id=True):
+        old = tag['id']
+        new = f"{prefix}-{old}"
+        id_map[old] = new
+        tag['id'] = new
 
-    CommonMark HTML blocks (type 6) terminate at the first blank line, so any
-    blank line inside an embedded SVG causes the Marp markdown parser to exit
-    the HTML block and treat subsequent lines as Markdown.  SVG does not need
-    blank lines — they are purely cosmetic in the source files.
-    """
-    return '\n'.join(line for line in svg_text.splitlines() if line.strip())
+    if not id_map:
+        return
+
+    # Update url(#old) and href="#old" references in all attributes
+    url_re = re.compile(
+        r'url\(#(' + '|'.join(re.escape(k) for k in id_map) + r')\)',
+    )
+    for tag in soup.find_all(True):
+        for attr, val in list(tag.attrs.items()):
+            if not isinstance(val, str):
+                continue
+            if 'url(#' in val:
+                tag[attr] = url_re.sub(
+                    lambda m: f'url(#{id_map[m.group(1)]})', val,
+                )
+            elif val.startswith('#') and val[1:] in id_map:
+                tag[attr] = f'#{id_map[val[1:]]}'
 
 
-def strip_comments(svg_text: str) -> str:
-    """Remove HTML comments from SVG content.
+def _prepare_svg(svg_path: Path, *, width: str | None, style: str | None) -> str:
+    """Parse, clean, namespace, and serialise an SVG for inline embedding."""
+    soup = BeautifulSoup(svg_path.read_text(), 'xml')
 
-    Marp treats ``<!-- ... -->`` as speaker notes.  SVG source files use HTML
-    comments for developer annotations (e.g. ``<!-- Background -->``), and
-    these leak into the presenter view when embedded inline.
-    """
-    return re.sub(r'<!--.*?-->', '', svg_text, flags=re.DOTALL)
+    # Remove HTML comments (Marp treats them as speaker notes)
+    for comment in soup.find_all(string=lambda t: isinstance(t, Comment)):
+        comment.extract()
 
+    # Namespace IDs to avoid collisions between diagrams
+    prefix = svg_path.stem.replace('_', '-')
+    _namespace_svg(soup, prefix)
 
-def namespace_svg(svg_text: str, prefix: str) -> str:
-    """Prefix every id= and every reference to those IDs with *prefix*."""
-    ids = re.findall(r'\bid="([^"]+)"', svg_text)
-    for id_val in ids:
-        new_id = f"{prefix}-{id_val}"
-        svg_text = re.sub(rf'\bid="{re.escape(id_val)}"', f'id="{new_id}"', svg_text)
-        svg_text = re.sub(rf'url\(#{re.escape(id_val)}\)', f'url(#{new_id})', svg_text)
-        svg_text = re.sub(
-            rf'((?:xlink:)?href)="#{re.escape(id_val)}"',
-            rf'\1="#{new_id}"', svg_text,
-        )
-    return svg_text
+    # Patch the <svg> root: drop its own width/height/style, apply ours
+    svg_tag = soup.find('svg')
+    for attr in ('width', 'height', 'style'):
+        del svg_tag[attr]
+    if width:
+        svg_tag['width'] = width
+    if style:
+        svg_tag['style'] = style
+
+    # Serialise — strip blank lines left behind by comment removal,
+    # since CommonMark HTML blocks terminate at the first blank line.
+    return '\n'.join(
+        line for line in str(svg_tag).splitlines() if line.strip()
+    )
 
 
 def embed_svgs(md_path: Path) -> None:
@@ -87,23 +111,7 @@ def embed_svgs(md_path: Path) -> None:
         style = style_m.group(1) if style_m else None
 
         prefix = svg_path.stem.replace('_', '-')
-        svg = strip_blank_lines(svg_path.read_text())
-        svg = strip_comments(svg)
-        svg = namespace_svg(svg, prefix)
-
-        def patch_svg_tag(tm: re.Match) -> str:
-            attrs = tm.group(1)
-            # Drop the SVG's own width/height/style — we control those
-            attrs = re.sub(r'\s+width="[^"]*"', '', attrs)
-            attrs = re.sub(r'\s+height="[^"]*"', '', attrs)
-            attrs = re.sub(r'\s+style="[^"]*"', '', attrs)
-            if width:
-                attrs += f' width="{width}"'
-            if style:
-                attrs += f' style="{style}"'
-            return f'<svg{attrs}>'
-
-        svg = re.sub(r'<svg([^>]*)>', patch_svg_tag, svg, count=1)
+        svg = _prepare_svg(svg_path, width=width, style=style)
         print(f"  {svg_file}  prefix={prefix}  width={width}")
         return svg
 

@@ -482,53 +482,39 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <style scoped>section { padding-top: 10px; }</style>
 
 # Shielding in Detail: asyncio.shield
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 280" font-family="'Courier New', monospace" width="650" style="display: block; margin: 0 auto;">
-  <defs>
-    <marker id="asyncio-shield-arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#dc2626"/></marker>
-    <marker id="asyncio-shield-arr-muted" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#9ca0b0"/></marker>
-  </defs>
-  
-  <rect width="700" height="340" fill="#eff1f5" rx="12"/>
-  
-  <text x="350" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">asyncio.shield -- what happens under cancellation</text>
-  <line x1="20" y1="40" x2="680" y2="40" stroke="#dc2626" stroke-width="1" opacity="0.4"/>
-  
-  <text x="170" y="62" text-anchor="middle" font-size="14" fill="#475569" font-weight="600">what your code sees</text>
-  <text x="530" y="62" text-anchor="middle" font-size="14" fill="#475569" font-weight="600">what happens inside shield()</text>
-  
-  <line x1="350" y1="50" x2="350" y2="270" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
-  <text x="350" y="182" text-anchor="middle" font-size="14" fill="#94a3b8" font-weight="700" transform="rotate(-90,350,182)">one-way barrier</text>
-  
-  
-  <rect x="40" y="78" width="230" height="52" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <text x="155" y="99" text-anchor="middle" font-size="13" fill="#475569">your code</text>
-  <text x="155" y="119" text-anchor="middle" font-size="14" font-weight="bold" fill="#2563eb">await shield(f)</text>
-  
-  <line x1="155" y1="130" x2="155" y2="158" stroke="#dc2626" stroke-width="2" marker-end="url(#asyncio-shield-arr-red)"/>
-  <text x="172" y="150" font-size="13" fill="#dc2626" font-weight="600">cancel</text>
-  
-  <rect x="30" y="164" width="250" height="52" rx="6" fill="#fecaca" stroke="#dc2626" stroke-width="2.5"/>
-  <text x="155" y="185" text-anchor="middle" font-size="13" fill="#475569">outer Future cancelled</text>
-  <text x="155" y="206" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">CancelledError</text>
-  
-  <text x="155" y="236" text-anchor="middle" font-size="12" fill="#64748b">edge-triggered:</text>
-  <text x="155" y="252" text-anchor="middle" font-size="12" fill="#64748b">cancel "used up" here</text>
-  <text x="155" y="268" text-anchor="middle" font-size="12" fill="#b45309" font-weight="600">next await may succeed [!]</text>
-  
-  
-  <rect x="380" y="78" width="290" height="52" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="2" stroke-dasharray="6,3"/>
-  <text x="525" y="99" text-anchor="middle" font-size="13" fill="#475569">inner Task (detached)</text>
-  <text x="525" y="119" text-anchor="middle" font-size="14" fill="#ea580c" font-weight="600">cancel NOT forwarded</text>
-  
-  <line x1="525" y1="130" x2="525" y2="158" stroke="#9ca0b0" stroke-width="2" marker-end="url(#asyncio-shield-arr-muted)"/>
-  <text x="542" y="150" font-size="12" fill="#64748b">runs on...</text>
-  
-  <rect x="390" y="164" width="270" height="52" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="525" y="185" text-anchor="middle" font-size="13" fill="#475569">completes eventually</text>
-  <text x="525" y="206" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">result lost [X]</text>
-  
-  <text x="525" y="236" text-anchor="middle" font-size="12" fill="#64748b">no owner, no supervision</text>
-  <text x="525" y="252" text-anchor="middle" font-size="12" fill="#64748b">resource cleanup may never run</text>
+<svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 700 280" width="650" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="asyncio-shield-arr-red" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="#dc2626"/></marker>
+<marker id="asyncio-shield-arr-muted" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="3"><path d="M0,0 L0,6 L8,3z" fill="#9ca0b0"/></marker>
+</defs>
+<rect fill="#eff1f5" height="340" rx="12" width="700"/>
+<text fill="#dc2626" font-size="16" font-weight="bold" text-anchor="middle" x="350" y="30">asyncio.shield -- what happens under cancellation</text>
+<line opacity="0.4" stroke="#dc2626" stroke-width="1" x1="20" x2="680" y1="40" y2="40"/>
+<text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="170" y="62">what your code sees</text>
+<text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="530" y="62">what happens inside shield()</text>
+<line stroke="#94a3b8" stroke-dasharray="6,4" stroke-width="2" x1="350" x2="350" y1="50" y2="270"/>
+<text fill="#94a3b8" font-size="14" font-weight="700" text-anchor="middle" transform="rotate(-90,350,182)" x="350" y="182">one-way barrier</text>
+<rect fill="#dbeafe" height="52" rx="6" stroke="#2563eb" stroke-width="2" width="230" x="40" y="78"/>
+<text fill="#475569" font-size="13" text-anchor="middle" x="155" y="99">your code</text>
+<text fill="#2563eb" font-size="14" font-weight="bold" text-anchor="middle" x="155" y="119">await shield(f)</text>
+<line marker-end="url(#asyncio-shield-arr-red)" stroke="#dc2626" stroke-width="2" x1="155" x2="155" y1="130" y2="158"/>
+<text fill="#dc2626" font-size="13" font-weight="600" x="172" y="150">cancel</text>
+<rect fill="#fecaca" height="52" rx="6" stroke="#dc2626" stroke-width="2.5" width="250" x="30" y="164"/>
+<text fill="#475569" font-size="13" text-anchor="middle" x="155" y="185">outer Future cancelled</text>
+<text fill="#dc2626" font-size="16" font-weight="bold" text-anchor="middle" x="155" y="206">CancelledError</text>
+<text fill="#64748b" font-size="12" text-anchor="middle" x="155" y="236">edge-triggered:</text>
+<text fill="#64748b" font-size="12" text-anchor="middle" x="155" y="252">cancel "used up" here</text>
+<text fill="#b45309" font-size="12" font-weight="600" text-anchor="middle" x="155" y="268">next await may succeed [!]</text>
+<rect fill="#fff7ed" height="52" rx="6" stroke="#ea580c" stroke-dasharray="6,3" stroke-width="2" width="290" x="380" y="78"/>
+<text fill="#475569" font-size="13" text-anchor="middle" x="525" y="99">inner Task (detached)</text>
+<text fill="#ea580c" font-size="14" font-weight="600" text-anchor="middle" x="525" y="119">cancel NOT forwarded</text>
+<line marker-end="url(#asyncio-shield-arr-muted)" stroke="#9ca0b0" stroke-width="2" x1="525" x2="525" y1="130" y2="158"/>
+<text fill="#64748b" font-size="12" x="542" y="150">runs on...</text>
+<rect fill="#fef2f2" height="52" rx="6" stroke="#dc2626" stroke-width="2" width="270" x="390" y="164"/>
+<text fill="#475569" font-size="13" text-anchor="middle" x="525" y="185">completes eventually</text>
+<text fill="#dc2626" font-size="16" font-weight="bold" text-anchor="middle" x="525" y="206">result lost [X]</text>
+<text fill="#64748b" font-size="12" text-anchor="middle" x="525" y="236">no owner, no supervision</text>
+<text fill="#64748b" font-size="12" text-anchor="middle" x="525" y="252">resource cleanup may never run</text>
 </svg>
 
 **What's happening:** `shield()` wraps the outer Future around an inner Task. When the outer cancel arrives, the outer Future is cancelled immediately (edge-triggered ⚡). The inner Task is orphaned — it keeps running with no owner. The result is silently discarded.
