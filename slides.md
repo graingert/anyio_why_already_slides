@@ -1035,6 +1035,45 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <!-- so this is the AnyIO equivalent. cancel arrives but is deferred at the scope boundary - not consumed. the work inside runs to completion. then when the scope exits, the cancel is reliably re-raised. no orphaned tasks, no lost results. -->
 ---
 
+# Shielding in Detail: CancelScope(shield=True) (continued)
+
+<svg font-family="'Courier New', monospace" style="float: right; margin-left: 16px;" viewBox="0 0 1100 500" width="320" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="anyio-shield-arrowGreen" markerHeight="8" markerWidth="12" orient="auto" refX="11" refY="4">
+<polygon fill="#22c55e" points="0 0, 12 4, 0 8"/>
+</marker>
+<marker id="anyio-shield-arrowAmber" markerHeight="8" markerWidth="12" orient="auto" refX="11" refY="4">
+<polygon fill="#b45309" points="0 0, 12 4, 0 8"/>
+</marker>
+</defs>
+<text fill="#475569" font-size="28" font-weight="600" text-anchor="middle" x="275" y="40">your code sees</text>
+<text fill="#475569" font-size="28" font-weight="600" text-anchor="middle" x="825" y="40">inside the scope</text>
+<rect fill="#bbf7d0" height="484" rx="5" width="14" x="543" y="8"/>
+<line stroke="#2563eb" stroke-width="4" x1="275" x2="275" y1="70" y2="96"/>
+<text fill="#2563eb" font-size="24" font-weight="700" text-anchor="middle" x="275" y="132">with CancelScope(shield=True)</text>
+<line marker-end="url(#anyio-shield-arrowAmber)" stroke="#b45309" stroke-width="4" x1="275" x2="275" y1="152" y2="200"/>
+<text fill="#b45309" font-size="20" font-weight="600" text-anchor="middle" x="275" y="240">anyio.fail_after cancels</text>
+<text fill="#b45309" font-size="18" text-anchor="middle" x="275" y="274">cancel deferred at boundary</text>
+<line marker-end="url(#anyio-shield-arrowAmber)" stroke="#b45309" stroke-width="4" x1="275" x2="275" y1="290" y2="338"/>
+<text fill="#b45309" font-size="36" font-weight="700" text-anchor="middle" x="275" y="384">CancelledError</text>
+<text fill="#22c55e" font-size="20" font-weight="600" text-anchor="middle" x="275" y="424">re-raised reliably on exit</text>
+<line stroke="#22c55e" stroke-width="4" x1="825" x2="825" y1="70" y2="96"/>
+<text fill="#22c55e" font-size="24" font-weight="600" text-anchor="middle" x="825" y="132">shielded work</text>
+<line marker-end="url(#anyio-shield-arrowGreen)" stroke="#22c55e" stroke-width="4" x1="825" x2="825" y1="152" y2="200"/>
+<text fill="#22c55e" font-size="18" x="858" y="192">protected</text>
+<text fill="#22c55e" font-size="36" font-weight="700" text-anchor="middle" x="825" y="310">runs to completion</text>
+<text fill="#64748b" font-size="20" text-anchor="middle" x="825" y="360">cancel cannot interrupt</text>
+<text fill="#64748b" font-size="20" text-anchor="middle" x="825" y="400">cleanup / I/O completes safely</text>
+<line marker-end="url(#anyio-shield-arrowGreen)" stroke="#22c55e" stroke-width="4" x1="825" x2="825" y1="420" y2="488"/>
+</svg>
+
+When `anyio.fail_after` fires, the cancellation is **deferred** at the `CancelScope(shield=True)` boundary — not consumed. The shielded work inside runs to completion: process joins, TLS shutdowns, buffer flushes all finish safely.
+
+Once the scope exits, the pending cancellation is **reliably re-raised** as `CancelledError`. No orphaned tasks, no lost results, no zombie processes.
+
+<!-- the key difference from asyncio.shield: cancel is deferred, not consumed. the work completes, THEN the cancel fires. with asyncio.shield the cancel is edge-triggered so it's used up immediately and the inner task is orphaned. here everything is structured - the scope contains the work and the cancel is re-raised predictably. -->
+---
+
 <style scoped>section { padding-top: 15px; }</style>
 
 # Comparison
