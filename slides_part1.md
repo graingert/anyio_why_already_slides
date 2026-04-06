@@ -340,7 +340,7 @@ async def structured():
 
 ---
 
-<style scoped>section { padding-top: 40px; }</style>
+<style scoped>section { padding-top: 10px; }</style>
 
 # The Fix: Structured Concurrency
 
