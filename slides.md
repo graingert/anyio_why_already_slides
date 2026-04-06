@@ -46,9 +46,12 @@ https://graingert.co.uk/why-anyio-already
 * `asyncio.shield` vs shielded `CancelScope`s
 * some of my favourite AnyIO features
     * memory object streams (`asyncio.Queue` done right)
+    * writing libraries: target AnyIO, not Trio
+    * buffered byte streams — `receive_until` / `receive_exactly`
     * `anyio.Path`
     * pytest plugin built in
     * summary of features
+    * the advantage of being on PyPI
 * why you already have AnyIO installed
 
 <!-- here's the plan. first I'll clear up the misconception that asyncio IS async/await, then I'll explain why create_task is broken, cover structured concurrency and the "return without waiting" pattern, then the two main reasons to use AnyIO, cancellation semantics, features I like, and finally reveal that you've already got AnyIO installed. -->

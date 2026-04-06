@@ -45,6 +45,7 @@ https://graingert.co.uk/why-anyio-already
   * cancellations are level-triggered (not edge-triggered like asyncio)
 * `asyncio.shield` vs shielded `CancelScope`s
 * some of my favourite AnyIO features
+* the advantage of being on PyPI
 * why you already have AnyIO installed
 
 <!-- here's the plan. first I'll clear up the misconception that asyncio IS async/await, then I'll explain why create_task is broken, cover structured concurrency and the "return without waiting" pattern, then the two main reasons to use AnyIO, cancellation semantics, features I like, and finally reveal that you've already got AnyIO installed. -->
