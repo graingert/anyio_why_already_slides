@@ -482,7 +482,7 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <style scoped>section { padding-top: 10px; }</style>
 
 # Shielding in Detail: asyncio.shield
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340" font-family="'Courier New', monospace" width="650" style="display: block; margin: 0 auto;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 280" font-family="'Courier New', monospace" width="650" style="display: block; margin: 0 auto;">
   <defs>
     <marker id="asyncio-shield-arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#dc2626"/></marker>
     <marker id="asyncio-shield-arr-muted" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#9ca0b0"/></marker>
@@ -496,7 +496,7 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
   <text x="170" y="62" text-anchor="middle" font-size="14" fill="#475569" font-weight="600">what your code sees</text>
   <text x="530" y="62" text-anchor="middle" font-size="14" fill="#475569" font-weight="600">what happens inside shield()</text>
   <!-- divider -->
-  <line x1="350" y1="50" x2="350" y2="292" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
+  <line x1="350" y1="50" x2="350" y2="270" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
   <text x="350" y="182" text-anchor="middle" font-size="14" fill="#94a3b8" font-weight="700" transform="rotate(-90,350,182)">one-way barrier</text>
   <!-- === LEFT SIDE === -->
   <!-- your code box -->
@@ -529,10 +529,6 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
   <!-- orphan note -->
   <text x="525" y="236" text-anchor="middle" font-size="12" fill="#64748b">no owner, no supervision</text>
   <text x="525" y="252" text-anchor="middle" font-size="12" fill="#64748b">resource cleanup may never run</text>
-  <!-- bottom summary -->
-  <rect x="20" y="280" width="660" height="46" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
-  <text x="350" y="300" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">cancel flows in (to outer Future) but not through (to inner Task)</text>
-  <text x="350" y="318" text-anchor="middle" font-size="12" fill="#475569">Use CancelScope(shield=True) instead -- defers cancellation, keeps the task owned</text>
 </svg>
 
 **What's happening:** `shield()` wraps the outer Future around an inner Task. When the outer cancel arrives, the outer Future is cancelled immediately (edge-triggered ⚡). The inner Task is orphaned — it keeps running with no owner. The result is silently discarded.
