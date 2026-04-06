@@ -275,7 +275,7 @@ my_function()  # Exception propagates to caller automatically
 <text fill="#2563eb" font-size="14" text-anchor="middle" x="300" y="118">async def main():</text>
 <line marker-end="url(#asyncio-create-task-arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="300" x2="300" y1="130" y2="168"/>
 <text fill="#c2410c" font-size="15" font-weight="700" text-anchor="middle" x="300" y="157">create_task()</text>
-<line stroke="#64748b" stroke-width="2.5" x1="150" x2="440" y1="182" y2="182"/>
+<line stroke="#64748b" stroke-width="2.5" x1="195" x2="395" y1="182" y2="182"/>
 <line marker-end="url(#asyncio-create-task-arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="195" x2="195" y1="182" y2="218"/>
 <line marker-end="url(#asyncio-create-task-arrowRed)" stroke="#dc2626" stroke-width="2.5" x1="395" x2="395" y1="182" y2="218"/>
 <rect fill="#f0fdf4" height="64" rx="8" stroke="#16a34a" stroke-width="2" width="190" x="100" y="224"/>
@@ -376,7 +376,7 @@ async def structured():
 <line stroke="#7c3aed" stroke-width="2" x1="390" x2="390" y1="206" y2="270"/>
 <text fill="#c2410c" font-size="14" font-weight="600" text-anchor="middle" x="390" y="228">tg.start_soon(task1)</text>
 <text fill="#c2410c" font-size="14" font-weight="600" text-anchor="middle" x="390" y="248">tg.start_soon(task2)</text>
-<line stroke="#7c3aed" stroke-width="2.5" x1="90" x2="690" y1="270" y2="270"/>
+<line stroke="#7c3aed" stroke-width="2.5" x1="155" x2="625" y1="270" y2="270"/>
 <line marker-end="url(#anyio-create-task-group-arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="155" x2="155" y1="270" y2="300"/>
 <line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#16a34a" stroke-width="2.5" x1="390" x2="390" y1="270" y2="300"/>
 <line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#16a34a" stroke-width="2.5" x1="625" x2="625" y1="270" y2="300"/>
