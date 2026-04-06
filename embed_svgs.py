@@ -93,9 +93,19 @@ def _prepare_svg(svg_path: Path, *, width: str | None, style: str | None) -> str
     )
 
 
+def _build_prefix_map() -> dict[str, Path]:
+    """Map namespace prefix → SVG source path for all local SVGs."""
+    return {
+        p.stem.replace('_', '-'): p
+        for p in SVG_DIR.glob('*.svg')
+    }
+
+
 def embed_svgs(md_path: Path) -> None:
     text = md_path.read_text()
+    prefix_map = _build_prefix_map()
 
+    # Pass 1: replace <img src="x.svg" ...> tags (first-time embedding)
     def replace_img(m: re.Match) -> str:
         svg_file = m.group(1)
         rest_attrs = m.group(2)
@@ -115,8 +125,46 @@ def embed_svgs(md_path: Path) -> None:
         print(f"  {svg_file}  prefix={prefix}  width={width}")
         return svg
 
-    new_text = IMG_PATTERN.sub(replace_img, text)
-    md_path.write_text(new_text)
+    text = IMG_PATTERN.sub(replace_img, text)
+
+    # Pass 2: replace already-embedded <svg>...</svg> blocks
+    # Can't parse the whole file as HTML (it's markdown), so find SVG
+    # blocks positionally and parse each one with BeautifulSoup.
+    parts: list[str] = []
+    pos = 0
+    while True:
+        start = text.find('<svg', pos)
+        if start == -1:
+            parts.append(text[pos:])
+            break
+        end = text.find('</svg>', start)
+        if end == -1:
+            parts.append(text[pos:])
+            break
+        end += len('</svg>')
+
+        svg_block = text[start:end]
+        soup = BeautifulSoup(svg_block, 'xml')
+        svg_tag = soup.find('svg')
+
+        # Identify which source SVG this came from via namespaced IDs
+        replacement = None
+        if svg_tag:
+            for prefix, svg_path in prefix_map.items():
+                if svg_tag.find(id=lambda v: v and v.startswith(f'{prefix}-')):
+                    width = svg_tag.get('width')
+                    style = svg_tag.get('style')
+                    replacement = _prepare_svg(svg_path, width=width, style=style)
+                    print(f"  {svg_path.name}  prefix={prefix}  width={width}  (update)")
+                    break
+
+        parts.append(text[pos:start])
+        parts.append(replacement if replacement is not None else svg_block)
+        pos = end
+
+    text = ''.join(parts)
+
+    md_path.write_text(text)
 
 
 def main() -> None:
