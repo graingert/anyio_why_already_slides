@@ -51,6 +51,9 @@ https://graingert.co.uk/why-anyio-already
   * Mixing native asyncio cancellation (gotcha!)
 * Why you probably already have AnyIO installed
 
+
+<!-- here's the plan for this part. -->
+
 ---
 
 # asyncio != async/await
@@ -298,6 +301,9 @@ async def main():
 asyncio.run(main())
 ```
 
+
+<!-- same program, one change: anyio.create_task_group instead of asyncio.TaskGroup. notice the inner functions still use asyncio.sleep and asyncio.Future directly - you don't have to rewrite everything to get the benefits. that's what incrementally adoptable means in practice. -->
+
 ---
 
 # AnyIO Output
@@ -476,6 +482,9 @@ async def to_process_run_sync(fn, *args):
 ✅ **No zombies**: structured concurrency means every process is joined
 
 The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only protect a single expression. `CancelScope(shield=True)` protects an entire logical block — terminate *and* join — which is exactly what subprocess cleanup needs.
+
+
+<!-- so why does this work where asyncio.shield doesn't? because sometimes cleanup requires I/O - you need to protect an entire logical block, not just a single await. CancelScope gives you that. and because cancellation is level-triggered, it's reliably re-raised after the shield exits. -->
 
 ---
 
@@ -676,6 +685,8 @@ anyio==4.13.0
 <style scoped>section { font-size: 21px; }</style>
 
 # Any questions?
+
+<!-- thanks! happy to take questions. I'm graingert on GitHub. -->
 
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 
