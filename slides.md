@@ -972,9 +972,13 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <line stroke="#ef4444" stroke-dasharray="5,4" stroke-width="2" x1="380" x2="380" y1="218" y2="248"/>
 </svg>
 
-**What's happening:** `shield()` wraps the outer Future around an inner Task. When the outer cancel arrives, the outer Future is cancelled immediately (edge-triggered ⚡). The inner Task is orphaned — it keeps running with no owner. The result is silently discarded.
-
 <!-- in this diagram you can see the orphaned inner task running off on its own - same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
+
+---
+
+# Shielding in Detail: asyncio.shield (continued)
+
+`shield()` wraps the outer Future around an inner Task. When the outer cancel arrives, the outer Future is cancelled immediately (edge-triggered). The inner Task is orphaned — it keeps running with no owner. The result is silently discarded.
 
 ---
 
