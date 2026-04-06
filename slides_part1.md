@@ -50,6 +50,9 @@ https://graingert.co.uk/why-anyio-already
 * Further Reading
 * Why you probably already have AnyIO installed
 
+
+<!-- here's the plan for this part. -->
+
 ---
 
 # asyncio != async/await
@@ -112,6 +115,9 @@ list(coro.__await__())  # [1, 2, 3] — no asyncio, no event loop
 - **Incrementally adoptable** — drop it into an existing asyncio codebase; your code automatically works on Trio too
 
 Think of it as: the async standard library that Python should have shipped.
+
+
+<!-- so what is AnyIO? it's the async standard library Python should have shipped. structured concurrency is the biggest conceptual shift - that's what we'll spend most of the talk on. level-triggered cancellation is the biggest practical win. and crucially, it's incrementally adoptable - you can drop it into an existing asyncio codebase today. -->
 
 ---
 
@@ -480,6 +486,9 @@ Sometimes you genuinely need to kick off work and respond immediately - e.g. a w
 
 The answer: a **long-lived task group** scoped to the application lifetime.
 
+
+<!-- I get this objection a lot. people hear "structured concurrency" and think it means you can never fire and forget. that's not true - you just need to scope it to something with a lifetime, like your application. -->
+
 ---
 
 <style scoped>section { padding-top: 20px; }</style>
@@ -682,6 +691,8 @@ anyio==4.13.0
 <style scoped>section { font-size: 21px; }</style>
 
 # Any questions?
+
+<!-- thanks! happy to take questions. I'm graingert on GitHub. -->
 
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 

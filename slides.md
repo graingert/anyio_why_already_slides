@@ -116,6 +116,9 @@ list(coro.__await__())  # [1, 2, 3] — no asyncio, no event loop
 
 Think of it as: the async standard library that Python should have shipped.
 
+
+<!-- so what is AnyIO? it's the async standard library Python should have shipped. structured concurrency is the biggest conceptual shift - that's what we'll spend most of the talk on. level-triggered cancellation is the biggest practical win. and crucially, it's incrementally adoptable - you can drop it into an existing asyncio codebase today. -->
+
 ---
 
 # How AnyIO Dispatches to the Right Backend
@@ -483,6 +486,9 @@ Sometimes you genuinely need to kick off work and respond immediately - e.g. a w
 
 The answer: a **long-lived task group** scoped to the application lifetime.
 
+
+<!-- I get this objection a lot. people hear "structured concurrency" and think it means you can never fire and forget. that's not true - you just need to scope it to something with a lifetime, like your application. -->
+
 ---
 
 <style scoped>section { padding-top: 20px; }</style>
@@ -776,6 +782,9 @@ async def main():
 asyncio.run(main())
 ```
 
+
+<!-- same program, one change: anyio.create_task_group instead of asyncio.TaskGroup. notice the inner functions still use asyncio.sleep and asyncio.Future directly - you don't have to rewrite everything to get the benefits. that's what incrementally adoptable means in practice. -->
+
 ---
 
 # AnyIO Output
@@ -954,6 +963,9 @@ async def to_process_run_sync(fn, *args):
 ✅ **No zombies**: structured concurrency means every process is joined
 
 The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only protect a single expression. `CancelScope(shield=True)` protects an entire logical block — terminate *and* join — which is exactly what subprocess cleanup needs.
+
+
+<!-- so why does this work where asyncio.shield doesn't? because sometimes cleanup requires I/O - you need to protect an entire logical block, not just a single await. CancelScope gives you that. and because cancellation is level-triggered, it's reliably re-raised after the shield exits. -->
 
 ---
 
@@ -1263,6 +1275,9 @@ If you write a library **against AnyIO**:
 
 **AnyIO is the right target for any library that wants to support both backends.**
 
+
+<!-- if you're writing a library, this matters. httpx, FastAPI, and MCP all chose AnyIO over raw Trio precisely because it doesn't lock out asyncio users. you get Trio semantics for free, and asyncio users can adopt structured concurrency incrementally. -->
+
 ---
 
 # Buffered Byte Streams (AnyIO Feature Trio Lacks)
@@ -1315,6 +1330,9 @@ async def main():
 
 anyio.run(main)
 ```
+
+
+<!-- so the producer sends both lines in a single chunk. the consumer uses receive_until to split by newline delimiter - no manual buffer management. and notice the sync `with stream:` pattern - that runs before the first await, so the clone is always closed even under cancellation. -->
 
 ---
 

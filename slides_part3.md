@@ -53,6 +53,9 @@ https://graingert.co.uk/why-anyio-already
 * Asyncio is not bad
 * Why you probably already have AnyIO installed
 
+
+<!-- here's the plan for this part. -->
+
 ---
 
 # asyncio != async/await
@@ -319,6 +322,9 @@ If you write a library **against AnyIO**:
 
 **AnyIO is the right target for any library that wants to support both backends.**
 
+
+<!-- if you're writing a library, this matters. httpx, FastAPI, and MCP all chose AnyIO over raw Trio precisely because it doesn't lock out asyncio users. you get Trio semantics for free, and asyncio users can adopt structured concurrency incrementally. -->
+
 ---
 
 # Buffered Byte Streams (AnyIO Feature Trio Lacks)
@@ -371,6 +377,9 @@ async def main():
 
 anyio.run(main)
 ```
+
+
+<!-- so the producer sends both lines in a single chunk. the consumer uses receive_until to split by newline delimiter - no manual buffer management. and notice the sync `with stream:` pattern - that runs before the first await, so the clone is always closed even under cancellation. -->
 
 ---
 
@@ -769,6 +778,8 @@ anyio==4.13.0
 <style scoped>section { font-size: 21px; }</style>
 
 # Any questions?
+
+<!-- thanks! happy to take questions. I'm graingert on GitHub. -->
 
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 

@@ -344,6 +344,9 @@ Sometimes you genuinely need to kick off work and respond immediately - e.g. a w
 
 The answer: a **long-lived task group** scoped to the application lifetime.
 
+
+<!-- I get this objection a lot. people hear "structured concurrency" and think it means you can never fire and forget. that's not true - you just need to scope it to something with a lifetime, like your application. -->
+
 ---
 
 <style scoped>section { padding-top: 20px; }</style>
