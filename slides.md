@@ -932,35 +932,34 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <style scoped>section { padding-top: 10px; }</style>
 
 # Shielding in Detail: asyncio.shield
-<svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 800 220" width="800" xmlns="http://www.w3.org/2000/svg">
+<svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 700 200" width="800" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <marker id="asyncio-shield-arrowRed" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
 <polygon fill="#ef4444" points="0 0, 8 3, 0 6"/>
 </marker>
-<marker id="asyncio-shield-arrowGreen" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
-<polygon fill="#22c55e" points="0 0, 8 3, 0 6"/>
+<marker id="asyncio-shield-arrowGrey" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
+<polygon fill="#94a3b8" points="0 0, 8 3, 0 6"/>
 </marker>
 </defs>
-<rect fill="#f8fafc" height="220" rx="10" width="800"/>
-<text fill="#ef4444" font-size="14" font-weight="700" text-anchor="middle" x="200" y="22">asyncio.timeout</text>
-<text fill="#22c55e" font-size="14" font-weight="700" text-anchor="middle" x="600" y="22">anyio.fail_after</text>
-<rect fill="#e2e8f0" height="200" rx="3" width="8" x="396" y="10"/>
-<line stroke="#2563eb" stroke-width="2.5" x1="200" x2="200" y1="36" y2="48"/>
-<text fill="#2563eb" font-size="12" font-weight="700" text-anchor="middle" x="200" y="66">await asyncio.shield(coro)</text>
-<line marker-end="url(#asyncio-shield-arrowRed)" stroke="#ef4444" stroke-width="2.5" x1="200" x2="200" y1="74" y2="94"/>
-<text fill="#ef4444" font-size="11" font-weight="600" x="226" y="90">timeout cancels</text>
-<text fill="#ef4444" font-size="15" font-weight="700" text-anchor="middle" x="200" y="116">CancelledError</text>
-<text fill="#64748b" font-size="11" text-anchor="middle" x="200" y="138">inner task keeps running</text>
-<text fill="#ef4444" font-size="11" font-weight="600" text-anchor="middle" x="200" y="154">result lost, task orphaned</text>
-<line stroke="#ef4444" stroke-dasharray="5,4" stroke-width="2" x1="200" x2="200" y1="164" y2="196"/>
-<line stroke="#2563eb" stroke-width="2.5" x1="600" x2="600" y1="36" y2="48"/>
-<text fill="#2563eb" font-size="12" font-weight="700" text-anchor="middle" x="600" y="66">with CancelScope(shield=True)</text>
-<line marker-end="url(#asyncio-shield-arrowGreen)" stroke="#22c55e" stroke-width="2.5" x1="600" x2="600" y1="74" y2="94"/>
-<text fill="#22c55e" font-size="11" font-weight="600" x="630" y="90">shielded</text>
-<text fill="#22c55e" font-size="15" font-weight="700" text-anchor="middle" x="600" y="116">work completes</text>
-<text fill="#64748b" font-size="11" text-anchor="middle" x="600" y="138">cancel deferred at scope boundary</text>
-<text fill="#22c55e" font-size="11" font-weight="600" text-anchor="middle" x="600" y="154">re-raised reliably on exit</text>
-<line marker-end="url(#asyncio-shield-arrowGreen)" stroke="#22c55e" stroke-width="2.5" x1="600" x2="600" y1="164" y2="196"/>
+<rect fill="#f8fafc" height="200" rx="10" width="700"/>
+<text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="175" y="22">your code sees</text>
+<text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="525" y="22">inside shield()</text>
+<rect fill="#fecaca" height="180" rx="3" width="8" x="345" y="10"/>
+<line stroke="#2563eb" stroke-width="2.5" x1="175" x2="175" y1="36" y2="48"/>
+<text fill="#2563eb" font-size="13" font-weight="700" text-anchor="middle" x="175" y="66">await asyncio.shield(coro)</text>
+<line marker-end="url(#asyncio-shield-arrowRed)" stroke="#ef4444" stroke-width="2.5" x1="175" x2="175" y1="74" y2="96"/>
+<text fill="#ef4444" font-size="11" font-weight="600" x="204" y="91">asyncio.timeout cancels</text>
+<text fill="#ef4444" font-size="16" font-weight="700" text-anchor="middle" x="175" y="118">CancelledError</text>
+<text fill="#64748b" font-size="11" text-anchor="middle" x="175" y="140">edge-triggered: used up</text>
+<text fill="#b45309" font-size="11" font-weight="600" text-anchor="middle" x="175" y="158">next await may succeed [!]</text>
+<line stroke="#94a3b8" stroke-width="2.5" x1="525" x2="525" y1="36" y2="48"/>
+<text fill="#ea580c" font-size="13" font-weight="600" text-anchor="middle" x="525" y="66">cancel NOT forwarded</text>
+<line marker-end="url(#asyncio-shield-arrowGrey)" stroke="#94a3b8" stroke-width="2.5" x1="525" x2="525" y1="74" y2="96"/>
+<text fill="#64748b" font-size="11" x="548" y="91">runs on...</text>
+<text fill="#ef4444" font-size="16" font-weight="700" text-anchor="middle" x="525" y="118">result lost</text>
+<text fill="#64748b" font-size="11" text-anchor="middle" x="525" y="140">no owner, no supervision</text>
+<text fill="#64748b" font-size="11" text-anchor="middle" x="525" y="158">cleanup may never run</text>
+<line stroke="#ef4444" stroke-dasharray="5,4" stroke-width="2" x1="525" x2="525" y1="166" y2="192"/>
 </svg>
 
 <!-- in this diagram you can see the orphaned inner task running off on its own - same problem as create_task. shield wraps a single point, and after it exits you're back to unstructured territory. -->
@@ -969,35 +968,34 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 
 # Shielding in Detail: asyncio.shield (continued)
 
-<svg font-family="'Courier New', monospace" style="float: right; margin-left: 16px;" viewBox="0 0 800 220" width="320" xmlns="http://www.w3.org/2000/svg">
+<svg font-family="'Courier New', monospace" style="float: right; margin-left: 16px;" viewBox="0 0 700 200" width="320" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <marker id="asyncio-shield-arrowRed" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
 <polygon fill="#ef4444" points="0 0, 8 3, 0 6"/>
 </marker>
-<marker id="asyncio-shield-arrowGreen" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
-<polygon fill="#22c55e" points="0 0, 8 3, 0 6"/>
+<marker id="asyncio-shield-arrowGrey" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
+<polygon fill="#94a3b8" points="0 0, 8 3, 0 6"/>
 </marker>
 </defs>
-<rect fill="#f8fafc" height="220" rx="10" width="800"/>
-<text fill="#ef4444" font-size="14" font-weight="700" text-anchor="middle" x="200" y="22">asyncio.timeout</text>
-<text fill="#22c55e" font-size="14" font-weight="700" text-anchor="middle" x="600" y="22">anyio.fail_after</text>
-<rect fill="#e2e8f0" height="200" rx="3" width="8" x="396" y="10"/>
-<line stroke="#2563eb" stroke-width="2.5" x1="200" x2="200" y1="36" y2="48"/>
-<text fill="#2563eb" font-size="12" font-weight="700" text-anchor="middle" x="200" y="66">await asyncio.shield(coro)</text>
-<line marker-end="url(#asyncio-shield-arrowRed)" stroke="#ef4444" stroke-width="2.5" x1="200" x2="200" y1="74" y2="94"/>
-<text fill="#ef4444" font-size="11" font-weight="600" x="226" y="90">timeout cancels</text>
-<text fill="#ef4444" font-size="15" font-weight="700" text-anchor="middle" x="200" y="116">CancelledError</text>
-<text fill="#64748b" font-size="11" text-anchor="middle" x="200" y="138">inner task keeps running</text>
-<text fill="#ef4444" font-size="11" font-weight="600" text-anchor="middle" x="200" y="154">result lost, task orphaned</text>
-<line stroke="#ef4444" stroke-dasharray="5,4" stroke-width="2" x1="200" x2="200" y1="164" y2="196"/>
-<line stroke="#2563eb" stroke-width="2.5" x1="600" x2="600" y1="36" y2="48"/>
-<text fill="#2563eb" font-size="12" font-weight="700" text-anchor="middle" x="600" y="66">with CancelScope(shield=True)</text>
-<line marker-end="url(#asyncio-shield-arrowGreen)" stroke="#22c55e" stroke-width="2.5" x1="600" x2="600" y1="74" y2="94"/>
-<text fill="#22c55e" font-size="11" font-weight="600" x="630" y="90">shielded</text>
-<text fill="#22c55e" font-size="15" font-weight="700" text-anchor="middle" x="600" y="116">work completes</text>
-<text fill="#64748b" font-size="11" text-anchor="middle" x="600" y="138">cancel deferred at scope boundary</text>
-<text fill="#22c55e" font-size="11" font-weight="600" text-anchor="middle" x="600" y="154">re-raised reliably on exit</text>
-<line marker-end="url(#asyncio-shield-arrowGreen)" stroke="#22c55e" stroke-width="2.5" x1="600" x2="600" y1="164" y2="196"/>
+<rect fill="#f8fafc" height="200" rx="10" width="700"/>
+<text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="175" y="22">your code sees</text>
+<text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="525" y="22">inside shield()</text>
+<rect fill="#fecaca" height="180" rx="3" width="8" x="345" y="10"/>
+<line stroke="#2563eb" stroke-width="2.5" x1="175" x2="175" y1="36" y2="48"/>
+<text fill="#2563eb" font-size="13" font-weight="700" text-anchor="middle" x="175" y="66">await asyncio.shield(coro)</text>
+<line marker-end="url(#asyncio-shield-arrowRed)" stroke="#ef4444" stroke-width="2.5" x1="175" x2="175" y1="74" y2="96"/>
+<text fill="#ef4444" font-size="11" font-weight="600" x="204" y="91">asyncio.timeout cancels</text>
+<text fill="#ef4444" font-size="16" font-weight="700" text-anchor="middle" x="175" y="118">CancelledError</text>
+<text fill="#64748b" font-size="11" text-anchor="middle" x="175" y="140">edge-triggered: used up</text>
+<text fill="#b45309" font-size="11" font-weight="600" text-anchor="middle" x="175" y="158">next await may succeed [!]</text>
+<line stroke="#94a3b8" stroke-width="2.5" x1="525" x2="525" y1="36" y2="48"/>
+<text fill="#ea580c" font-size="13" font-weight="600" text-anchor="middle" x="525" y="66">cancel NOT forwarded</text>
+<line marker-end="url(#asyncio-shield-arrowGrey)" stroke="#94a3b8" stroke-width="2.5" x1="525" x2="525" y1="74" y2="96"/>
+<text fill="#64748b" font-size="11" x="548" y="91">runs on...</text>
+<text fill="#ef4444" font-size="16" font-weight="700" text-anchor="middle" x="525" y="118">result lost</text>
+<text fill="#64748b" font-size="11" text-anchor="middle" x="525" y="140">no owner, no supervision</text>
+<text fill="#64748b" font-size="11" text-anchor="middle" x="525" y="158">cleanup may never run</text>
+<line stroke="#ef4444" stroke-dasharray="5,4" stroke-width="2" x1="525" x2="525" y1="166" y2="192"/>
 </svg>
 
 `shield()` wraps the outer Future around an inner Task. When the outer cancel arrives, the outer Future is cancelled immediately (edge-triggered). The inner Task is orphaned — it keeps running with no owner. The result is silently discarded.
