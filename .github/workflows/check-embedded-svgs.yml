@@ -1,14 +1,6 @@
 name: Check embedded SVGs
 
 on:
-  push:
-    paths:
-      - "*.svg"
-      - "*.md"
-      - "embed_svgs.py"
-      - "requirements*.txt"
-      - "requirements*.in"
-      - ".github/workflows/check-embedded-svgs.yml"
   pull_request:
     paths:
       - "*.svg"
