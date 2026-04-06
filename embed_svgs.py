@@ -21,7 +21,14 @@ from pathlib import Path
 
 SVG_DIR = Path(__file__).parent
 
-DEFAULT_MD_FILES = ['slides.md', 'slides_40.md', 'lightning.md']
+DEFAULT_MD_FILES = [
+    'slides.md',
+    'slides_40.md',
+    'lightning.md',
+    'slides_part1.md',
+    'slides_part2.md',
+    'slides_part3.md',
+]
 
 # Match <img src="local-file.svg" ...> — local references only
 IMG_PATTERN = re.compile(r'<img\s+src="([\w]+\.svg)"([^>]*)>')
