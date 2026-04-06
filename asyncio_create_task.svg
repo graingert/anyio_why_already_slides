@@ -25,7 +25,7 @@
 <!-- create_task() label -->
 <text fill="#c2410c" font-size="15" font-weight="700" text-anchor="middle" x="300" y="157">create_task()</text>
 <!-- Fork horizontal line -->
-<line stroke="#64748b" stroke-width="2.5" x1="150" x2="440" y1="182" y2="182"/>
+<line stroke="#64748b" stroke-width="2.5" x1="195" x2="395" y1="182" y2="182"/>
 <!-- Left branch down (parent) -->
 <line marker-end="url(#arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="195" x2="195" y1="182" y2="218"/>
 <!-- Right branch down (child) -->

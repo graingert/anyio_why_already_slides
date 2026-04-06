@@ -37,7 +37,7 @@
 <text fill="#c2410c" font-size="14" font-weight="600" text-anchor="middle" x="390" y="228">tg.start_soon(task1)</text>
 <text fill="#c2410c" font-size="14" font-weight="600" text-anchor="middle" x="390" y="248">tg.start_soon(task2)</text>
 <!-- Fork horizontal line -->
-<line stroke="#7c3aed" stroke-width="2.5" x1="90" x2="690" y1="270" y2="270"/>
+<line stroke="#7c3aed" stroke-width="2.5" x1="155" x2="625" y1="270" y2="270"/>
 <!-- Left branch: parent continues -->
 <line marker-end="url(#arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="155" x2="155" y1="270" y2="300"/>
 <!-- Center branch: child 1 -->
