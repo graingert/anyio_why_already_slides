@@ -482,57 +482,57 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <style scoped>section { padding-top: 10px; }</style>
 
 # Shielding in Detail: asyncio.shield
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 310" font-family="'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,monospace" width="650" style="display: block; margin: 0 auto;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340" font-family="'Courier New', monospace" width="650" style="display: block; margin: 0 auto;">
   <defs>
-    <marker id="asyncio-shield-arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#d20f39"/></marker>
-    <marker id="asyncio-shield-arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#1e66f5"/></marker>
+    <marker id="asyncio-shield-arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#dc2626"/></marker>
     <marker id="asyncio-shield-arr-muted" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#9ca0b0"/></marker>
   </defs>
   <!-- background -->
-  <rect width="660" height="310" fill="#eff1f5" rx="12"/>
+  <rect width="700" height="340" fill="#eff1f5" rx="12"/>
   <!-- title -->
-  <text x="330" y="26" text-anchor="middle" font-size="13" font-weight="bold" fill="#d20f39">asyncio.shield — what happens under cancellation</text>
-  <line x1="16" y1="34" x2="644" y2="34" stroke="#d20f39" stroke-width="1" opacity="0.35"/>
+  <text x="350" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">asyncio.shield -- what happens under cancellation</text>
+  <line x1="20" y1="40" x2="680" y2="40" stroke="#dc2626" stroke-width="1" opacity="0.4"/>
   <!-- column headers -->
-  <text x="160" y="54" text-anchor="middle" font-size="11" fill="#6c6f85">what your code sees</text>
-  <text x="490" y="54" text-anchor="middle" font-size="11" fill="#6c6f85">what happens inside shield()</text>
+  <text x="170" y="62" text-anchor="middle" font-size="14" fill="#475569" font-weight="600">what your code sees</text>
+  <text x="530" y="62" text-anchor="middle" font-size="14" fill="#475569" font-weight="600">what happens inside shield()</text>
   <!-- divider -->
-  <line x1="330" y1="44" x2="330" y2="290" stroke="#8c8fa1" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="330" y="174" text-anchor="middle" font-size="18" fill="#8c8fa1" transform="rotate(-90,330,174)">one-way barrier</text>
+  <line x1="350" y1="50" x2="350" y2="292" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="350" y="182" text-anchor="middle" font-size="14" fill="#94a3b8" font-weight="700" transform="rotate(-90,350,182)">one-way barrier</text>
   <!-- === LEFT SIDE === -->
   <!-- your code box -->
-  <rect x="30" y="66" width="140" height="44" rx="5" fill="#dce0e8" stroke="#1e66f5" stroke-width="1.5"/>
-  <text x="100" y="84" text-anchor="middle" font-size="11" fill="#6c6f85">your code</text>
-  <text x="100" y="101" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e66f5">await shield(f)</text>
+  <rect x="40" y="78" width="230" height="52" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="155" y="99" text-anchor="middle" font-size="13" fill="#475569">your code</text>
+  <text x="155" y="119" text-anchor="middle" font-size="14" font-weight="bold" fill="#2563eb">await shield(f)</text>
   <!-- down arrow -->
-  <line x1="100" y1="110" x2="100" y2="138" stroke="#d20f39" stroke-width="1.5" marker-end="url(#asyncio-shield-arr-red)"/>
-  <text x="112" y="130" font-size="10" fill="#d20f39">cancel</text>
+  <line x1="155" y1="130" x2="155" y2="158" stroke="#dc2626" stroke-width="2" marker-end="url(#asyncio-shield-arr-red)"/>
+  <text x="172" y="150" font-size="13" fill="#dc2626" font-weight="600">cancel</text>
   <!-- CancelledError box -->
-  <rect x="20" y="140" width="220" height="44" rx="5" fill="#ffd7cf" stroke="#d20f39" stroke-width="2"/>
-  <text x="130" y="158" text-anchor="middle" font-size="11" fill="#6c6f85">outer Future cancelled</text>
-  <text x="130" y="176" text-anchor="middle" font-size="13" font-weight="bold" fill="#d20f39">⚡ CancelledError</text>
+  <rect x="30" y="164" width="250" height="52" rx="6" fill="#fecaca" stroke="#dc2626" stroke-width="2.5"/>
+  <text x="155" y="185" text-anchor="middle" font-size="13" fill="#475569">outer Future cancelled</text>
+  <text x="155" y="206" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">CancelledError</text>
   <!-- edge note -->
-  <text x="130" y="208" text-anchor="middle" font-size="10" fill="#6c6f85">edge-triggered: cancel "used up" here</text>
-  <text x="130" y="222" text-anchor="middle" font-size="10" fill="#6c6f85">next await may succeed ⚠</text>
+  <text x="155" y="236" text-anchor="middle" font-size="12" fill="#64748b">edge-triggered:</text>
+  <text x="155" y="252" text-anchor="middle" font-size="12" fill="#64748b">cancel "used up" here</text>
+  <text x="155" y="268" text-anchor="middle" font-size="12" fill="#b45309" font-weight="600">next await may succeed [!]</text>
   <!-- === RIGHT SIDE === -->
   <!-- inner Task box -->
-  <rect x="350" y="66" width="270" height="44" rx="5" fill="#fff0d4" stroke="#fe640b" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="485" y="84" text-anchor="middle" font-size="11" fill="#6c6f85">inner Task  👻</text>
-  <text x="485" y="101" text-anchor="middle" font-size="12" fill="#fe640b">cancel NOT forwarded</text>
+  <rect x="380" y="78" width="290" height="52" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="525" y="99" text-anchor="middle" font-size="13" fill="#475569">inner Task (detached)</text>
+  <text x="525" y="119" text-anchor="middle" font-size="14" fill="#ea580c" font-weight="600">cancel NOT forwarded</text>
   <!-- down arrow -->
-  <line x1="485" y1="110" x2="485" y2="138" stroke="#9ca0b0" stroke-width="1.5" marker-end="url(#asyncio-shield-arr-muted)"/>
-  <text x="497" y="130" font-size="10" fill="#6c6f85">runs on...</text>
+  <line x1="525" y1="130" x2="525" y2="158" stroke="#9ca0b0" stroke-width="2" marker-end="url(#asyncio-shield-arr-muted)"/>
+  <text x="542" y="150" font-size="12" fill="#64748b">runs on...</text>
   <!-- result lost box -->
-  <rect x="360" y="140" width="250" height="44" rx="5" fill="#eff1f5" stroke="#d20f39" stroke-width="1.5"/>
-  <text x="485" y="158" text-anchor="middle" font-size="11" fill="#6c6f85">completes eventually</text>
-  <text x="485" y="176" text-anchor="middle" font-size="13" font-weight="bold" fill="#d20f39">result → void ❌</text>
+  <rect x="390" y="164" width="270" height="52" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="525" y="185" text-anchor="middle" font-size="13" fill="#475569">completes eventually</text>
+  <text x="525" y="206" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">result lost [X]</text>
   <!-- orphan note -->
-  <text x="485" y="208" text-anchor="middle" font-size="10" fill="#6c6f85">no owner, no supervision</text>
-  <text x="485" y="222" text-anchor="middle" font-size="10" fill="#6c6f85">resource cleanup may never run</text>
+  <text x="525" y="236" text-anchor="middle" font-size="12" fill="#64748b">no owner, no supervision</text>
+  <text x="525" y="252" text-anchor="middle" font-size="12" fill="#64748b">resource cleanup may never run</text>
   <!-- bottom summary -->
-  <rect x="16" y="248" width="628" height="48" rx="6" fill="#e6e9ef" stroke="#8c8fa1" stroke-width="1"/>
-  <text x="330" y="266" text-anchor="middle" font-size="11" fill="#d20f39" font-weight="bold">cancel flows in (to outer Future) but not through (to inner Task)</text>
-  <text x="330" y="285" text-anchor="middle" font-size="10" fill="#6c6f85">Use CancelScope(shield=True) instead — it defers cancellation and keeps the task owned</text>
+  <rect x="20" y="280" width="660" height="46" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="350" y="300" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">cancel flows in (to outer Future) but not through (to inner Task)</text>
+  <text x="350" y="318" text-anchor="middle" font-size="12" fill="#475569">Use CancelScope(shield=True) instead -- defers cancellation, keeps the task owned</text>
 </svg>
 
 **What's happening:** `shield()` wraps the outer Future around an inner Task. When the outer cancel arrives, the outer Future is cancelled immediately (edge-triggered ⚡). The inner Task is orphaned — it keeps running with no owner. The result is silently discarded.

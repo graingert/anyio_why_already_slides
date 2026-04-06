@@ -257,98 +257,49 @@ my_function()  # Exception propagates to caller automatically
 
 # The Root Cause: Unstructured Concurrency
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 290" font-family="'Courier New', monospace" width="700" style="display: block; margin: 0 auto;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 340" font-family="'Courier New', monospace" width="700" style="display: block; margin: 0 auto;">
   <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&amp;display=swap');
-    </style>
-    <!-- Light background -->
     <linearGradient id="asyncio-create-task-bgGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f6f8fa"/>
       <stop offset="100%" stop-color="#ffffff"/>
     </linearGradient>
-    <!-- Parent task box gradient -->
-    <linearGradient id="asyncio-create-task-parentGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#60a5fa"/>
-      <stop offset="100%" stop-color="#3b82f6"/>
-    </linearGradient>
-    <!-- Child task box gradient -->
-    <linearGradient id="asyncio-create-task-childGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fca5a5"/>
-      <stop offset="100%" stop-color="#f87171"/>
-    </linearGradient>
-    <!-- Glow filter for parent (no-op on light bg) -->
-    <filter id="asyncio-create-task-blueGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-    <!-- Glow filter for child (no-op on light bg) -->
-    <filter id="asyncio-create-task-redGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-    <!-- Arrow markers -->
     <marker id="asyncio-create-task-arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
     </marker>
     <marker id="asyncio-create-task-arrowRed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444"/>
-    </marker>
-    <marker id="asyncio-create-task-arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
-    </marker>
-    <marker id="asyncio-create-task-arrowDashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#9ca3af"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
     </marker>
   </defs>
   <!-- Background -->
-  <rect width="520" height="290" fill="url(#asyncio-create-task-bgGrad)" rx="12"/>
-  <!-- Subtle grid lines -->
-  <g opacity="0.04" stroke="#3b82f6" stroke-width="1">
-    <line x1="0" y1="40" x2="520" y2="40"/>
-    <line x1="0" y1="80" x2="520" y2="80"/>
-    <line x1="0" y1="120" x2="520" y2="120"/>
-    <line x1="0" y1="160" x2="520" y2="160"/>
-    <line x1="0" y1="200" x2="520" y2="200"/>
-    <line x1="0" y1="240" x2="520" y2="240"/>
-    <line x1="0" y1="280" x2="520" y2="280"/>
-  </g>
+  <rect width="600" height="340" fill="url(#asyncio-create-task-bgGrad)" rx="12"/>
   <!-- Title -->
-  <text x="260" y="34" text-anchor="middle" fill="#1f2328" font-size="13" font-weight="700" font-family="'Courier New', monospace" letter-spacing="0.5">asyncio.create_task() control flow</text>
-  <line x1="20" y1="44" x2="500" y2="44" stroke="#d0d7de" stroke-width="1"/>
-  <!-- ── Parent task box ── -->
-  <rect x="175" y="60" width="170" height="58" rx="6" fill="#dbeafe" filter="url(#asyncio-create-task-blueGlow)" opacity="0.95"/>
-  <rect x="175" y="60" width="170" height="58" rx="6" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="260" y="85" text-anchor="middle" fill="#1f2328" font-size="13" font-weight="700" font-family="'Courier New', monospace">Parent</text>
-  <text x="260" y="104" text-anchor="middle" fill="#1e40af" font-size="12" font-family="'Courier New', monospace">task</text>
+  <text x="300" y="36" text-anchor="middle" fill="#1f2328" font-size="16" font-weight="700" letter-spacing="0.5">asyncio.create_task() control flow</text>
+  <line x1="24" y1="50" x2="576" y2="50" stroke="#d0d7de" stroke-width="1"/>
+  <!-- Parent task box -->
+  <rect x="195" y="66" width="210" height="64" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="300" y="94" text-anchor="middle" fill="#1e3a5f" font-size="18" font-weight="700">Parent task</text>
+  <text x="300" y="118" text-anchor="middle" fill="#2563eb" font-size="14">async def main():</text>
   <!-- Arrow down from parent to fork -->
-  <line x1="260" y1="118" x2="260" y2="155" stroke="#3b82f6" stroke-width="2" marker-end="url(#asyncio-create-task-arrowBlue)"/>
+  <line x1="300" y1="130" x2="300" y2="168" stroke="#2563eb" stroke-width="2.5" marker-end="url(#asyncio-create-task-arrowBlue)"/>
   <!-- create_task() label -->
-  <rect x="188" y="127" width="145" height="22" rx="4" fill="#f8fafc" opacity="0.7"/>
-  <text x="260" y="142" text-anchor="middle" fill="#ea580c" font-size="12" font-family="'Courier New', monospace" font-weight="600">create_task()</text>
+  <text x="300" y="157" text-anchor="middle" fill="#c2410c" font-size="15" font-weight="700">create_task()</text>
   <!-- Fork horizontal line -->
-  <line x1="155" y1="168" x2="365" y2="168" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="150" y1="182" x2="440" y2="182" stroke="#64748b" stroke-width="2.5"/>
   <!-- Left branch down (parent) -->
-  <line x1="185" y1="168" x2="185" y2="205" stroke="#3b82f6" stroke-width="2" marker-end="url(#asyncio-create-task-arrowBlue)"/>
+  <line x1="195" y1="182" x2="195" y2="218" stroke="#2563eb" stroke-width="2.5" marker-end="url(#asyncio-create-task-arrowBlue)"/>
   <!-- Right branch down (child) -->
-  <line x1="335" y1="168" x2="335" y2="205" stroke="#ef4444" stroke-width="2" marker-end="url(#asyncio-create-task-arrowRed)"/>
-  <!-- ── Parent returns box ── -->
-  <rect x="105" y="210" width="160" height="52" rx="6" fill="#f8fafc" stroke="#d1d5db" stroke-width="1.5"/>
-  <text x="185" y="233" text-anchor="middle" fill="#57606a" font-size="12" font-family="'Courier New', monospace">Parent</text>
-  <text x="185" y="252" text-anchor="middle" fill="#16a34a" font-size="12" font-family="'Courier New', monospace" font-weight="600">returns ✓</text>
-  <!-- ── Child task box ── -->
-  <rect x="255" y="205" width="160" height="58" rx="6" fill="#fecdd3" filter="url(#asyncio-create-task-redGlow)" opacity="0.95"/>
-  <rect x="255" y="205" width="160" height="58" rx="6" fill="none" stroke="#ef4444" stroke-width="1.5"/>
-  <text x="335" y="230" text-anchor="middle" fill="#991b1b" font-size="13" font-weight="700" font-family="'Courier New', monospace">Child</text>
-  <text x="335" y="250" text-anchor="middle" fill="#991b1b" font-size="10" font-family="'Courier New', monospace">(orphaned, unsupervised)</text>
-  <!-- Arrow right from child to myfunc() -->
-  <line x1="415" y1="234" x2="460" y2="234" stroke="#ef4444" stroke-width="2" marker-end="url(#asyncio-create-task-arrowRed)"/>
-  <!-- myfunc() pill -->
-  <rect x="460" y="220" width="44" height="28" rx="14" fill="#f8fafc" stroke="#ef4444" stroke-width="1.5"/>
-  <text x="482" y="238" text-anchor="middle" fill="#ef4444" font-size="9" font-family="'Courier New', monospace" font-weight="600">myfunc</text>
-  <!-- Corner decoration -->
-  <text x="14" y="284" fill="#9ca3af" font-size="10" font-family="'Courier New', monospace">asyncio</text>
-  <text x="448" y="284" fill="#9ca3af" font-size="10" font-family="'Courier New', monospace">CPython</text>
+  <line x1="395" y1="182" x2="395" y2="218" stroke="#dc2626" stroke-width="2.5" marker-end="url(#asyncio-create-task-arrowRed)"/>
+  <!-- Parent returns box -->
+  <rect x="100" y="224" width="190" height="64" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="195" y="253" text-anchor="middle" fill="#14532d" font-size="16">Parent returns</text>
+  <text x="195" y="275" text-anchor="middle" fill="#16a34a" font-size="15" font-weight="700">[OK]</text>
+  <!-- Child task box -->
+  <rect x="300" y="224" width="260" height="64" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="430" y="250" text-anchor="middle" fill="#7f1d1d" font-size="17" font-weight="700">Child task</text>
+  <text x="430" y="274" text-anchor="middle" fill="#991b1b" font-size="13">(orphaned, unsupervised)</text>
+  <!-- Corner labels -->
+  <text x="18" y="330" fill="#9ca3af" font-size="12">asyncio</text>
+  <text x="534" y="330" fill="#9ca3af" font-size="12">CPython</text>
 </svg>
 
 ⚠ no await, no supervision, no cancellation - exceptions silently swallowed
@@ -407,42 +358,14 @@ async def structured():
 
 # The Fix: Structured Concurrency
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 445" font-family="'Courier New', monospace" width="700" style="display: block; margin: 0 auto;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 480" font-family="'Courier New', monospace" width="700" style="display: block; margin: 0 auto;">
   <defs>
     <linearGradient id="anyio-create-task-group-bgGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f6f8fa"/>
       <stop offset="100%" stop-color="#ffffff"/>
     </linearGradient>
-    <linearGradient id="anyio-create-task-group-parentGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#60a5fa"/>
-      <stop offset="100%" stop-color="#3b82f6"/>
-    </linearGradient>
-    <linearGradient id="anyio-create-task-group-childGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#86efac"/>
-      <stop offset="100%" stop-color="#4ade80"/>
-    </linearGradient>
-    <linearGradient id="anyio-create-task-group-tgGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#a78bfa"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
-    </linearGradient>
-    <linearGradient id="anyio-create-task-group-exitGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fbbf24"/>
-      <stop offset="100%" stop-color="#f59e0b"/>
-    </linearGradient>
-    <filter id="anyio-create-task-group-blueGlow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-    <filter id="anyio-create-task-group-greenGlow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-    <filter id="anyio-create-task-group-purpleGlow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
     <marker id="anyio-create-task-group-arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
     </marker>
     <marker id="anyio-create-task-group-arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
@@ -451,85 +374,63 @@ async def structured():
       <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
     </marker>
     <marker id="anyio-create-task-group-arrowGold" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#b45309"/>
     </marker>
   </defs>
   <!-- Background -->
-  <rect width="750" height="445" fill="url(#anyio-create-task-group-bgGrad)" rx="12"/>
-  <!-- Subtle grid -->
-  <g opacity="0.035" stroke="#16a34a" stroke-width="1">
-    <line x1="0" y1="40"  x2="750" y2="40"/>
-    <line x1="0" y1="80"  x2="750" y2="80"/>
-    <line x1="0" y1="120" x2="750" y2="120"/>
-    <line x1="0" y1="160" x2="750" y2="160"/>
-    <line x1="0" y1="200" x2="750" y2="200"/>
-    <line x1="0" y1="240" x2="750" y2="240"/>
-    <line x1="0" y1="280" x2="750" y2="280"/>
-    <line x1="0" y1="320" x2="750" y2="320"/>
-    <line x1="0" y1="360" x2="750" y2="360"/>
-    <line x1="0" y1="400" x2="750" y2="400"/>
-    <line x1="0" y1="440" x2="750" y2="440"/>
-  </g>
+  <rect width="780" height="480" fill="url(#anyio-create-task-group-bgGrad)" rx="12"/>
   <!-- Title -->
-  <text x="375" y="32" text-anchor="middle" fill="#1f2328" font-size="13" font-weight="700" font-family="'Courier New', monospace" letter-spacing="0.5">anyio.create_task_group() control flow</text>
-  <line x1="20" y1="52" x2="730" y2="52" stroke="#d0d7de" stroke-width="1"/>
-  <!-- ── Parent task box ── center=375 -->
-  <rect x="290" y="66" width="170" height="54" rx="6" fill="#dbeafe" filter="url(#anyio-create-task-group-blueGlow)" opacity="0.95"/>
-  <rect x="290" y="66" width="170" height="54" rx="6" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="375" y="89" text-anchor="middle" fill="#1f2328" font-size="13" font-weight="700" font-family="'Courier New', monospace">Parent task</text>
-  <text x="375" y="108" text-anchor="middle" fill="#1e40af" font-size="10" font-family="'Courier New', monospace">async def main():</text>
-  <!-- Arrow down: parent → async with -->
-  <line x1="375" y1="120" x2="375" y2="148" stroke="#3b82f6" stroke-width="2" marker-end="url(#anyio-create-task-group-arrowBlue)"/>
-  <!-- ── async with create_task_group() ── center=375 -->
-  <rect x="210" y="152" width="330" height="42" rx="6" fill="#ede9fe" filter="url(#anyio-create-task-group-purpleGlow)" opacity="0.95"/>
-  <rect x="210" y="152" width="330" height="42" rx="6" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
-  <text x="375" y="170" text-anchor="middle" fill="#4c1d95" font-size="11" font-weight="700" font-family="'Courier New', monospace">async with</text>
-  <text x="375" y="186" text-anchor="middle" fill="#4c1d95" font-size="11" font-family="'Courier New', monospace">create_task_group() as tg</text>
-  <!-- Arrow down from TaskGroup to fork (through start_soon labels) -->
-  <line x1="375" y1="194" x2="375" y2="248" stroke="#7c3aed" stroke-width="2"/>
-  <!-- tg.start_soon labels on the arrow -->
-  <rect x="249" y="200" width="252" height="40" rx="4" fill="#f8fafc" opacity="0.82"/>
-  <text x="375" y="216" text-anchor="middle" fill="#ea580c" font-size="11" font-family="'Courier New', monospace" font-weight="600">tg.start_soon(task1)</text>
-  <text x="375" y="233" text-anchor="middle" fill="#ea580c" font-size="11" font-family="'Courier New', monospace" font-weight="600">tg.start_soon(task2)</text>
-  <!-- Fork horizontal line: y=248, x=70 to x=680 -->
-  <line x1="70" y1="248" x2="680" y2="248" stroke="#7c3aed" stroke-width="2"/>
-  <!-- Left branch: parent continues at x=145 -->
-  <line x1="145" y1="248" x2="145" y2="280" stroke="#3b82f6" stroke-width="2" marker-end="url(#anyio-create-task-group-arrowBlue)"/>
-  <!-- Center branch: child 1 at x=375 -->
-  <line x1="375" y1="248" x2="375" y2="280" stroke="#16a34a" stroke-width="2" marker-end="url(#anyio-create-task-group-arrowGreen)"/>
-  <!-- Right branch: child 2 at x=610 -->
-  <line x1="610" y1="248" x2="610" y2="280" stroke="#16a34a" stroke-width="2" marker-end="url(#anyio-create-task-group-arrowGreen)"/>
-  <!-- ── Parent body continues ── center=145 -->
-  <rect x="56" y="283" width="178" height="52" rx="6" fill="#f8fafc" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="145" y="304" text-anchor="middle" fill="#57606a" font-size="11" font-family="'Courier New', monospace">Parent body continues</text>
-  <text x="145" y="323" text-anchor="middle" fill="#3b82f6" font-size="10" font-family="'Courier New', monospace">(runs concurrently)</text>
-  <!-- ── Child task 1 ── center=375 -->
-  <rect x="285" y="283" width="180" height="55" rx="6" fill="#dcfce7" filter="url(#anyio-create-task-group-greenGlow)" opacity="0.95"/>
-  <rect x="285" y="283" width="180" height="55" rx="6" fill="none" stroke="#16a34a" stroke-width="1.5"/>
-  <text x="375" y="307" text-anchor="middle" fill="#14532d" font-size="13" font-weight="700" font-family="'Courier New', monospace">Child task 1</text>
-  <text x="375" y="325" text-anchor="middle" fill="#14532d" font-size="11" font-family="'Courier New', monospace">→ task1()</text>
-  <!-- ── Child task 2 ── center=610 -->
-  <rect x="520" y="283" width="180" height="55" rx="6" fill="#dcfce7" filter="url(#anyio-create-task-group-greenGlow)" opacity="0.95"/>
-  <rect x="520" y="283" width="180" height="55" rx="6" fill="none" stroke="#16a34a" stroke-width="1.5"/>
-  <text x="610" y="307" text-anchor="middle" fill="#14532d" font-size="13" font-weight="700" font-family="'Courier New', monospace">Child task 2</text>
-  <text x="610" y="325" text-anchor="middle" fill="#14532d" font-size="11" font-family="'Courier New', monospace">→ task2()</text>
+  <text x="390" y="36" text-anchor="middle" fill="#1f2328" font-size="16" font-weight="700" letter-spacing="0.5">anyio.create_task_group() control flow</text>
+  <line x1="24" y1="52" x2="756" y2="52" stroke="#d0d7de" stroke-width="1"/>
+  <!-- Parent task box -->
+  <rect x="290" y="68" width="200" height="60" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="390" y="95" text-anchor="middle" fill="#1e3a5f" font-size="17" font-weight="700">Parent task</text>
+  <text x="390" y="117" text-anchor="middle" fill="#2563eb" font-size="13">async def main():</text>
+  <!-- Arrow down: parent to async with -->
+  <line x1="390" y1="128" x2="390" y2="152" stroke="#2563eb" stroke-width="2.5" marker-end="url(#anyio-create-task-group-arrowBlue)"/>
+  <!-- async with create_task_group() box -->
+  <rect x="215" y="158" width="350" height="48" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="390" y="179" text-anchor="middle" fill="#4c1d95" font-size="14" font-weight="700">async with</text>
+  <text x="390" y="197" text-anchor="middle" fill="#4c1d95" font-size="14">create_task_group() as tg</text>
+  <!-- Arrow down with start_soon labels -->
+  <line x1="390" y1="206" x2="390" y2="270" stroke="#7c3aed" stroke-width="2"/>
+  <text x="390" y="228" text-anchor="middle" fill="#c2410c" font-size="14" font-weight="600">tg.start_soon(task1)</text>
+  <text x="390" y="248" text-anchor="middle" fill="#c2410c" font-size="14" font-weight="600">tg.start_soon(task2)</text>
+  <!-- Fork horizontal line -->
+  <line x1="90" y1="270" x2="690" y2="270" stroke="#7c3aed" stroke-width="2.5"/>
+  <!-- Left branch: parent continues -->
+  <line x1="155" y1="270" x2="155" y2="300" stroke="#2563eb" stroke-width="2.5" marker-end="url(#anyio-create-task-group-arrowBlue)"/>
+  <!-- Center branch: child 1 -->
+  <line x1="390" y1="270" x2="390" y2="300" stroke="#16a34a" stroke-width="2.5" marker-end="url(#anyio-create-task-group-arrowGreen)"/>
+  <!-- Right branch: child 2 -->
+  <line x1="625" y1="270" x2="625" y2="300" stroke="#16a34a" stroke-width="2.5" marker-end="url(#anyio-create-task-group-arrowGreen)"/>
+  <!-- Parent body continues box -->
+  <rect x="60" y="306" width="190" height="58" rx="8" fill="#f8fafc" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="155" y="331" text-anchor="middle" fill="#475569" font-size="13">Parent body</text>
+  <text x="155" y="351" text-anchor="middle" fill="#2563eb" font-size="13">(runs concurrently)</text>
+  <!-- Child task 1 box -->
+  <rect x="295" y="306" width="190" height="58" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="390" y="333" text-anchor="middle" fill="#14532d" font-size="16" font-weight="700">Child task 1</text>
+  <text x="390" y="353" text-anchor="middle" fill="#14532d" font-size="13">task1()</text>
+  <!-- Child task 2 box -->
+  <rect x="530" y="306" width="190" height="58" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="625" y="333" text-anchor="middle" fill="#14532d" font-size="16" font-weight="700">Child task 2</text>
+  <text x="625" y="353" text-anchor="middle" fill="#14532d" font-size="13">task2()</text>
   <!-- Convergence lines -->
-  <line x1="145" y1="335" x2="145" y2="363" stroke="#3b82f6" stroke-width="2"/>
-  <line x1="375" y1="338" x2="375" y2="363" stroke="#16a34a" stroke-width="2"/>
-  <line x1="610" y1="338" x2="610" y2="363" stroke="#16a34a" stroke-width="2"/>
-  <line x1="145" y1="363" x2="610" y2="363" stroke="#d97706" stroke-width="2"/>
-  <line x1="375" y1="363" x2="375" y2="380" stroke="#d97706" stroke-width="2" marker-end="url(#anyio-create-task-group-arrowGold)"/>
+  <line x1="155" y1="364" x2="155" y2="392" stroke="#2563eb" stroke-width="2"/>
+  <line x1="390" y1="364" x2="390" y2="392" stroke="#16a34a" stroke-width="2"/>
+  <line x1="625" y1="364" x2="625" y2="392" stroke="#16a34a" stroke-width="2"/>
+  <line x1="155" y1="392" x2="625" y2="392" stroke="#b45309" stroke-width="2.5"/>
+  <line x1="390" y1="392" x2="390" y2="412" stroke="#b45309" stroke-width="2.5" marker-end="url(#anyio-create-task-group-arrowGold)"/>
   <!-- Barrier wait label -->
-  <rect x="262" y="344" width="226" height="19" rx="4" fill="#f8fafc" opacity="0.85"/>
-  <text x="375" y="357" text-anchor="middle" fill="#d97706" font-size="10" font-family="'Courier New', monospace" font-weight="600">__aexit__ waits for all tasks</text>
-  <!-- ── TaskGroup exit / reunion ── center=375 -->
-  <rect x="210" y="383" width="330" height="42" rx="6" fill="#fef3c7" opacity="0.95"/>
-  <rect x="210" y="383" width="330" height="42" rx="6" fill="none" stroke="#d97706" stroke-width="1.5"/>
-  <text x="375" y="401" text-anchor="middle" fill="#78350f" font-size="11" font-weight="700" font-family="'Courier New', monospace">TaskGroup exits cleanly</text>
-  <text x="375" y="417" text-anchor="middle" fill="#78350f" font-size="10" font-family="'Courier New', monospace">all tasks joined ✓</text>
+  <text x="390" y="386" text-anchor="middle" fill="#b45309" font-size="12" font-weight="600">__aexit__ waits for all tasks</text>
+  <!-- TaskGroup exit box -->
+  <rect x="215" y="418" width="350" height="44" rx="8" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+  <text x="390" y="438" text-anchor="middle" fill="#78350f" font-size="15" font-weight="700">TaskGroup exits cleanly</text>
+  <text x="390" y="455" text-anchor="middle" fill="#78350f" font-size="12">all tasks joined</text>
   <!-- Corner labels -->
-  <text x="14" y="439" fill="#9ca3af" font-size="10" font-family="'Courier New', monospace">anyio</text>
-  <text x="683" y="439" fill="#9ca3af" font-size="10" font-family="'Courier New', monospace">trio/asyncio</text>
+  <text x="18" y="473" fill="#9ca3af" font-size="12">anyio</text>
+  <text x="680" y="473" fill="#9ca3af" font-size="12">trio/asyncio</text>
 </svg>
 
 ✓ structured concurrency - no orphaned tasks
@@ -1087,57 +988,57 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <style scoped>section { padding-top: 10px; }</style>
 
 # Shielding in Detail: asyncio.shield
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 310" font-family="'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,monospace" width="650" style="display: block; margin: 0 auto;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340" font-family="'Courier New', monospace" width="650" style="display: block; margin: 0 auto;">
   <defs>
-    <marker id="asyncio-shield-arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#d20f39"/></marker>
-    <marker id="asyncio-shield-arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#1e66f5"/></marker>
+    <marker id="asyncio-shield-arr-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#dc2626"/></marker>
     <marker id="asyncio-shield-arr-muted" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#9ca0b0"/></marker>
   </defs>
   <!-- background -->
-  <rect width="660" height="310" fill="#eff1f5" rx="12"/>
+  <rect width="700" height="340" fill="#eff1f5" rx="12"/>
   <!-- title -->
-  <text x="330" y="26" text-anchor="middle" font-size="13" font-weight="bold" fill="#d20f39">asyncio.shield — what happens under cancellation</text>
-  <line x1="16" y1="34" x2="644" y2="34" stroke="#d20f39" stroke-width="1" opacity="0.35"/>
+  <text x="350" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">asyncio.shield -- what happens under cancellation</text>
+  <line x1="20" y1="40" x2="680" y2="40" stroke="#dc2626" stroke-width="1" opacity="0.4"/>
   <!-- column headers -->
-  <text x="160" y="54" text-anchor="middle" font-size="11" fill="#6c6f85">what your code sees</text>
-  <text x="490" y="54" text-anchor="middle" font-size="11" fill="#6c6f85">what happens inside shield()</text>
+  <text x="170" y="62" text-anchor="middle" font-size="14" fill="#475569" font-weight="600">what your code sees</text>
+  <text x="530" y="62" text-anchor="middle" font-size="14" fill="#475569" font-weight="600">what happens inside shield()</text>
   <!-- divider -->
-  <line x1="330" y1="44" x2="330" y2="290" stroke="#8c8fa1" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="330" y="174" text-anchor="middle" font-size="18" fill="#8c8fa1" transform="rotate(-90,330,174)">one-way barrier</text>
+  <line x1="350" y1="50" x2="350" y2="292" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="350" y="182" text-anchor="middle" font-size="14" fill="#94a3b8" font-weight="700" transform="rotate(-90,350,182)">one-way barrier</text>
   <!-- === LEFT SIDE === -->
   <!-- your code box -->
-  <rect x="30" y="66" width="140" height="44" rx="5" fill="#dce0e8" stroke="#1e66f5" stroke-width="1.5"/>
-  <text x="100" y="84" text-anchor="middle" font-size="11" fill="#6c6f85">your code</text>
-  <text x="100" y="101" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e66f5">await shield(f)</text>
+  <rect x="40" y="78" width="230" height="52" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="155" y="99" text-anchor="middle" font-size="13" fill="#475569">your code</text>
+  <text x="155" y="119" text-anchor="middle" font-size="14" font-weight="bold" fill="#2563eb">await shield(f)</text>
   <!-- down arrow -->
-  <line x1="100" y1="110" x2="100" y2="138" stroke="#d20f39" stroke-width="1.5" marker-end="url(#asyncio-shield-arr-red)"/>
-  <text x="112" y="130" font-size="10" fill="#d20f39">cancel</text>
+  <line x1="155" y1="130" x2="155" y2="158" stroke="#dc2626" stroke-width="2" marker-end="url(#asyncio-shield-arr-red)"/>
+  <text x="172" y="150" font-size="13" fill="#dc2626" font-weight="600">cancel</text>
   <!-- CancelledError box -->
-  <rect x="20" y="140" width="220" height="44" rx="5" fill="#ffd7cf" stroke="#d20f39" stroke-width="2"/>
-  <text x="130" y="158" text-anchor="middle" font-size="11" fill="#6c6f85">outer Future cancelled</text>
-  <text x="130" y="176" text-anchor="middle" font-size="13" font-weight="bold" fill="#d20f39">⚡ CancelledError</text>
+  <rect x="30" y="164" width="250" height="52" rx="6" fill="#fecaca" stroke="#dc2626" stroke-width="2.5"/>
+  <text x="155" y="185" text-anchor="middle" font-size="13" fill="#475569">outer Future cancelled</text>
+  <text x="155" y="206" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">CancelledError</text>
   <!-- edge note -->
-  <text x="130" y="208" text-anchor="middle" font-size="10" fill="#6c6f85">edge-triggered: cancel "used up" here</text>
-  <text x="130" y="222" text-anchor="middle" font-size="10" fill="#6c6f85">next await may succeed ⚠</text>
+  <text x="155" y="236" text-anchor="middle" font-size="12" fill="#64748b">edge-triggered:</text>
+  <text x="155" y="252" text-anchor="middle" font-size="12" fill="#64748b">cancel "used up" here</text>
+  <text x="155" y="268" text-anchor="middle" font-size="12" fill="#b45309" font-weight="600">next await may succeed [!]</text>
   <!-- === RIGHT SIDE === -->
   <!-- inner Task box -->
-  <rect x="350" y="66" width="270" height="44" rx="5" fill="#fff0d4" stroke="#fe640b" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="485" y="84" text-anchor="middle" font-size="11" fill="#6c6f85">inner Task  👻</text>
-  <text x="485" y="101" text-anchor="middle" font-size="12" fill="#fe640b">cancel NOT forwarded</text>
+  <rect x="380" y="78" width="290" height="52" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="525" y="99" text-anchor="middle" font-size="13" fill="#475569">inner Task (detached)</text>
+  <text x="525" y="119" text-anchor="middle" font-size="14" fill="#ea580c" font-weight="600">cancel NOT forwarded</text>
   <!-- down arrow -->
-  <line x1="485" y1="110" x2="485" y2="138" stroke="#9ca0b0" stroke-width="1.5" marker-end="url(#asyncio-shield-arr-muted)"/>
-  <text x="497" y="130" font-size="10" fill="#6c6f85">runs on...</text>
+  <line x1="525" y1="130" x2="525" y2="158" stroke="#9ca0b0" stroke-width="2" marker-end="url(#asyncio-shield-arr-muted)"/>
+  <text x="542" y="150" font-size="12" fill="#64748b">runs on...</text>
   <!-- result lost box -->
-  <rect x="360" y="140" width="250" height="44" rx="5" fill="#eff1f5" stroke="#d20f39" stroke-width="1.5"/>
-  <text x="485" y="158" text-anchor="middle" font-size="11" fill="#6c6f85">completes eventually</text>
-  <text x="485" y="176" text-anchor="middle" font-size="13" font-weight="bold" fill="#d20f39">result → void ❌</text>
+  <rect x="390" y="164" width="270" height="52" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="525" y="185" text-anchor="middle" font-size="13" fill="#475569">completes eventually</text>
+  <text x="525" y="206" text-anchor="middle" font-size="16" font-weight="bold" fill="#dc2626">result lost [X]</text>
   <!-- orphan note -->
-  <text x="485" y="208" text-anchor="middle" font-size="10" fill="#6c6f85">no owner, no supervision</text>
-  <text x="485" y="222" text-anchor="middle" font-size="10" fill="#6c6f85">resource cleanup may never run</text>
+  <text x="525" y="236" text-anchor="middle" font-size="12" fill="#64748b">no owner, no supervision</text>
+  <text x="525" y="252" text-anchor="middle" font-size="12" fill="#64748b">resource cleanup may never run</text>
   <!-- bottom summary -->
-  <rect x="16" y="248" width="628" height="48" rx="6" fill="#e6e9ef" stroke="#8c8fa1" stroke-width="1"/>
-  <text x="330" y="266" text-anchor="middle" font-size="11" fill="#d20f39" font-weight="bold">cancel flows in (to outer Future) but not through (to inner Task)</text>
-  <text x="330" y="285" text-anchor="middle" font-size="10" fill="#6c6f85">Use CancelScope(shield=True) instead — it defers cancellation and keeps the task owned</text>
+  <rect x="20" y="280" width="660" height="46" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="350" y="300" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="bold">cancel flows in (to outer Future) but not through (to inner Task)</text>
+  <text x="350" y="318" text-anchor="middle" font-size="12" fill="#475569">Use CancelScope(shield=True) instead -- defers cancellation, keeps the task owned</text>
 </svg>
 
 **What's happening:** `shield()` wraps the outer Future around an inner Task. When the outer cancel arrives, the outer Future is cancelled immediately (edge-triggered ⚡). The inner Task is orphaned — it keeps running with no owner. The result is silently discarded.
