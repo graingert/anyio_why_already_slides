@@ -147,7 +147,6 @@ async def process_file(f):
 <polygon fill="#ef4444" points="0 0, 8 3, 0 6"/>
 </marker>
 </defs>
-<rect fill="#f8fafc" height="180" rx="10" width="600"/>
 <line marker-end="url(#asyncio-create-task-arrowGreen)" stroke="#22c55e" stroke-width="3" x1="150" x2="150" y1="10" y2="150"/>
 <circle cx="150" cy="100" fill="#64748b" r="4"/>
 <text fill="#c2410c" font-size="13" font-weight="700" text-anchor="middle" x="310" y="90">create_task()</text>
@@ -203,7 +202,6 @@ async def structured():
 <polygon fill="#22c55e" points="0 0, 8 3, 0 6"/>
 </marker>
 </defs>
-<rect fill="#f8fafc" height="200" rx="10" width="600"/>
 <line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#22c55e" stroke-width="3" x1="300" x2="300" y1="8" y2="22"/>
 <rect fill="none" height="140" rx="8" stroke="#22c55e" stroke-width="2.5" width="540" x="30" y="28"/>
 <text fill="#14532d" font-size="12" font-weight="600" text-anchor="middle" x="300" y="46">async with create_task_group() as tg:</text>

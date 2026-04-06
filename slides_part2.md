@@ -500,7 +500,6 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <polygon fill="#94a3b8" points="0 0, 8 3, 0 6"/>
 </marker>
 </defs>
-<rect fill="#f8fafc" height="200" rx="10" width="700"/>
 <text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="175" y="22">your code sees</text>
 <text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="525" y="22">inside shield()</text>
 <rect fill="#fecaca" height="180" rx="3" width="8" x="345" y="10"/>
@@ -536,7 +535,6 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <polygon fill="#94a3b8" points="0 0, 8 3, 0 6"/>
 </marker>
 </defs>
-<rect fill="#f8fafc" height="200" rx="10" width="700"/>
 <text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="175" y="22">your code sees</text>
 <text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="525" y="22">inside shield()</text>
 <rect fill="#fecaca" height="180" rx="3" width="8" x="345" y="10"/>
