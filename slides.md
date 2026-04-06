@@ -34,7 +34,7 @@ https://graingert.co.uk/why-anyio-already
 ---
 <style scoped>section{font-size:22px; padding-top:10px;}</style>
 
-<style scoped>section { font-size: 22px; padding-top: 10px; line-height: 1.3; } li { margin: 0.1em 0; } .twocol { columns: 2; column-gap: 1.5em; font-size: 20px; margin-left: 1.5em; } .twocol li { break-inside: avoid; }</style>
+<style scoped>section { font-size: 22px; padding-top: 30px; line-height: 1.3; } li { margin: 0.1em 0; } .twocol { columns: 2; column-gap: 1.5em; font-size: 20px; margin-left: 1.5em; } .twocol li { break-inside: avoid; }</style>
 
 # Agenda
 
