@@ -1083,24 +1083,6 @@ except anyio.get_cancelled_exc_class():
 <!-- the key difference from asyncio.shield: cancel is deferred, not consumed. CancelScope doesn't re-raise anything itself - it just stops deferring. after the shield exits, the outer scope is still cancelled, so the next checkpoint delivers CancelledError. for explicit cleanup like subprocess termination, you catch the exception, do shielded cleanup, and manually re-raise. -->
 ---
 
-<style scoped>section { padding-top: 15px; }</style>
-
-# Comparison
-
-| | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
-|---|---|---|
-| Cancellation model | Edge (one-shot) | Level (persistent, deferred) |
-| Scope | Single `await` | Entire `with` block |
-| Process cleanup | ❌ Can't reliably terminate + join | ✅ Terminate then shielded join |
-| Cancellation after exit | ⚠️ Maybe (edge, unreliable) | ✅ Always re-raised |
-| Orphaned tasks | ❌ Yes | ✅ Never |
-| Composable | ❌ Not really | ✅ Nests with task groups |
-
-<!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. the process case makes this crystal clear - you need to shield a multi-step cleanup sequence. -->
-
-
----
-
 <style scoped>section { font-size: 22px; padding-top: 20px; }</style>
 
 # Mixing Native asyncio Cancellation
@@ -1130,6 +1112,24 @@ async def main():
 AnyIO guarantees every `start_soon`'d task runs to its first `await` before cancellation is delivered — so `with anyio.CancelScope(shield=True):` (synchronous) is always entered first.
 
 <!-- task.cancel() is a raw asyncio operation that bypasses AnyIO's cancel scope stack entirely. CancelScope(shield=True) only defers cancellations delivered through AnyIO's own machinery. tg.cancel_scope.cancel() goes through that machinery, so the shield works. AnyIO's start_soon guarantee means the synchronous with block is always entered before cancellation fires, so the shield is always in place. -->
+
+---
+
+<style scoped>section { padding-top: 15px; }</style>
+
+# Comparison
+
+| | `asyncio.shield` | `anyio.CancelScope(shield=True)` |
+|---|---|---|
+| Cancellation model | Edge (one-shot) | Level (persistent, deferred) |
+| Scope | Single `await` | Entire `with` block |
+| Process cleanup | ❌ Can't reliably terminate + join | ✅ Terminate then shielded join |
+| Cancellation after exit | ⚠️ Maybe (edge, unreliable) | ✅ Always re-raised |
+| Orphaned tasks | ❌ Yes | ✅ Never |
+| Composable | ❌ Not really | ✅ Nests with task groups |
+
+<!-- full comparison side by side. every row is a win for AnyIO. key insight: shielding should be a scope, not a wrapper around a single expression. the process case makes this crystal clear - you need to shield a multi-step cleanup sequence. -->
+
 
 ---
 
