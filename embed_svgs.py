@@ -45,6 +45,16 @@ def strip_blank_lines(svg_text: str) -> str:
     return '\n'.join(line for line in svg_text.splitlines() if line.strip())
 
 
+def strip_comments(svg_text: str) -> str:
+    """Remove HTML comments from SVG content.
+
+    Marp treats ``<!-- ... -->`` as speaker notes.  SVG source files use HTML
+    comments for developer annotations (e.g. ``<!-- Background -->``), and
+    these leak into the presenter view when embedded inline.
+    """
+    return re.sub(r'<!--.*?-->', '', svg_text, flags=re.DOTALL)
+
+
 def namespace_svg(svg_text: str, prefix: str) -> str:
     """Prefix every id= and every reference to those IDs with *prefix*."""
     ids = re.findall(r'\bid="([^"]+)"', svg_text)
@@ -78,6 +88,7 @@ def embed_svgs(md_path: Path) -> None:
 
         prefix = svg_path.stem.replace('_', '-')
         svg = strip_blank_lines(svg_path.read_text())
+        svg = strip_comments(svg)
         svg = namespace_svg(svg, prefix)
 
         def patch_svg_tag(tm: re.Match) -> str:
