@@ -1,5 +1,10 @@
 # Claude Instructions
 
+## Branch naming
+
+The default branch is named `default` (not `main` or `master`). The CI
+release workflow triggers on pushes to `default`.
+
 ## Regenerating the PDFs
 
 Run each command separately (do not chain with `&&` or `;`):
