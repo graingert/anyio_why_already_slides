@@ -996,6 +996,8 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 
 `shield()` wraps the outer Future around an inner Task. When the outer cancel arrives, the outer Future is cancelled immediately (edge-triggered). The inner Task is orphaned — it keeps running with no owner. The result is silently discarded.
 
+<!-- shield wraps the outer Future around a detached inner Task. when asyncio.timeout fires, the outer Future gets CancelledError immediately - edge-triggered, so it's consumed. the inner task has no owner, keeps running, and the result is silently discarded. -->
+
 ---
 
 # Shielding in Detail: CancelScope(shield=True)
