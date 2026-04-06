@@ -14,8 +14,8 @@
 <line stroke="#2563eb" stroke-width="2.5" x1="175" x2="175" y1="36" y2="48"/>
 <text fill="#2563eb" font-size="13" font-weight="700" text-anchor="middle" x="175" y="66">await asyncio.shield(coro)</text>
 <line marker-end="url(#arrowRed)" stroke="#ef4444" stroke-width="2.5" x1="175" x2="175" y1="74" y2="96"/>
-<text fill="#ef4444" font-size="11" font-weight="600" x="204" y="91">asyncio.timeout cancels</text>
-<text fill="#ef4444" font-size="16" font-weight="700" text-anchor="middle" x="175" y="118">CancelledError</text>
+<text fill="#ef4444" font-size="11" font-weight="600" text-anchor="middle" x="175" y="108">asyncio.timeout cancels</text>
+<text fill="#ef4444" font-size="16" font-weight="700" text-anchor="middle" x="175" y="130">CancelledError</text>
 <text fill="#64748b" font-size="11" text-anchor="middle" x="175" y="140">edge-triggered: used up</text>
 <text fill="#b45309" font-size="11" font-weight="600" text-anchor="middle" x="175" y="158">next await may succeed [!]</text>
 <line stroke="#94a3b8" stroke-width="2.5" x1="525" x2="525" y1="36" y2="48"/>
