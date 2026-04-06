@@ -1021,7 +1021,7 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <text fill="#b45309" font-size="18" text-anchor="middle" x="275" y="274">cancel deferred at boundary</text>
 <line marker-end="url(#anyio-shield-arrowAmber)" stroke="#b45309" stroke-width="4" x1="275" x2="275" y1="290" y2="338"/>
 <text fill="#b45309" font-size="36" font-weight="700" text-anchor="middle" x="275" y="384">CancelledError</text>
-<text fill="#22c55e" font-size="20" font-weight="600" text-anchor="middle" x="275" y="424">re-raised reliably on exit</text>
+<text fill="#22c55e" font-size="20" font-weight="600" text-anchor="middle" x="275" y="424">pending cancel delivered on exit</text>
 <line stroke="#22c55e" stroke-width="4" x1="825" x2="825" y1="70" y2="96"/>
 <text fill="#22c55e" font-size="24" font-weight="600" text-anchor="middle" x="825" y="132">shielded work</text>
 <line marker-end="url(#anyio-shield-arrowGreen)" stroke="#22c55e" stroke-width="4" x1="825" x2="825" y1="152" y2="200"/>
@@ -1056,7 +1056,7 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <text fill="#b45309" font-size="18" text-anchor="middle" x="275" y="274">cancel deferred at boundary</text>
 <line marker-end="url(#anyio-shield-arrowAmber)" stroke="#b45309" stroke-width="4" x1="275" x2="275" y1="290" y2="338"/>
 <text fill="#b45309" font-size="36" font-weight="700" text-anchor="middle" x="275" y="384">CancelledError</text>
-<text fill="#22c55e" font-size="20" font-weight="600" text-anchor="middle" x="275" y="424">re-raised reliably on exit</text>
+<text fill="#22c55e" font-size="20" font-weight="600" text-anchor="middle" x="275" y="424">pending cancel delivered on exit</text>
 <line stroke="#22c55e" stroke-width="4" x1="825" x2="825" y1="70" y2="96"/>
 <text fill="#22c55e" font-size="24" font-weight="600" text-anchor="middle" x="825" y="132">shielded work</text>
 <line marker-end="url(#anyio-shield-arrowGreen)" stroke="#22c55e" stroke-width="4" x1="825" x2="825" y1="152" y2="200"/>
@@ -1067,11 +1067,20 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 <line marker-end="url(#anyio-shield-arrowGreen)" stroke="#22c55e" stroke-width="4" x1="825" x2="825" y1="420" y2="488"/>
 </svg>
 
-When `anyio.fail_after` fires, the cancellation is **deferred** at the `CancelScope(shield=True)` boundary — not consumed. The shielded work inside runs to completion: process joins, TLS shutdowns, buffer flushes all finish safely.
+`CancelScope(shield=True)` **defers** cancellation delivery while inside the scope — not consumed. The shielded work runs to completion: process joins, TLS shutdowns, buffer flushes all finish safely.
 
-Once the scope exits, the pending cancellation is **reliably re-raised** as `CancelledError`. No orphaned tasks, no lost results, no zombie processes.
+For explicit cleanup, catch and re-raise:
 
-<!-- the key difference from asyncio.shield: cancel is deferred, not consumed. the work completes, THEN the cancel fires. with asyncio.shield the cancel is edge-triggered so it's used up immediately and the inner task is orphaned. here everything is structured - the scope contains the work and the cancel is re-raised predictably. -->
+```python
+try:
+    ...
+except anyio.get_cancelled_exc_class():
+    with CancelScope(shield=True):
+        await cleanup()
+    raise
+```
+
+<!-- the key difference from asyncio.shield: cancel is deferred, not consumed. CancelScope doesn't re-raise anything itself - it just stops deferring. after the shield exits, the outer scope is still cancelled, so the next checkpoint delivers CancelledError. for explicit cleanup like subprocess termination, you catch the exception, do shielded cleanup, and manually re-raise. -->
 ---
 
 <style scoped>section { padding-top: 15px; }</style>
