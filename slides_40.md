@@ -134,40 +134,28 @@ async def process_file(f):
 
 ---
 
+<style scoped>section { padding-top: 10px; }</style>
+
 # The Root Cause: Unstructured Concurrency
 
-<svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 600 340" width="700" xmlns="http://www.w3.org/2000/svg">
+<svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 600 180" width="700" xmlns="http://www.w3.org/2000/svg">
 <defs>
-<linearGradient id="asyncio-create-task-bgGrad" x1="0" x2="1" y1="0" y2="1">
-<stop offset="0%" stop-color="#f6f8fa"/>
-<stop offset="100%" stop-color="#ffffff"/>
-</linearGradient>
-<marker id="asyncio-create-task-arrowBlue" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-<polygon fill="#2563eb" points="0 0, 10 3.5, 0 7"/>
+<marker id="asyncio-create-task-arrowGreen" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
+<polygon fill="#22c55e" points="0 0, 8 3, 0 6"/>
 </marker>
-<marker id="asyncio-create-task-arrowRed" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-<polygon fill="#dc2626" points="0 0, 10 3.5, 0 7"/>
+<marker id="asyncio-create-task-arrowRed" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
+<polygon fill="#ef4444" points="0 0, 8 3, 0 6"/>
 </marker>
 </defs>
-<rect fill="url(#asyncio-create-task-bgGrad)" height="340" rx="12" width="600"/>
-<text fill="#1f2328" font-size="16" font-weight="700" letter-spacing="0.5" text-anchor="middle" x="300" y="36">asyncio.create_task() control flow</text>
-<line stroke="#d0d7de" stroke-width="1" x1="24" x2="576" y1="50" y2="50"/>
-<rect fill="#dbeafe" height="64" rx="8" stroke="#2563eb" stroke-width="2" width="210" x="195" y="66"/>
-<text fill="#1e3a5f" font-size="18" font-weight="700" text-anchor="middle" x="300" y="94">Parent task</text>
-<text fill="#2563eb" font-size="14" text-anchor="middle" x="300" y="118">async def main():</text>
-<line marker-end="url(#asyncio-create-task-arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="300" x2="300" y1="130" y2="168"/>
-<text fill="#c2410c" font-size="15" font-weight="700" text-anchor="middle" x="300" y="157">create_task()</text>
-<line stroke="#64748b" stroke-width="2.5" x1="195" x2="395" y1="182" y2="182"/>
-<line marker-end="url(#asyncio-create-task-arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="195" x2="195" y1="182" y2="218"/>
-<line marker-end="url(#asyncio-create-task-arrowRed)" stroke="#dc2626" stroke-width="2.5" x1="395" x2="395" y1="182" y2="218"/>
-<rect fill="#f0fdf4" height="64" rx="8" stroke="#16a34a" stroke-width="2" width="190" x="100" y="224"/>
-<text fill="#14532d" font-size="16" text-anchor="middle" x="195" y="253">Parent returns</text>
-<text fill="#16a34a" font-size="15" font-weight="700" text-anchor="middle" x="195" y="275">[OK]</text>
-<rect fill="#fef2f2" height="64" rx="8" stroke="#dc2626" stroke-width="2" width="260" x="300" y="224"/>
-<text fill="#7f1d1d" font-size="17" font-weight="700" text-anchor="middle" x="430" y="250">Child task</text>
-<text fill="#991b1b" font-size="13" text-anchor="middle" x="430" y="274">(orphaned, unsupervised)</text>
-<text fill="#9ca3af" font-size="12" x="18" y="330">asyncio</text>
-<text fill="#9ca3af" font-size="12" x="534" y="330">CPython</text>
+<line marker-end="url(#asyncio-create-task-arrowGreen)" stroke="#22c55e" stroke-width="3" x1="150" x2="150" y1="10" y2="150"/>
+<circle cx="150" cy="100" fill="#64748b" r="4"/>
+<text fill="#c2410c" font-size="13" font-weight="700" text-anchor="middle" x="310" y="90">create_task()</text>
+<path d="M 150,100 L 350,100 Q 420,100 470,50" fill="none" marker-end="url(#asyncio-create-task-arrowRed)" stroke="#ef4444" stroke-width="3"/>
+<line stroke="#ef4444" stroke-dasharray="5,4" stroke-width="2" x1="470" x2="520" y1="50" y2="0"/>
+<text fill="#ef4444" font-size="14" font-weight="700" x="520" y="60">myfunc</text>
+<text fill="#64748b" font-size="12" x="520" y="76">orphaned</text>
+<text fill="#22c55e" font-size="13" font-weight="700" text-anchor="middle" x="150" y="164">parent continues</text>
+<text fill="#22c55e" font-size="13" font-weight="700" text-anchor="middle" x="150" y="180">or worse, returns</text>
 </svg>
 
 ⚠ no await, no supervision, no cancellation - exceptions silently swallowed
@@ -204,66 +192,36 @@ async def structured():
 
 ---
 
-<style scoped>section { padding-top: 40px; }</style>
+<style scoped>section { padding-top: 10px; }</style>
 
 # The Fix: Structured Concurrency
 
-<svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 780 480" width="700" xmlns="http://www.w3.org/2000/svg">
+<svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 600 200" width="700" xmlns="http://www.w3.org/2000/svg">
 <defs>
-<linearGradient id="anyio-create-task-group-bgGrad" x1="0" x2="1" y1="0" y2="1">
-<stop offset="0%" stop-color="#f6f8fa"/>
-<stop offset="100%" stop-color="#ffffff"/>
-</linearGradient>
-<marker id="anyio-create-task-group-arrowBlue" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-<polygon fill="#2563eb" points="0 0, 10 3.5, 0 7"/>
-</marker>
-<marker id="anyio-create-task-group-arrowGreen" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-<polygon fill="#16a34a" points="0 0, 10 3.5, 0 7"/>
-</marker>
-<marker id="anyio-create-task-group-arrowPurple" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-<polygon fill="#7c3aed" points="0 0, 10 3.5, 0 7"/>
-</marker>
-<marker id="anyio-create-task-group-arrowGold" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-<polygon fill="#b45309" points="0 0, 10 3.5, 0 7"/>
+<marker id="anyio-create-task-group-arrowGreen" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
+<polygon fill="#22c55e" points="0 0, 8 3, 0 6"/>
 </marker>
 </defs>
-<rect fill="url(#anyio-create-task-group-bgGrad)" height="480" rx="12" width="780"/>
-<text fill="#1f2328" font-size="16" font-weight="700" letter-spacing="0.5" text-anchor="middle" x="390" y="36">anyio.create_task_group() control flow</text>
-<line stroke="#d0d7de" stroke-width="1" x1="24" x2="756" y1="52" y2="52"/>
-<rect fill="#dbeafe" height="60" rx="8" stroke="#2563eb" stroke-width="2" width="200" x="290" y="68"/>
-<text fill="#1e3a5f" font-size="17" font-weight="700" text-anchor="middle" x="390" y="95">Parent task</text>
-<text fill="#2563eb" font-size="13" text-anchor="middle" x="390" y="117">async def main():</text>
-<line marker-end="url(#anyio-create-task-group-arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="390" x2="390" y1="128" y2="152"/>
-<rect fill="#ede9fe" height="48" rx="8" stroke="#7c3aed" stroke-width="2" width="350" x="215" y="158"/>
-<text fill="#4c1d95" font-size="14" font-weight="700" text-anchor="middle" x="390" y="179">async with</text>
-<text fill="#4c1d95" font-size="14" text-anchor="middle" x="390" y="197">create_task_group() as tg</text>
-<line stroke="#7c3aed" stroke-width="2" x1="390" x2="390" y1="206" y2="270"/>
-<text fill="#c2410c" font-size="14" font-weight="600" text-anchor="middle" x="390" y="228">tg.start_soon(task1)</text>
-<text fill="#c2410c" font-size="14" font-weight="600" text-anchor="middle" x="390" y="248">tg.start_soon(task2)</text>
-<line stroke="#7c3aed" stroke-width="2.5" x1="155" x2="625" y1="270" y2="270"/>
-<line marker-end="url(#anyio-create-task-group-arrowBlue)" stroke="#2563eb" stroke-width="2.5" x1="155" x2="155" y1="270" y2="300"/>
-<line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#16a34a" stroke-width="2.5" x1="390" x2="390" y1="270" y2="300"/>
-<line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#16a34a" stroke-width="2.5" x1="625" x2="625" y1="270" y2="300"/>
-<rect fill="#f8fafc" height="58" rx="8" stroke="#2563eb" stroke-dasharray="6,3" stroke-width="1.5" width="190" x="60" y="306"/>
-<text fill="#475569" font-size="13" text-anchor="middle" x="155" y="331">Parent body</text>
-<text fill="#2563eb" font-size="13" text-anchor="middle" x="155" y="351">(runs concurrently)</text>
-<rect fill="#dcfce7" height="58" rx="8" stroke="#16a34a" stroke-width="2" width="190" x="295" y="306"/>
-<text fill="#14532d" font-size="16" font-weight="700" text-anchor="middle" x="390" y="333">Child task 1</text>
-<text fill="#14532d" font-size="13" text-anchor="middle" x="390" y="353">task1()</text>
-<rect fill="#dcfce7" height="58" rx="8" stroke="#16a34a" stroke-width="2" width="190" x="530" y="306"/>
-<text fill="#14532d" font-size="16" font-weight="700" text-anchor="middle" x="625" y="333">Child task 2</text>
-<text fill="#14532d" font-size="13" text-anchor="middle" x="625" y="353">task2()</text>
-<line stroke="#2563eb" stroke-width="2" x1="155" x2="155" y1="364" y2="392"/>
-<line stroke="#16a34a" stroke-width="2" x1="390" x2="390" y1="364" y2="392"/>
-<line stroke="#16a34a" stroke-width="2" x1="625" x2="625" y1="364" y2="392"/>
-<line stroke="#b45309" stroke-width="2.5" x1="155" x2="625" y1="392" y2="392"/>
-<line marker-end="url(#anyio-create-task-group-arrowGold)" stroke="#b45309" stroke-width="2.5" x1="390" x2="390" y1="392" y2="412"/>
-<text fill="#b45309" font-size="12" font-weight="600" text-anchor="middle" x="390" y="386">__aexit__ waits for all tasks</text>
-<rect fill="#fef3c7" height="44" rx="8" stroke="#b45309" stroke-width="2" width="350" x="215" y="418"/>
-<text fill="#78350f" font-size="15" font-weight="700" text-anchor="middle" x="390" y="438">TaskGroup exits cleanly</text>
-<text fill="#78350f" font-size="12" text-anchor="middle" x="390" y="455">all tasks joined</text>
-<text fill="#9ca3af" font-size="12" x="18" y="473">anyio</text>
-<text fill="#9ca3af" font-size="12" x="680" y="473">trio/asyncio</text>
+<line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#22c55e" stroke-width="3" x1="300" x2="300" y1="8" y2="22"/>
+<rect fill="none" height="140" rx="8" stroke="#22c55e" stroke-width="2.5" width="540" x="30" y="28"/>
+<text fill="#14532d" font-size="12" font-weight="600" text-anchor="middle" x="300" y="46">async with create_task_group() as tg:</text>
+<line stroke="#22c55e" stroke-width="2" x1="300" x2="300" y1="52" y2="60"/>
+<circle cx="300" cy="60" fill="#22c55e" r="3"/>
+<line stroke="#22c55e" stroke-width="2" x1="300" x2="110" y1="60" y2="60"/>
+<line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#22c55e" stroke-width="2" x1="110" x2="110" y1="60" y2="112"/>
+<line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#22c55e" stroke-width="2" x1="300" x2="300" y1="60" y2="112"/>
+<line stroke="#22c55e" stroke-width="2" x1="300" x2="490" y1="60" y2="60"/>
+<line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#22c55e" stroke-width="2" x1="490" x2="490" y1="60" y2="112"/>
+<text fill="#14532d" font-size="12" text-anchor="middle" x="110" y="130">parent</text>
+<text fill="#14532d" font-size="12" text-anchor="middle" x="300" y="130">task1</text>
+<text fill="#14532d" font-size="12" text-anchor="middle" x="490" y="130">task2</text>
+<circle cx="300" cy="146" fill="#22c55e" r="3"/>
+<line stroke="#22c55e" stroke-width="2" x1="110" x2="110" y1="136" y2="146"/>
+<line stroke="#22c55e" stroke-width="2" x1="110" x2="300" y1="146" y2="146"/>
+<line stroke="#22c55e" stroke-width="2" x1="490" x2="490" y1="136" y2="146"/>
+<line stroke="#22c55e" stroke-width="2" x1="490" x2="300" y1="146" y2="146"/>
+<line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#22c55e" stroke-width="2" x1="300" x2="300" y1="146" y2="162"/>
+<line marker-end="url(#anyio-create-task-group-arrowGreen)" stroke="#22c55e" stroke-width="3" x1="300" x2="300" y1="174" y2="194"/>
 </svg>
 
 ✓ structured concurrency - no orphaned tasks
