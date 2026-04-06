@@ -1002,6 +1002,42 @@ The key insight: sometimes cleanup requires I/O. `asyncio.shield` can only prote
 
 ---
 
+# Shielding in Detail: CancelScope(shield=True)
+
+<svg font-family="'Courier New', monospace" style="display: block; margin: 0 auto;" viewBox="0 0 700 200" width="800" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="anyio-shield-arrowGreen" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
+<polygon fill="#22c55e" points="0 0, 8 3, 0 6"/>
+</marker>
+<marker id="anyio-shield-arrowAmber" markerHeight="6" markerWidth="8" orient="auto" refX="7" refY="3">
+<polygon fill="#b45309" points="0 0, 8 3, 0 6"/>
+</marker>
+</defs>
+<rect fill="#f8fafc" height="200" rx="10" width="700"/>
+<text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="175" y="22">your code sees</text>
+<text fill="#475569" font-size="14" font-weight="600" text-anchor="middle" x="525" y="22">inside the scope</text>
+<rect fill="#bbf7d0" height="180" rx="3" width="8" x="345" y="10"/>
+<line stroke="#2563eb" stroke-width="2.5" x1="175" x2="175" y1="36" y2="48"/>
+<text fill="#2563eb" font-size="12" font-weight="700" text-anchor="middle" x="175" y="66">with CancelScope(shield=True)</text>
+<line marker-end="url(#anyio-shield-arrowAmber)" stroke="#b45309" stroke-width="2.5" x1="175" x2="175" y1="74" y2="96"/>
+<text fill="#b45309" font-size="11" font-weight="600" text-anchor="middle" x="175" y="110">anyio.fail_after cancels</text>
+<text fill="#b45309" font-size="11" text-anchor="middle" x="175" y="130">cancel deferred at boundary</text>
+<line marker-end="url(#anyio-shield-arrowAmber)" stroke="#b45309" stroke-width="2.5" x1="175" x2="175" y1="138" y2="156"/>
+<text fill="#b45309" font-size="14" font-weight="700" text-anchor="middle" x="175" y="172">CancelledError</text>
+<text fill="#22c55e" font-size="11" font-weight="600" text-anchor="middle" x="175" y="190">re-raised reliably on exit</text>
+<line stroke="#22c55e" stroke-width="2.5" x1="525" x2="525" y1="36" y2="48"/>
+<text fill="#22c55e" font-size="13" font-weight="600" text-anchor="middle" x="525" y="66">shielded work</text>
+<line marker-end="url(#anyio-shield-arrowGreen)" stroke="#22c55e" stroke-width="2.5" x1="525" x2="525" y1="74" y2="96"/>
+<text fill="#22c55e" font-size="11" x="548" y="91">protected</text>
+<text fill="#22c55e" font-size="16" font-weight="700" text-anchor="middle" x="525" y="118">runs to completion</text>
+<text fill="#64748b" font-size="11" text-anchor="middle" x="525" y="140">cancel cannot interrupt</text>
+<text fill="#64748b" font-size="11" text-anchor="middle" x="525" y="158">cleanup / I/O completes safely</text>
+<line marker-end="url(#anyio-shield-arrowGreen)" stroke="#22c55e" stroke-width="2.5" x1="525" x2="525" y1="166" y2="192"/>
+</svg>
+
+<!-- so this is the AnyIO equivalent. cancel arrives but is deferred at the scope boundary - not consumed. the work inside runs to completion. then when the scope exits, the cancel is reliably re-raised. no orphaned tasks, no lost results. -->
+---
+
 <style scoped>section { padding-top: 15px; }</style>
 
 # Comparison
