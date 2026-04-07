@@ -47,8 +47,10 @@ https://graingert.co.uk/why-anyio-already
   * Example: Windows IOCP buffer safety
   * `asyncio.shield` — the duct-tape approach and its problems
   * AnyIO shielded cancel scopes — the structured approach
-  * Why it works + diagram + comparison table
+  * Why it works
+  * Shielding in Detail: `asyncio.shield` vs `CancelScope(shield=True)` diagrams
   * Mixing native asyncio cancellation (gotcha!)
+  * Comparison table
 * Why you probably already have AnyIO installed
 
 
