@@ -1,11 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 450" font-family="sans-serif">
-  <rect width="660" height="450" fill="#f2ede4"/>
-
-  <defs>
-    <pattern id="hatch" patternUnits="userSpaceOnUse" width="10" height="10">
-      <line x1="0" y1="10" x2="10" y2="0" stroke="#c0c0c0" stroke-width="1.5"/>
-    </pattern>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 630 455" font-family="sans-serif">
+  <rect width="630" height="455" fill="#f2ede4"/>
 
   <!-- Row numbers 1-13, rowH=30, startY=25 -->
   <g fill="#c0392b" font-size="13" font-weight="bold" text-anchor="middle">
@@ -25,36 +19,55 @@
     <text x="20" y="422">:</text>
   </g>
 
-  <!-- Col 1: A1 (rows 1-10): y=25, h=300 — still running, result unknown -->
-  <rect x="38" y="25" width="100" height="300" fill="url(#hatch)" stroke="#3a5068" stroke-width="2" rx="3"/>
-  <text x="88" y="172" text-anchor="middle" fill="#d4a017" font-size="20" font-weight="bold">A1</text>
-  <text x="88" y="314" text-anchor="middle" fill="#5a8a5a" font-size="16">?</text>
+  <!-- Col 1: Address 1 — still running, result unknown (rows 1-13+) -->
+  <rect x="38" y="25" width="85" height="390" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text transform="translate(98,218) rotate(-90)" text-anchor="middle" fill="#d4a017" font-size="15" font-weight="bold">Address 1</text>
+  <text x="80" y="405" text-anchor="middle" fill="#5a8a5a" font-size="16">?</text>
 
-  <!-- Col 2: DELAY (rows 1-2) then A2 (rows 3-4) -->
-  <rect x="148" y="25" width="88" height="60" fill="#e2e2e2" stroke="#999" stroke-width="1.5" rx="3"/>
-  <text x="192" y="60" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
-  <rect x="148" y="85" width="88" height="60" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
-  <text x="192" y="120" text-anchor="middle" fill="#d4a017" font-size="15" font-weight="bold">A2</text>
-  <text x="192" y="136" text-anchor="middle" fill="#8b1a1a" font-size="17">✗</text>
+  <!-- Col 2: DELAY1 (rows 1-2, y=25-85) then A2 (row 3, short — fails at y=125) -->
+  <rect x="148" y="25" width="85" height="60" fill="#e2e2e2" fill-opacity="0.55" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="190" y="60" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="148" y="85" width="85" height="40" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="190" y="109" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A2</text>
+  <text x="190" y="121" text-anchor="middle" fill="#8b1a1a" font-size="15">✗</text>
 
-  <!-- Col 3: DELAY (rows 3-4) then A3 (rows 5-6) -->
-  <rect x="246" y="85" width="88" height="60" fill="#e2e2e2" stroke="#999" stroke-width="1.5" rx="3"/>
-  <text x="290" y="120" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
-  <rect x="246" y="145" width="88" height="60" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
-  <text x="290" y="180" text-anchor="middle" fill="#d4a017" font-size="15" font-weight="bold">A3</text>
-  <text x="290" y="196" text-anchor="middle" fill="#2d6a2d" font-size="17">✓</text>
+  <!-- Col 3: A3 drawn first (lower), then DELAY2 on top to show the delay is short-circuited.
+       DELAY2 starts when A2 starts (y=85). A2 fails at y=125 before DELAY2 expires at y=145.
+       Arrow at y=125 shows A3 starts immediately on A2 failure, cutting through the delay. -->
+  <rect x="243" y="125" width="85" height="150" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="285" y="210" text-anchor="middle" fill="#d4a017" font-size="15" font-weight="bold">A3</text>
+  <text x="285" y="264" text-anchor="middle" fill="#2d6a2d" font-size="17">✓</text>
 
-  <!-- Col 4: DELAY (rows 5-6) then A4 (rows 7-8, muted — interrupted) -->
-  <rect x="344" y="145" width="88" height="60" fill="#e2e2e2" stroke="#999" stroke-width="1.5" rx="3"/>
-  <text x="388" y="180" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
-  <rect x="344" y="205" width="88" height="60" fill="#eeeeee" stroke="#bbb" stroke-width="1.5" rx="3"/>
-  <text x="388" y="240" text-anchor="middle" fill="#b89820" font-size="15" font-weight="bold">A4</text>
-  <text x="388" y="256" text-anchor="middle" fill="#999" font-size="14">?</text>
+  <!-- DELAY2 drawn on top of A3's upper section (y=85-145 overlaps A3 from y=125-145) -->
+  <rect x="243" y="85" width="85" height="60" fill="#e2e2e2" fill-opacity="0.55" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="285" y="120" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
 
-  <!-- INTERRUPT dashed line at y=205 (start of row 7) -->
-  <line x1="35" y1="205" x2="445" y2="205" stroke="#444" stroke-width="1.5" stroke-dasharray="8,5"/>
-  <text x="450" y="210" fill="#444" font-size="12" font-style="italic">INTERRUPT</text>
+  <!-- Arrow: A2 fails → A3 starts, short-circuiting DELAY2 (drawn on top of both) -->
+  <line x1="233" y1="125" x2="239" y2="125" stroke="#3a5068" stroke-width="1.5"/>
+  <polygon points="239,122 243,125 239,128" fill="#3a5068"/>
+
+  <!-- Col 4: DELAY3 (starts when A3 starts, y=125-185) then A4 (y=185-305, crosses interrupt) -->
+  <rect x="338" y="125" width="85" height="60" fill="#e2e2e2" fill-opacity="0.55" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="380" y="160" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="338" y="185" width="85" height="120" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="380" y="233" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A4</text>
+  <text x="380" y="295" text-anchor="middle" fill="#888" font-size="14">?</text>
+
+  <!-- Col 5: DELAY4 (y=185-245) then A5 (y=245-305, crosses interrupt) -->
+  <rect x="433" y="185" width="85" height="60" fill="#e2e2e2" fill-opacity="0.55" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="475" y="220" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="433" y="245" width="85" height="60" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" rx="3"/>
+  <text x="475" y="263" text-anchor="middle" fill="#b89820" font-size="14" font-weight="bold">A5</text>
+  <text x="475" y="295" text-anchor="middle" fill="#999" font-size="14">?</text>
+
+  <!-- Col 6: DELAY5 (starts when A5 starts, y=245; would expire at y=305 but interrupted at y=275) -->
+  <rect x="528" y="245" width="85" height="60" fill="#ebebeb" fill-opacity="0.55" stroke="#bbb" stroke-width="1.5" rx="3"/>
+  <text x="570" y="263" text-anchor="middle" fill="#888" font-size="12">DELAY</text>
+
+  <!-- INTERRUPT dashed line at y=275 (A3 succeeds, cancels A4, A5, DELAY5) -->
+  <line x1="35" y1="275" x2="617" y2="275" stroke="#444" stroke-width="1.5" stroke-dasharray="8,5"/>
+  <text x="285" y="290" text-anchor="middle" fill="#444" font-size="12" font-style="italic">INTERRUPT</text>
 
   <!-- JUST RIGHT! label -->
-  <text x="330" y="438" text-anchor="middle" fill="#1a1a2e" font-size="18" font-style="italic" font-weight="bold">JUST RIGHT!</text>
+  <text x="340" y="440" text-anchor="middle" fill="#1a1a2e" font-size="18" font-style="italic" font-weight="bold">JUST RIGHT!</text>
 </svg>

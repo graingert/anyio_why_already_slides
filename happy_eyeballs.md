@@ -49,7 +49,122 @@ html: true
 
 ---
 
+# The Naive Approaches
+
+<svg font-family="sans-serif" viewBox="0 0 775 430" width="680" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#f2ede4" height="430" width="775"/>
+<g fill="#c0392b" font-size="13" font-weight="bold" text-anchor="middle">
+<text x="20" y="45">1</text>
+<text x="20" y="75">2</text>
+<text x="20" y="105">3</text>
+<text x="20" y="135">4</text>
+<text x="20" y="165">5</text>
+<text x="20" y="195">6</text>
+<text x="20" y="225">7</text>
+<text x="20" y="255">8</text>
+<text x="20" y="285">9</text>
+<text x="20" y="315">10</text>
+<text x="20" y="345">11</text>
+<text x="20" y="375">12</text>
+<text x="20" y="405">13</text>
+<text x="20" y="422">:</text>
+</g>
+<rect fill="white" height="150" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="42" y="25"/>
+<text fill="#d4a017" font-size="13" font-weight="bold" text-anchor="middle" transform="translate(110,100) rotate(-90)">Address 1</text>
+<text fill="#8b1a1a" font-size="18" text-anchor="middle" x="84" y="166">✗</text>
+<rect fill="white" height="90" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="67" y="175"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="109" y="224">A2</text>
+<text fill="#8b1a1a" font-size="17" text-anchor="middle" x="109" y="257">✗</text>
+<rect fill="white" height="90" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="92" y="265"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="134" y="314">A3</text>
+<text fill="#2d6a2d" font-size="17" text-anchor="middle" x="134" y="347">✓</text>
+<text fill="#1a1a2e" font-size="15" font-style="italic" text-anchor="middle" x="110" y="392">TOO SLOW</text>
+<line stroke="#999" stroke-dasharray="8,5" stroke-width="1.5" x1="215" x2="215" y1="20" y2="380"/>
+<rect fill="white" height="390" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="230" y="25"/>
+<text fill="#d4a017" font-size="13" font-weight="bold" text-anchor="middle" transform="translate(298,220) rotate(-90)">Address 1</text>
+<text fill="#5a8a5a" font-size="14" text-anchor="middle" x="272" y="405">?</text>
+<rect fill="white" height="40" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="320" y="25"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="362" y="49">A2</text>
+<text fill="#8b1a1a" font-size="15" text-anchor="middle" x="362" y="61">✗</text>
+<rect fill="white" height="150" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="410" y="25"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="452" y="58">A3</text>
+<text fill="#888" font-size="14" text-anchor="middle" x="452" y="170">?</text>
+<rect fill="white" height="120" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="500" y="25"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="542" y="58">A4</text>
+<text fill="#888" font-size="14" text-anchor="middle" x="542" y="140">?</text>
+<rect fill="white" height="60" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="590" y="25"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="632" y="55">A5</text>
+<text fill="#2d6a2d" font-size="15" text-anchor="middle" x="632" y="74">✓</text>
+<rect fill="white" height="90" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="680" y="25"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="722" y="55">A6</text>
+<text fill="#888" font-size="14" text-anchor="middle" x="722" y="110">?</text>
+<line stroke="#444" stroke-dasharray="8,5" stroke-width="1.5" x1="227" x2="765" y1="85" y2="85"/>
+<text fill="#444" font-size="11" font-style="italic" text-anchor="middle" x="632" y="100">INTERRUPT</text>
+<text fill="#1a1a2e" font-size="15" font-style="italic" text-anchor="middle" x="500" y="392">TOO RESOURCE-</text>
+<text fill="#1a1a2e" font-size="15" font-style="italic" text-anchor="middle" x="500" y="411">INTENSIVE</text>
+</svg>
+
+---
+
+# Happy Eyeballs: Stagger with Timeout
+
+<svg font-family="sans-serif" viewBox="0 0 630 455" width="620" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#f2ede4" height="455" width="630"/>
+<g fill="#c0392b" font-size="13" font-weight="bold" text-anchor="middle">
+<text x="20" y="45">1</text>
+<text x="20" y="75">2</text>
+<text x="20" y="105">3</text>
+<text x="20" y="135">4</text>
+<text x="20" y="165">5</text>
+<text x="20" y="195">6</text>
+<text x="20" y="225">7</text>
+<text x="20" y="255">8</text>
+<text x="20" y="285">9</text>
+<text x="20" y="315">10</text>
+<text x="20" y="345">11</text>
+<text x="20" y="375">12</text>
+<text x="20" y="405">13</text>
+<text x="20" y="422">:</text>
+</g>
+<rect fill="white" height="390" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="38" y="25"/>
+<text fill="#d4a017" font-size="15" font-weight="bold" text-anchor="middle" transform="translate(98,218) rotate(-90)">Address 1</text>
+<text fill="#5a8a5a" font-size="16" text-anchor="middle" x="80" y="405">?</text>
+<rect fill="#e2e2e2" fill-opacity="0.55" height="60" rx="3" stroke="#999" stroke-width="1.5" width="85" x="148" y="25"/>
+<text fill="#666" font-size="12" text-anchor="middle" x="190" y="60">DELAY</text>
+<rect fill="white" height="40" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="148" y="85"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="190" y="109">A2</text>
+<text fill="#8b1a1a" font-size="15" text-anchor="middle" x="190" y="121">✗</text>
+<rect fill="white" height="150" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="243" y="125"/>
+<text fill="#d4a017" font-size="15" font-weight="bold" text-anchor="middle" x="285" y="210">A3</text>
+<text fill="#2d6a2d" font-size="17" text-anchor="middle" x="285" y="264">✓</text>
+<rect fill="#e2e2e2" fill-opacity="0.55" height="60" rx="3" stroke="#999" stroke-width="1.5" width="85" x="243" y="85"/>
+<text fill="#666" font-size="12" text-anchor="middle" x="285" y="120">DELAY</text>
+<line stroke="#3a5068" stroke-width="1.5" x1="233" x2="239" y1="125" y2="125"/>
+<polygon fill="#3a5068" points="239,122 243,125 239,128"/>
+<rect fill="#e2e2e2" fill-opacity="0.55" height="60" rx="3" stroke="#999" stroke-width="1.5" width="85" x="338" y="125"/>
+<text fill="#666" font-size="12" text-anchor="middle" x="380" y="160">DELAY</text>
+<rect fill="white" height="120" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="338" y="185"/>
+<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="380" y="233">A4</text>
+<text fill="#888" font-size="14" text-anchor="middle" x="380" y="295">?</text>
+<rect fill="#e2e2e2" fill-opacity="0.55" height="60" rx="3" stroke="#999" stroke-width="1.5" width="85" x="433" y="185"/>
+<text fill="#666" font-size="12" text-anchor="middle" x="475" y="220">DELAY</text>
+<rect fill="#f4f4f4" height="60" rx="3" stroke="#aaa" stroke-width="1.5" width="85" x="433" y="245"/>
+<text fill="#b89820" font-size="14" font-weight="bold" text-anchor="middle" x="475" y="263">A5</text>
+<text fill="#999" font-size="14" text-anchor="middle" x="475" y="295">?</text>
+<rect fill="#ebebeb" fill-opacity="0.55" height="60" rx="3" stroke="#bbb" stroke-width="1.5" width="85" x="528" y="245"/>
+<text fill="#888" font-size="12" text-anchor="middle" x="570" y="263">DELAY</text>
+<line stroke="#444" stroke-dasharray="8,5" stroke-width="1.5" x1="35" x2="617" y1="275" y2="275"/>
+<text fill="#444" font-size="12" font-style="italic" text-anchor="middle" x="285" y="290">INTERRUPT</text>
+<text fill="#1a1a2e" font-size="18" font-style="italic" font-weight="bold" text-anchor="middle" x="340" y="440">JUST RIGHT!</text>
+</svg>
+
+*Diagrams adapted from [graingert.co.uk/happy-eyeballs-zio](https://graingert.co.uk/happy-eyeballs-zio)*
+
+---
+
 # Twisted (2013): Callbacks
+
+<style scoped>section { font-size: 18px; }</style>
 
 ```python
 pending: list[Deferred] = []

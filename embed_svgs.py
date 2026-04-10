@@ -30,6 +30,7 @@ DEFAULT_MD_FILES = [
     'slides_part1.md',
     'slides_part2.md',
     'slides_part3.md',
+    'happy_eyeballs.md',
 ]
 
 # Match <img src="local-file.svg" ...> — local references only

@@ -56,4 +56,8 @@ npx @marp-team/marp-cli@latest slides_part2.md --pdf --html
 npx @marp-team/marp-cli@latest slides_part3.md --pdf --html
 ```
 
+```
+npx @marp-team/marp-cli@latest happy_eyeballs.md --pdf --html
+```
+
 The `--html` flag enables HTML tag parsing in the markdown (for `<img>`, `<style scoped>`, etc.) — it does not produce an HTML output file. Only a PDF is generated.

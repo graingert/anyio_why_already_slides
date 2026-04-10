@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 775 430" font-family="sans-serif">
+  <rect width="775" height="430" fill="#f2ede4"/>
+
+  <!-- Row numbers 1-13, rowH=30, startY=25 -->
+  <g fill="#c0392b" font-size="13" font-weight="bold" text-anchor="middle">
+    <text x="20" y="45">1</text>
+    <text x="20" y="75">2</text>
+    <text x="20" y="105">3</text>
+    <text x="20" y="135">4</text>
+    <text x="20" y="165">5</text>
+    <text x="20" y="195">6</text>
+    <text x="20" y="225">7</text>
+    <text x="20" y="255">8</text>
+    <text x="20" y="285">9</text>
+    <text x="20" y="315">10</text>
+    <text x="20" y="345">11</text>
+    <text x="20" y="375">12</text>
+    <text x="20" y="405">13</text>
+    <text x="20" y="422">:</text>
+  </g>
+
+  <!-- LEFT PANEL: TOO SLOW (sequential, staircase), rowH=30 -->
+
+  <!-- Address 1 (rows 1-5): y=25, h=150 -->
+  <rect x="42" y="25" width="85" height="150" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text transform="translate(110,100) rotate(-90)" text-anchor="middle" fill="#d4a017" font-size="13" font-weight="bold">Address 1</text>
+  <text x="84" y="166" text-anchor="middle" fill="#8b1a1a" font-size="18">✗</text>
+
+  <!-- A2 (rows 6-8): y=175, h=90 -->
+  <rect x="67" y="175" width="85" height="90" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="109" y="224" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A2</text>
+  <text x="109" y="257" text-anchor="middle" fill="#8b1a1a" font-size="17">✗</text>
+
+  <!-- A3 (rows 9-11): y=265, h=90 -->
+  <rect x="92" y="265" width="85" height="90" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="134" y="314" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A3</text>
+  <text x="134" y="347" text-anchor="middle" fill="#2d6a2d" font-size="17">✓</text>
+
+  <text x="110" y="392" text-anchor="middle" fill="#1a1a2e" font-size="15" font-style="italic">TOO SLOW</text>
+
+  <!-- Dashed vertical divider -->
+  <line x1="215" y1="20" x2="215" y2="380" stroke="#999" stroke-width="1.5" stroke-dasharray="8,5"/>
+
+  <!-- RIGHT PANEL: TOO RESOURCE-INTENSIVE
+       All 6 start simultaneously at y=25. Heights copied from just_right diagram.
+       A5 wins (h=60), triggering interrupt at y=85.
+       A2 (h=40) already failed. A1 (h=390), A3 (h=150), A4 (h=120), A6 (h=90) are interrupted. -->
+
+  <!-- A1 / Address 1: h=390, still running — interrupted at y=85 -->
+  <rect x="230" y="25" width="85" height="390" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text transform="translate(298,220) rotate(-90)" text-anchor="middle" fill="#d4a017" font-size="13" font-weight="bold">Address 1</text>
+  <text x="272" y="405" text-anchor="middle" fill="#5a8a5a" font-size="14">?</text>
+
+  <!-- A2: h=40, fails before A5 wins -->
+  <rect x="320" y="25" width="85" height="40" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="362" y="49" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A2</text>
+  <text x="362" y="61" text-anchor="middle" fill="#8b1a1a" font-size="15">✗</text>
+
+  <!-- A3: h=150, interrupted at y=85 while still running -->
+  <rect x="410" y="25" width="85" height="150" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="452" y="58" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A3</text>
+  <text x="452" y="170" text-anchor="middle" fill="#888" font-size="14">?</text>
+
+  <!-- A4: h=120, interrupted at y=85 while still running -->
+  <rect x="500" y="25" width="85" height="120" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="542" y="58" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A4</text>
+  <text x="542" y="140" text-anchor="middle" fill="#888" font-size="14">?</text>
+
+  <!-- A5: h=60, WINS -->
+  <rect x="590" y="25" width="85" height="60" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="632" y="55" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A5</text>
+  <text x="632" y="74" text-anchor="middle" fill="#2d6a2d" font-size="15">✓</text>
+
+  <!-- A6: h=90, interrupted at y=85 while still running -->
+  <rect x="680" y="25" width="85" height="90" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="722" y="55" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A6</text>
+  <text x="722" y="110" text-anchor="middle" fill="#888" font-size="14">?</text>
+
+  <!-- INTERRUPT at y=85 (A5 succeeds, cancels A1, A3, A4, A6) -->
+  <line x1="227" y1="85" x2="765" y2="85" stroke="#444" stroke-width="1.5" stroke-dasharray="8,5"/>
+  <text x="632" y="100" text-anchor="middle" fill="#444" font-size="11" font-style="italic">INTERRUPT</text>
+
+  <text x="500" y="392" text-anchor="middle" fill="#1a1a2e" font-size="15" font-style="italic">TOO RESOURCE-</text>
+  <text x="500" y="411" text-anchor="middle" fill="#1a1a2e" font-size="15" font-style="italic">INTENSIVE</text>
+</svg>
