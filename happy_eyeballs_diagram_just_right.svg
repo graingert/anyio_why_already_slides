@@ -1,406 +1,72 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   viewBox="0 0 630 455"
-   font-family="sans-serif"
-   version="1.1"
-   id="svg94"
-   sodipodi:docname="happy_eyeballs_diagram_just_right.svg"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs98">
-    <marker
-       id="ann-arrow"
-       markerWidth="6"
-       markerHeight="4"
-       refX="6"
-       refY="2"
-       orient="auto">
-      <polygon
-         points="0 0, 6 2, 0 4"
-         fill="#555"
-         id="polygon2" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 630 455" font-family="sans-serif">
+  <defs>
+    <marker id="ann-arrow" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+      <polygon points="0 0, 6 2, 0 4" fill="#555"/>
     </marker>
   </defs>
-  <sodipodi:namedview
-     id="namedview96"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     showgrid="false"
-     inkscape:zoom="2.0747253"
-     inkscape:cx="426.0805"
-     inkscape:cy="164.8411"
-     inkscape:window-width="1662"
-     inkscape:window-height="1011"
-     inkscape:window-x="26"
-     inkscape:window-y="23"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="delay-cancellation-note" />
-  <rect
-     width="630"
-     height="455"
-     fill="#f2ede4"
-     id="rect2" />
+  <rect width="630" height="455" fill="#f2ede4"/>
   <!-- Row numbers 1-13, rowH=30, startY=25 -->
-  <g
-     fill="#c0392b"
-     font-size="13"
-     font-weight="bold"
-     text-anchor="middle"
-     id="g32">
-    <text
-       x="20"
-       y="45"
-       id="text4">1</text>
-    <text
-       x="20"
-       y="75"
-       id="text6">2</text>
-    <text
-       x="20"
-       y="105"
-       id="text8">3</text>
-    <text
-       x="20"
-       y="135"
-       id="text10">4</text>
-    <text
-       x="20"
-       y="165"
-       id="text12">5</text>
-    <text
-       x="20"
-       y="195"
-       id="text14">6</text>
-    <text
-       x="20"
-       y="225"
-       id="text16">7</text>
-    <text
-       x="20"
-       y="255"
-       id="text18">8</text>
-    <text
-       x="20"
-       y="285"
-       id="text20">9</text>
-    <text
-       x="20"
-       y="315"
-       id="text22">10</text>
-    <text
-       x="20"
-       y="345"
-       id="text24">11</text>
-    <text
-       x="20"
-       y="375"
-       id="text26">12</text>
-    <text
-       x="20"
-       y="405"
-       id="text28">13</text>
-    <text
-       x="20"
-       y="422"
-       id="text30">:</text>
+  <g fill="#c0392b" font-size="13" font-weight="bold" text-anchor="middle" id="g32">
+    <text x="20" y="45">1</text>
+    <text x="20" y="75">2</text>
+    <text x="20" y="105">3</text>
+    <text x="20" y="135">4</text>
+    <text x="20" y="165">5</text>
+    <text x="20" y="195">6</text>
+    <text x="20" y="225">7</text>
+    <text x="20" y="255">8</text>
+    <text x="20" y="285">9</text>
+    <text x="20" y="315">10</text>
+    <text x="20" y="345">11</text>
+    <text x="20" y="375">12</text>
+    <text x="20" y="405">13</text>
+    <text x="20" y="422">:</text>
   </g>
   <!-- Col 1: Address 1 — still running, result unknown (rows 1-13+) -->
-  <rect
-     x="38"
-     y="25"
-     width="85"
-     height="390"
-     fill="white"
-     stroke="#3a5068"
-     stroke-width="2"
-     rx="3"
-     id="rect34" />
-  <text
-     transform="translate(98,218) rotate(-90)"
-     text-anchor="middle"
-     fill="#d4a017"
-     font-size="15"
-     font-weight="bold"
-     id="text36">Address 1</text>
-  <text
-     x="80"
-     y="405"
-     text-anchor="middle"
-     fill="#5a8a5a"
-     font-size="16"
-     id="text38">?</text>
+  <rect x="38" y="25" width="85" height="390" fill="white" stroke="#3a5068" stroke-width="2" rx="3" id="rect34"/>
+  <text transform="translate(98,218) rotate(-90)" text-anchor="middle" fill="#d4a017" font-size="15" font-weight="bold">Address 1</text>
+  <text x="80" y="405" text-anchor="middle" fill="#5a8a5a" font-size="16">?</text>
   <!-- Col 2: DELAY1 (rows 1-2, y=25-85) then A2 (row 3, short — fails at y=125) -->
-  <rect
-     x="148"
-     y="25"
-     width="85"
-     height="60"
-     fill="#e2e2e2"
-     fill-opacity="0.55"
-     stroke="#999"
-     stroke-width="1.5"
-     rx="3"
-     id="rect40" />
-  <text
-     x="190"
-     y="60"
-     text-anchor="middle"
-     fill="#666"
-     font-size="12"
-     id="text42">DELAY</text>
-  <rect
-     x="148"
-     y="85"
-     width="85"
-     height="40"
-     fill="white"
-     stroke="#3a5068"
-     stroke-width="2"
-     rx="3"
-     id="rect44" />
-  <text
-     x="190"
-     y="109"
-     text-anchor="middle"
-     fill="#d4a017"
-     font-size="14"
-     font-weight="bold"
-     id="text46">A2</text>
-  <text
-     x="190"
-     y="121"
-     text-anchor="middle"
-     fill="#8b1a1a"
-     font-size="15"
-     id="text48">✗</text>
+  <rect x="148" y="25" width="85" height="60" fill="#e2e2e2" fill-opacity="0.55" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="190" y="60" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="148" y="85" width="85" height="40" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="190" y="109" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A2</text>
+  <text x="190" y="121" text-anchor="middle" fill="#8b1a1a" font-size="15">✗</text>
   <!-- Col 3: A3 drawn first (lower), then DELAY2 on top to show the delay is short-circuited.
        DELAY2 starts when A2 starts (y=85). A2 fails at y=125 before DELAY2 expires at y=145.
        Arrow at y=125 shows A3 starts immediately on A2 failure, cutting through the delay. -->
-  <rect
-     x="243"
-     y="125"
-     width="85"
-     height="150"
-     fill="white"
-     stroke="#3a5068"
-     stroke-width="2"
-     rx="3"
-     id="rect50" />
-  <text
-     x="285"
-     y="210"
-     text-anchor="middle"
-     fill="#d4a017"
-     font-size="15"
-     font-weight="bold"
-     id="text52">A3</text>
-  <text
-     x="285"
-     y="264"
-     text-anchor="middle"
-     fill="#2d6a2d"
-     font-size="17"
-     id="text54">✓</text>
+  <rect x="243" y="125" width="85" height="150" fill="white" stroke="#3a5068" stroke-width="2" rx="3" id="rect50"/>
+  <text x="285" y="210" text-anchor="middle" fill="#d4a017" font-size="15" font-weight="bold">A3</text>
+  <text x="285" y="264" text-anchor="middle" fill="#2d6a2d" font-size="17">✓</text>
   <!-- DELAY2 drawn on top of A3's upper section (y=85-145 overlaps A3 from y=125-145) -->
-  <rect
-     x="243"
-     y="85"
-     width="85"
-     height="60"
-     fill="#e2e2e2"
-     fill-opacity="0.55"
-     stroke="#999"
-     stroke-width="1.5"
-     rx="3"
-     id="rect56" />
-  <text
-     x="285"
-     y="120"
-     text-anchor="middle"
-     fill="#666"
-     font-size="12"
-     id="text58">DELAY</text>
+  <rect x="243" y="85" width="85" height="60" fill="#e2e2e2" fill-opacity="0.55" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="285" y="120" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
   <!-- Arrow: A2 fails → A3 starts, short-circuiting DELAY2 (drawn on top of both) -->
-  <line
-     x1="233"
-     y1="125"
-     x2="239"
-     y2="125"
-     stroke="#3a5068"
-     stroke-width="1.5"
-     id="line60" />
-  <polygon
-     points="239,122 243,125 239,128"
-     fill="#3a5068"
-     id="polygon62" />
+  <line x1="233" y1="125" x2="239" y2="125" stroke="#3a5068" stroke-width="1.5" id="line60"/>
+  <polygon points="239,122 243,125 239,128" fill="#3a5068" id="polygon62"/>
   <!-- Col 4: DELAY3 (starts when A3 starts, y=125-185) then A4 (y=185-305, crosses interrupt) -->
-  <rect
-     x="338"
-     y="125"
-     width="85"
-     height="60"
-     fill="#e2e2e2"
-     fill-opacity="0.55"
-     stroke="#999"
-     stroke-width="1.5"
-     rx="3"
-     id="rect64" />
-  <text
-     x="380"
-     y="160"
-     text-anchor="middle"
-     fill="#666"
-     font-size="12"
-     id="text66">DELAY</text>
-  <rect
-     x="338"
-     y="185"
-     width="85"
-     height="120"
-     fill="white"
-     stroke="#3a5068"
-     stroke-width="2"
-     rx="3"
-     id="rect68" />
-  <text
-     x="380"
-     y="233"
-     text-anchor="middle"
-     fill="#d4a017"
-     font-size="14"
-     font-weight="bold"
-     id="text70">A4</text>
-  <text
-     x="380"
-     y="295"
-     text-anchor="middle"
-     fill="#888"
-     font-size="14"
-     id="text72">?</text>
+  <rect x="338" y="125" width="85" height="60" fill="#e2e2e2" fill-opacity="0.55" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="380" y="160" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="338" y="185" width="85" height="120" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="380" y="233" text-anchor="middle" fill="#d4a017" font-size="14" font-weight="bold">A4</text>
+  <text x="380" y="295" text-anchor="middle" fill="#888" font-size="14">?</text>
   <!-- Col 5: DELAY4 (y=185-245) then A5 (y=245-305, crosses interrupt) -->
-  <rect
-     x="433"
-     y="185"
-     width="85"
-     height="60"
-     fill="#e2e2e2"
-     fill-opacity="0.55"
-     stroke="#999"
-     stroke-width="1.5"
-     rx="3"
-     id="rect74" />
-  <text
-     x="475"
-     y="220"
-     text-anchor="middle"
-     fill="#666"
-     font-size="12"
-     id="text76">DELAY</text>
-  <rect
-     x="433"
-     y="245"
-     width="85"
-     height="60"
-     fill="#f4f4f4"
-     stroke="#aaa"
-     stroke-width="1.5"
-     rx="3"
-     id="rect78" />
-  <text
-     x="475"
-     y="263"
-     text-anchor="middle"
-     fill="#b89820"
-     font-size="14"
-     font-weight="bold"
-     id="text80">A5</text>
-  <text
-     x="475"
-     y="295"
-     text-anchor="middle"
-     fill="#999"
-     font-size="14"
-     id="text82">?</text>
+  <rect x="433" y="185" width="85" height="60" fill="#e2e2e2" fill-opacity="0.55" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="475" y="220" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="433" y="245" width="85" height="60" fill="#f4f4f4" stroke="#aaa" stroke-width="1.5" rx="3"/>
+  <text x="475" y="263" text-anchor="middle" fill="#b89820" font-size="14" font-weight="bold">A5</text>
+  <text x="475" y="295" text-anchor="middle" fill="#999" font-size="14">?</text>
   <!-- Col 6: DELAY5 (starts when A5 starts, y=245; would expire at y=305 but interrupted at y=275) -->
-  <rect
-     x="528"
-     y="245"
-     width="85"
-     height="60"
-     fill="#ebebeb"
-     fill-opacity="0.55"
-     stroke="#bbb"
-     stroke-width="1.5"
-     rx="3"
-     id="rect84" />
-  <text
-     x="570"
-     y="263"
-     text-anchor="middle"
-     fill="#888"
-     font-size="12"
-     id="text86">DELAY</text>
+  <rect x="528" y="245" width="85" height="60" fill="#ebebeb" fill-opacity="0.55" stroke="#bbb" stroke-width="1.5" rx="3"/>
+  <text x="570" y="263" text-anchor="middle" fill="#888" font-size="12">DELAY</text>
   <!-- INTERRUPT dashed line at y=275 (A3 succeeds, cancels A4, A5, DELAY5) -->
-  <line
-     x1="35"
-     y1="275"
-     x2="617"
-     y2="275"
-     stroke="#444"
-     stroke-width="1.5"
-     stroke-dasharray="8,5"
-     id="line88" />
-  <text
-     x="285"
-     y="290"
-     text-anchor="middle"
-     fill="#444"
-     font-size="12"
-     font-style="italic"
-     id="text90">INTERRUPT</text>
+  <line x1="35" y1="275" x2="617" y2="275" stroke="#444" stroke-width="1.5" stroke-dasharray="8,5"/>
+  <text x="285" y="290" text-anchor="middle" fill="#444" font-size="12" font-style="italic">INTERRUPT</text>
   <!-- JUST RIGHT! label -->
-  <text
-     x="340"
-     y="440"
-     text-anchor="middle"
-     fill="#1a1a2e"
-     font-size="18"
-     font-style="italic"
-     font-weight="bold"
-     id="text92">JUST RIGHT!</text>
-  <g
-     id="delay-cancellation-note">
-    <text
-       x="285"
-       y="66"
-       text-anchor="middle"
-       fill="#555"
-       font-size="10"
-       font-style="italic"
-       id="text-delay-cancellation-1">A2 connection failure</text>
-    <text
-       x="285"
-       y="78"
-       text-anchor="middle"
-       fill="#555"
-       font-size="10"
-       font-style="italic"
-       id="text-delay-cancellation-2">cancels delay</text>
-    <path
-       d="M 253.8157,68.559674 C 235,68.559674 238,100 238,125"
-       fill="none"
-       stroke="#555555"
-       stroke-width="1"
-       marker-end="url(#ann-arrow)"
-       id="path-delay-cancellation" />
+  <text x="340" y="440" text-anchor="middle" fill="#1a1a2e" font-size="18" font-style="italic" font-weight="bold">JUST RIGHT!</text>
+  <g id="delay-cancellation-note">
+    <text x="424.3331" y="35.885628" text-anchor="middle" fill="#555" font-size="32.451px" font-style="italic" id="text-delay-cancellation-1">A2 connection failure</text>
+    <text x="424.3331" y="76.449379" text-anchor="middle" fill="#555" font-size="32.451px" font-style="italic" id="text-delay-cancellation-2">cancels delay</text>
+    <path d="M 337.15439,47.346947 C 226,47.346947 238.12372,93.728843 238.1237,124.24325" fill="none" stroke="#555" stroke-width="1.20057" marker-end="url(#ann-arrow)" id="path-delay-cancellation"/>
   </g>
 </svg>
