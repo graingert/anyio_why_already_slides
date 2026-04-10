@@ -108,55 +108,66 @@ html: true
 
 # Happy Eyeballs: Stagger with Timeout
 
-<svg font-family="sans-serif" viewBox="0 0 630 455" width="620" xmlns="http://www.w3.org/2000/svg">
-<rect fill="#f2ede4" height="455" width="630"/>
-<g fill="#c0392b" font-size="13" font-weight="bold" text-anchor="middle">
-<text x="20" y="45">1</text>
-<text x="20" y="75">2</text>
-<text x="20" y="105">3</text>
-<text x="20" y="135">4</text>
-<text x="20" y="165">5</text>
-<text x="20" y="195">6</text>
-<text x="20" y="225">7</text>
-<text x="20" y="255">8</text>
-<text x="20" y="285">9</text>
-<text x="20" y="315">10</text>
-<text x="20" y="345">11</text>
-<text x="20" y="375">12</text>
-<text x="20" y="405">13</text>
-<text x="20" y="422">:</text>
-</g>
-<rect fill="white" height="390" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="38" y="25"/>
-<text fill="#d4a017" font-size="15" font-weight="bold" text-anchor="middle" transform="translate(98,218) rotate(-90)">Address 1</text>
-<text fill="#5a8a5a" font-size="16" text-anchor="middle" x="80" y="405">?</text>
-<rect fill="#e2e2e2" fill-opacity="0.55" height="60" rx="3" stroke="#999" stroke-width="1.5" width="85" x="148" y="25"/>
-<text fill="#666" font-size="12" text-anchor="middle" x="190" y="60">DELAY</text>
-<rect fill="white" height="40" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="148" y="85"/>
-<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="190" y="109">A2</text>
-<text fill="#8b1a1a" font-size="15" text-anchor="middle" x="190" y="121">✗</text>
-<rect fill="white" height="150" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="243" y="125"/>
-<text fill="#d4a017" font-size="15" font-weight="bold" text-anchor="middle" x="285" y="210">A3</text>
-<text fill="#2d6a2d" font-size="17" text-anchor="middle" x="285" y="264">✓</text>
-<rect fill="#e2e2e2" fill-opacity="0.55" height="60" rx="3" stroke="#999" stroke-width="1.5" width="85" x="243" y="85"/>
-<text fill="#666" font-size="12" text-anchor="middle" x="285" y="120">DELAY</text>
-<line stroke="#3a5068" stroke-width="1.5" x1="233" x2="239" y1="125" y2="125"/>
-<polygon fill="#3a5068" points="239,122 243,125 239,128"/>
-<rect fill="#e2e2e2" fill-opacity="0.55" height="60" rx="3" stroke="#999" stroke-width="1.5" width="85" x="338" y="125"/>
-<text fill="#666" font-size="12" text-anchor="middle" x="380" y="160">DELAY</text>
-<rect fill="white" height="120" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="338" y="185"/>
-<text fill="#d4a017" font-size="14" font-weight="bold" text-anchor="middle" x="380" y="233">A4</text>
-<text fill="#888" font-size="14" text-anchor="middle" x="380" y="295">?</text>
-<rect fill="#e2e2e2" fill-opacity="0.55" height="60" rx="3" stroke="#999" stroke-width="1.5" width="85" x="433" y="185"/>
-<text fill="#666" font-size="12" text-anchor="middle" x="475" y="220">DELAY</text>
-<rect fill="#f4f4f4" height="60" rx="3" stroke="#aaa" stroke-width="1.5" width="85" x="433" y="245"/>
-<text fill="#b89820" font-size="14" font-weight="bold" text-anchor="middle" x="475" y="263">A5</text>
-<text fill="#999" font-size="14" text-anchor="middle" x="475" y="295">?</text>
-<rect fill="#ebebeb" fill-opacity="0.55" height="60" rx="3" stroke="#bbb" stroke-width="1.5" width="85" x="528" y="245"/>
-<text fill="#888" font-size="12" text-anchor="middle" x="570" y="263">DELAY</text>
-<line stroke="#444" stroke-dasharray="8,5" stroke-width="1.5" x1="35" x2="617" y1="275" y2="275"/>
-<text fill="#444" font-size="12" font-style="italic" text-anchor="middle" x="285" y="290">INTERRUPT</text>
-<text fill="#1a1a2e" font-size="18" font-style="italic" font-weight="bold" text-anchor="middle" x="340" y="440">JUST RIGHT!</text>
-</svg>
+<svg:svg font-family="sans-serif" id="happy-eyeballs-diagram-just-right-svg94" inkscape:version="1.2.2 (b0a8486541, 2022-12-01)" sodipodi:docname="happy_eyeballs_diagram_just_right.svg" version="1.1" viewBox="0 0 630 455" width="620" xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg">
+<svg:defs id="happy-eyeballs-diagram-just-right-defs98">
+<svg:marker id="happy-eyeballs-diagram-just-right-ann-arrow" markerHeight="4" markerWidth="6" orient="auto" refX="6" refY="2">
+<svg:polygon fill="#555" id="happy-eyeballs-diagram-just-right-polygon2" points="0 0, 6 2, 0 4"/>
+</svg:marker>
+</svg:defs>
+<sodipodi:namedview bordercolor="#000000" borderopacity="0.25" id="happy-eyeballs-diagram-just-right-namedview96" inkscape:current-layer="delay-cancellation-note" inkscape:cx="426.0805" inkscape:cy="164.8411" inkscape:deskcolor="#d1d1d1" inkscape:pagecheckerboard="0" inkscape:pageopacity="0.0" inkscape:showpageshadow="2" inkscape:window-height="1011" inkscape:window-maximized="0" inkscape:window-width="1662" inkscape:window-x="26" inkscape:window-y="23" inkscape:zoom="2.0747253" pagecolor="#ffffff" showgrid="false"/>
+<svg:rect fill="#f2ede4" height="455" id="happy-eyeballs-diagram-just-right-rect2" width="630"/>
+<svg:g fill="#c0392b" font-size="13" font-weight="bold" id="happy-eyeballs-diagram-just-right-g32" text-anchor="middle">
+<svg:text id="happy-eyeballs-diagram-just-right-text4" x="20" y="45">1</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text6" x="20" y="75">2</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text8" x="20" y="105">3</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text10" x="20" y="135">4</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text12" x="20" y="165">5</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text14" x="20" y="195">6</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text16" x="20" y="225">7</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text18" x="20" y="255">8</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text20" x="20" y="285">9</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text22" x="20" y="315">10</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text24" x="20" y="345">11</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text26" x="20" y="375">12</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text28" x="20" y="405">13</svg:text>
+<svg:text id="happy-eyeballs-diagram-just-right-text30" x="20" y="422">:</svg:text>
+</svg:g>
+<svg:rect fill="white" height="390" id="happy-eyeballs-diagram-just-right-rect34" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="38" y="25"/>
+<svg:text fill="#d4a017" font-size="15" font-weight="bold" id="happy-eyeballs-diagram-just-right-text36" text-anchor="middle" transform="translate(98,218) rotate(-90)">Address 1</svg:text>
+<svg:text fill="#5a8a5a" font-size="16" id="happy-eyeballs-diagram-just-right-text38" text-anchor="middle" x="80" y="405">?</svg:text>
+<svg:rect fill="#e2e2e2" fill-opacity="0.55" height="60" id="happy-eyeballs-diagram-just-right-rect40" rx="3" stroke="#999" stroke-width="1.5" width="85" x="148" y="25"/>
+<svg:text fill="#666" font-size="12" id="happy-eyeballs-diagram-just-right-text42" text-anchor="middle" x="190" y="60">DELAY</svg:text>
+<svg:rect fill="white" height="40" id="happy-eyeballs-diagram-just-right-rect44" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="148" y="85"/>
+<svg:text fill="#d4a017" font-size="14" font-weight="bold" id="happy-eyeballs-diagram-just-right-text46" text-anchor="middle" x="190" y="109">A2</svg:text>
+<svg:text fill="#8b1a1a" font-size="15" id="happy-eyeballs-diagram-just-right-text48" text-anchor="middle" x="190" y="121">✗</svg:text>
+<svg:rect fill="white" height="150" id="happy-eyeballs-diagram-just-right-rect50" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="243" y="125"/>
+<svg:text fill="#d4a017" font-size="15" font-weight="bold" id="happy-eyeballs-diagram-just-right-text52" text-anchor="middle" x="285" y="210">A3</svg:text>
+<svg:text fill="#2d6a2d" font-size="17" id="happy-eyeballs-diagram-just-right-text54" text-anchor="middle" x="285" y="264">✓</svg:text>
+<svg:rect fill="#e2e2e2" fill-opacity="0.55" height="60" id="happy-eyeballs-diagram-just-right-rect56" rx="3" stroke="#999" stroke-width="1.5" width="85" x="243" y="85"/>
+<svg:text fill="#666" font-size="12" id="happy-eyeballs-diagram-just-right-text58" text-anchor="middle" x="285" y="120">DELAY</svg:text>
+<svg:line id="happy-eyeballs-diagram-just-right-line60" stroke="#3a5068" stroke-width="1.5" x1="233" x2="239" y1="125" y2="125"/>
+<svg:polygon fill="#3a5068" id="happy-eyeballs-diagram-just-right-polygon62" points="239,122 243,125 239,128"/>
+<svg:rect fill="#e2e2e2" fill-opacity="0.55" height="60" id="happy-eyeballs-diagram-just-right-rect64" rx="3" stroke="#999" stroke-width="1.5" width="85" x="338" y="125"/>
+<svg:text fill="#666" font-size="12" id="happy-eyeballs-diagram-just-right-text66" text-anchor="middle" x="380" y="160">DELAY</svg:text>
+<svg:rect fill="white" height="120" id="happy-eyeballs-diagram-just-right-rect68" rx="3" stroke="#3a5068" stroke-width="2" width="85" x="338" y="185"/>
+<svg:text fill="#d4a017" font-size="14" font-weight="bold" id="happy-eyeballs-diagram-just-right-text70" text-anchor="middle" x="380" y="233">A4</svg:text>
+<svg:text fill="#888" font-size="14" id="happy-eyeballs-diagram-just-right-text72" text-anchor="middle" x="380" y="295">?</svg:text>
+<svg:rect fill="#e2e2e2" fill-opacity="0.55" height="60" id="happy-eyeballs-diagram-just-right-rect74" rx="3" stroke="#999" stroke-width="1.5" width="85" x="433" y="185"/>
+<svg:text fill="#666" font-size="12" id="happy-eyeballs-diagram-just-right-text76" text-anchor="middle" x="475" y="220">DELAY</svg:text>
+<svg:rect fill="#f4f4f4" height="60" id="happy-eyeballs-diagram-just-right-rect78" rx="3" stroke="#aaa" stroke-width="1.5" width="85" x="433" y="245"/>
+<svg:text fill="#b89820" font-size="14" font-weight="bold" id="happy-eyeballs-diagram-just-right-text80" text-anchor="middle" x="475" y="263">A5</svg:text>
+<svg:text fill="#999" font-size="14" id="happy-eyeballs-diagram-just-right-text82" text-anchor="middle" x="475" y="295">?</svg:text>
+<svg:rect fill="#ebebeb" fill-opacity="0.55" height="60" id="happy-eyeballs-diagram-just-right-rect84" rx="3" stroke="#bbb" stroke-width="1.5" width="85" x="528" y="245"/>
+<svg:text fill="#888" font-size="12" id="happy-eyeballs-diagram-just-right-text86" text-anchor="middle" x="570" y="263">DELAY</svg:text>
+<svg:line id="happy-eyeballs-diagram-just-right-line88" stroke="#444" stroke-dasharray="8,5" stroke-width="1.5" x1="35" x2="617" y1="275" y2="275"/>
+<svg:text fill="#444" font-size="12" font-style="italic" id="happy-eyeballs-diagram-just-right-text90" text-anchor="middle" x="285" y="290">INTERRUPT</svg:text>
+<svg:text fill="#1a1a2e" font-size="18" font-style="italic" font-weight="bold" id="happy-eyeballs-diagram-just-right-text92" text-anchor="middle" x="340" y="440">JUST RIGHT!</svg:text>
+<svg:g id="happy-eyeballs-diagram-just-right-delay-cancellation-note">
+<svg:text fill="#555" font-size="10" font-style="italic" id="happy-eyeballs-diagram-just-right-text-delay-cancellation-1" text-anchor="middle" x="285" y="66">A2 connection failure</svg:text>
+<svg:text fill="#555" font-size="10" font-style="italic" id="happy-eyeballs-diagram-just-right-text-delay-cancellation-2" text-anchor="middle" x="285" y="78">cancels delay</svg:text>
+<svg:path d="M 253.8157,68.559674 C 235,68.559674 238,100 238,125" fill="none" id="happy-eyeballs-diagram-just-right-path-delay-cancellation" marker-end="url(#happy-eyeballs-diagram-just-right-ann-arrow)" stroke="#555555" stroke-width="1"/>
+</svg:g>
+</svg:svg>
 
 *Diagrams adapted from [graingert.co.uk/happy-eyeballs-zio](https://graingert.co.uk/happy-eyeballs-zio)*
 
