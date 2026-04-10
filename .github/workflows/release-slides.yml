@@ -30,7 +30,7 @@ jobs:
 
       - name: Generate PDFs and PPTX
         run: |
-          for deck in slides slides_40 lightning slides_part1 slides_part2 slides_part3; do
+          for deck in slides slides_40 lightning happy_eyeballs slides_part1 slides_part2 slides_part3; do
             npx @marp-team/marp-cli@latest ${deck}.md --pdf  --html
             npx @marp-team/marp-cli@latest ${deck}.md --pptx --html
           done
@@ -67,6 +67,7 @@ jobs:
               '| `slides` | Full talk |',
               '| `slides_40` | 40-min version |',
               '| `lightning` | Lightning talk |',
+              '| `happy_eyeballs` | Happy Eyeballs lightning talk |',
               '| `slides_part1` | Part 1: asyncio ≠ async/await + Structured Concurrency |',
               '| `slides_part2` | Part 2: Level-Triggered Cancellation + Shielding |',
               '| `slides_part3` | Part 3: AnyIO Features + Why You Already Have It |',
@@ -96,9 +97,10 @@ jobs:
           gh release create "${TAG}" \
             --title "Slides ${DATETIME} (${SHORT_SHA})" \
             --notes "${COMMIT_MSG}" \
-            slides.pdf       slides.pptx \
-            slides_40.pdf    slides_40.pptx \
-            lightning.pdf    lightning.pptx \
-            slides_part1.pdf slides_part1.pptx \
-            slides_part2.pdf slides_part2.pptx \
-            slides_part3.pdf slides_part3.pptx
+            slides.pdf         slides.pptx \
+            slides_40.pdf      slides_40.pptx \
+            lightning.pdf      lightning.pptx \
+            happy_eyeballs.pdf happy_eyeballs.pptx \
+            slides_part1.pdf   slides_part1.pptx \
+            slides_part2.pdf   slides_part2.pptx \
+            slides_part3.pdf   slides_part3.pptx
