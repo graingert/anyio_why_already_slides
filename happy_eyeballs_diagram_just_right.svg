@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 450" font-family="sans-serif">
+  <rect width="660" height="450" fill="#f2ede4"/>
+
+  <defs>
+    <pattern id="hatch" patternUnits="userSpaceOnUse" width="10" height="10">
+      <line x1="0" y1="10" x2="10" y2="0" stroke="#c0c0c0" stroke-width="1.5"/>
+    </pattern>
+  </defs>
+
+  <!-- Row numbers 1-13, rowH=30, startY=25 -->
+  <g fill="#c0392b" font-size="13" font-weight="bold" text-anchor="middle">
+    <text x="20" y="45">1</text>
+    <text x="20" y="75">2</text>
+    <text x="20" y="105">3</text>
+    <text x="20" y="135">4</text>
+    <text x="20" y="165">5</text>
+    <text x="20" y="195">6</text>
+    <text x="20" y="225">7</text>
+    <text x="20" y="255">8</text>
+    <text x="20" y="285">9</text>
+    <text x="20" y="315">10</text>
+    <text x="20" y="345">11</text>
+    <text x="20" y="375">12</text>
+    <text x="20" y="405">13</text>
+    <text x="20" y="422">:</text>
+  </g>
+
+  <!-- Col 1: A1 (rows 1-10): y=25, h=300 — still running, result unknown -->
+  <rect x="38" y="25" width="100" height="300" fill="url(#hatch)" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="88" y="172" text-anchor="middle" fill="#d4a017" font-size="20" font-weight="bold">A1</text>
+  <text x="88" y="314" text-anchor="middle" fill="#5a8a5a" font-size="16">?</text>
+
+  <!-- Col 2: DELAY (rows 1-2) then A2 (rows 3-4) -->
+  <rect x="148" y="25" width="88" height="60" fill="#e2e2e2" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="192" y="60" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="148" y="85" width="88" height="60" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="192" y="120" text-anchor="middle" fill="#d4a017" font-size="15" font-weight="bold">A2</text>
+  <text x="192" y="136" text-anchor="middle" fill="#8b1a1a" font-size="17">✗</text>
+
+  <!-- Col 3: DELAY (rows 3-4) then A3 (rows 5-6) -->
+  <rect x="246" y="85" width="88" height="60" fill="#e2e2e2" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="290" y="120" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="246" y="145" width="88" height="60" fill="white" stroke="#3a5068" stroke-width="2" rx="3"/>
+  <text x="290" y="180" text-anchor="middle" fill="#d4a017" font-size="15" font-weight="bold">A3</text>
+  <text x="290" y="196" text-anchor="middle" fill="#2d6a2d" font-size="17">✓</text>
+
+  <!-- Col 4: DELAY (rows 5-6) then A4 (rows 7-8, muted — interrupted) -->
+  <rect x="344" y="145" width="88" height="60" fill="#e2e2e2" stroke="#999" stroke-width="1.5" rx="3"/>
+  <text x="388" y="180" text-anchor="middle" fill="#666" font-size="12">DELAY</text>
+  <rect x="344" y="205" width="88" height="60" fill="#eeeeee" stroke="#bbb" stroke-width="1.5" rx="3"/>
+  <text x="388" y="240" text-anchor="middle" fill="#b89820" font-size="15" font-weight="bold">A4</text>
+  <text x="388" y="256" text-anchor="middle" fill="#999" font-size="14">?</text>
+
+  <!-- INTERRUPT dashed line at y=205 (start of row 7) -->
+  <line x1="35" y1="205" x2="445" y2="205" stroke="#444" stroke-width="1.5" stroke-dasharray="8,5"/>
+  <text x="450" y="210" fill="#444" font-size="12" font-style="italic">INTERRUPT</text>
+
+  <!-- JUST RIGHT! label -->
+  <text x="330" y="438" text-anchor="middle" fill="#1a1a2e" font-size="18" font-style="italic" font-weight="bold">JUST RIGHT!</text>
+</svg>
