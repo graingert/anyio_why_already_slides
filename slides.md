@@ -17,6 +17,8 @@ https://graingert.co.uk/why-anyio-already
 
 <img src="https://avatars.githubusercontent.com/u/413772" alt="graingert" style="display: block; margin: 0 auto;" width="250">
 
+<style scoped>section { font-size: 22px; }</style>
+
 **Networking & async:**
 - Core developer of AnyIO, Twisted, and Trio
 - CPython triager — asyncio contributor
