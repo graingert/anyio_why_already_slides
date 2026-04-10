@@ -19,6 +19,7 @@ https://graingert.co.uk/why-anyio-already
 **Networking & async:**
 - Core developer of AnyIO, Twisted, and Trio
 - CPython triager — asyncio contributor
+- uvloop contributor — including Python 3.14 compatibility (AbstractChildWatcher removal)
 
 **Other open source:**
 - `PyPy`, `pytest-dev`, `PyCQA`, `Dask` and others
