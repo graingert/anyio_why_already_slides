@@ -72,7 +72,9 @@ return winner.addBoth(cancelRemainingPending)
 
 4 pieces of manual state · 5 nested closures · 1 `LoopingCall`
 
-<!-- Twisted was genuinely ahead of its time implementing this in 2013. but look at the bookkeeping required. four pieces of state: a pending list, a failures list, and two booleans just to track whether you're done. a LoopingCall firing every 300ms. five nested closures. this is the inherent complexity of the callback model — you're manually managing a state machine. -->
+**Still shipping unchanged in 2026.**
+
+<!-- Twisted was genuinely ahead of its time implementing this in 2013. but look at the bookkeeping required. four pieces of state: a pending list, a failures list, and two booleans just to track whether you're done. a LoopingCall firing every 300ms. five nested closures. this is the inherent complexity of the callback model — you're manually managing a state machine. And this is still the code shipping in Twisted today. -->
 
 ---
 
@@ -176,6 +178,21 @@ AnyIO's structured approach avoids this whole class of bug.
 
 ---
 
+# Twisted: still trying
+
+**Issue [#9345](https://github.com/twisted/twisted/issues/9345)** (filed by njsmith, 2017): the fixed 300ms delay is wrong — if an attempt fails in 10ms, the next should start immediately.
+
+**Glyph's rewrite** (`statemachine-hostnameendpoint`, active since 2017):
+- Multiple attempts: `_statefulhost.py` → `_statefulhost2/3/4.py` → `_corohost.py`
+- Still not submitted as a PR
+- Last commit: April 2026 — *"my eyes are starting to water looking at this"*
+
+The same adaptive-delay bug that #9345 describes is what AnyIO solves naturally — `move_on_after` fires immediately when the event is set.
+
+<!-- issue 9345 is still open with no comments and no fix. Glyph has been working on a rewrite for nearly a decade, producing multiple implementation files. even with coroutines available, the lack of structured concurrency means you still have to build the machinery yourself. -->
+
+---
+
 <style scoped>section { font-size: 22px; }</style>
 
 # Further Reading
@@ -183,11 +200,12 @@ AnyIO's structured approach avoids this whole class of bug.
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 
 - [anyio.readthedocs.io](https://anyio.readthedocs.io) — AnyIO docs
-- [datatracker.ietf.org/doc/html/rfc6555](https://datatracker.ietf.org/doc/html/rfc6555) — Happy Eyeballs
-- [datatracker.ietf.org/doc/html/rfc8305](https://datatracker.ietf.org/doc/html/rfc8305) — Happy Eyeballs v2
+- [datatracker.ietf.org/doc/html/rfc6555](https://datatracker.ietf.org/doc/html/rfc6555) — Happy Eyeballs (RFC 6555)
+- [datatracker.ietf.org/doc/html/rfc8305](https://datatracker.ietf.org/doc/html/rfc8305) — Happy Eyeballs v2 (RFC 8305)
+- [github.com/twisted/twisted/issues/9345](https://github.com/twisted/twisted/issues/9345) — Twisted issue #9345 (adaptive delay, open since 2017)
+- [graingert.co.uk/glyph-watering-eyeballs](https://graingert.co.uk/glyph-watering-eyeballs) — Glyph's WIP rewrite branch
 - [github.com/python/cpython/issues/124858](https://github.com/python/cpython/issues/124858) — asyncio refcycle fix
-- [github.com/python/cpython/pull/128475](https://github.com/python/cpython/pull/128475) — staggered_race leak fix
-- [graingert.co.uk/glyph-watering-eyeballs](https://graingert.co.uk/glyph-watering-eyeballs) — Glyph's WIP branch
+- [github.com/python/cpython/pull/128475](https://github.com/python/cpython/pull/128475) — asyncio staggered_race leak fix
 
 <!-- thanks for listening! links are on screen. -->
 
