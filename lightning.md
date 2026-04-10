@@ -169,11 +169,10 @@ Installed `httpx`, `fastapi`, `jupyter`, or `mcp`? **AnyIO is already in your vi
 
 <style scoped>section { font-size: 22px; }</style>
 
-# Any questions?
+# Further Reading
 
 **These slides:** [graingert.co.uk/why-anyio-already](https://graingert.co.uk/why-anyio-already)
 
-**Further reading:**
 - [anyio.readthedocs.io](https://anyio.readthedocs.io) — AnyIO documentation
 - [graingert.co.uk/trio-sc](https://graingert.co.uk/trio-sc) — Go statement considered harmful (njs)
 - [graingert.co.uk/dijkstra68](https://graingert.co.uk/dijkstra68) — Go To Statement Considered Harmful (1968)
@@ -181,4 +180,4 @@ Installed `httpx`, `fastapi`, `jupyter`, or `mcp`? **AnyIO is already in your vi
 - [graingert.co.uk/dabeaz-coro](https://graingert.co.uk/dabeaz-coro) — A Curious Course on Coroutines and Concurrency
 - [graingert.co.uk/dabeaz-final](https://graingert.co.uk/dabeaz-final) — Generators: The Final Frontier
 
-<!-- thanks! happy to take questions. I'm graingert on GitHub. -->
+<!-- thanks for listening! links are on screen. I'm graingert on GitHub. -->
