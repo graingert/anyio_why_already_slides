@@ -26,16 +26,20 @@ jobs:
           python -m venv .venv
           .venv/bin/pip install -r requirements.txt
 
+      - name: Show Python and lxml versions
+        run: |
+          .venv/bin/python --version
+          .venv/bin/python -c "import lxml, lxml.etree; print('lxml', lxml.__version__, 'libxml2', lxml.etree.LIBXML_VERSION)"
+
       - name: Re-embed SVGs
         run: .venv/bin/python embed_svgs.py
 
       - name: Fail if slides are out of sync with SVG sources
         run: |
+          git diff
           if ! git diff --exit-code; then
             echo ""
-            echo "❌ The embedded SVGs in slides.md / slides_40.md are out of sync"
-            echo "   with the source .svg files."
-            echo ""
+            echo "❌ Embedded SVGs are out of sync with the source .svg files."
             echo "   Run  python3 embed_svgs.py  and commit the result."
             exit 1
           fi
