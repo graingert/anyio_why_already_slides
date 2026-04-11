@@ -171,6 +171,208 @@ html: true
 *Diagrams adapted from [blog.softwaremill.com — Happy Eyeballs Algorithm Using ZIO](https://graingert.co.uk/happy-eyeballs-zio) ([graingert.co.uk/happy-eyeballs-zio](https://graingert.co.uk/happy-eyeballs-zio))*
 
 ---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# Twisted `HostnameEndpoint.connect`: Full Source (1/4) ([github.com/twisted/twisted](https://github.com/twisted/twisted/blob/twisted-25.5.0/src/twisted/internet/endpoints.py#L989-L1159))
+
+```python
+    def connect(self, protocolFactory: IProtocolFactory) -> Deferred[IProtocol]:
+        """
+        Attempts a connection to each resolved address, and returns a
+        connection which is established first.
+
+        @param protocolFactory: The protocol factory whose protocol
+            will be connected.
+        @type protocolFactory:
+            L{IProtocolFactory<twisted.internet.interfaces.IProtocolFactory>}
+
+        @return: A L{Deferred} that fires with the connected protocol
+            or fails a connection-related error.
+        """
+        if self._badHostname:
+            return defer.fail(ValueError(f"invalid hostname: {self._hostText}"))
+
+        resolved: Deferred[list[IAddress]] = Deferred()
+        addresses: list[IAddress] = []
+
+        @implementer(IResolutionReceiver)
+        class EndpointReceiver:
+            @staticmethod
+            def resolutionBegan(resolutionInProgress: IHostResolution) -> None:
+                pass
+
+            @staticmethod
+            def addressResolved(address: IAddress) -> None:
+                addresses.append(address)
+
+            @staticmethod
+            def resolutionComplete() -> None:
+                resolved.callback(addresses)
+
+        nameResolver = self._getNameResolverAndMaybeWarn(self._reactor)
+        nameResolver.resolveHostName(
+            EndpointReceiver(), self._hostText, portNumber=self._port
+        )
+
+        resolved.addErrback(
+            lambda ignored: defer.fail(
+                error.DNSLookupError(f"Couldn't find the hostname '{self._hostText}'")
+            )
+        )
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# Twisted `HostnameEndpoint.connect`: Full Source (2/4) ([github.com/twisted/twisted](https://github.com/twisted/twisted/blob/twisted-25.5.0/src/twisted/internet/endpoints.py#L989-L1159))
+
+```python
+
+        def resolvedAddressesToEndpoints(
+            addresses: Iterable[IAddress],
+        ) -> Iterable[TCP6ClientEndpoint | TCP4ClientEndpoint]:
+            # Yield an endpoint for every address resolved from the name.
+            for eachAddress in addresses:
+                if isinstance(eachAddress, IPv6Address):
+                    yield TCP6ClientEndpoint(
+                        self._reactor,
+                        eachAddress.host,
+                        eachAddress.port,
+                        self._timeout,
+                        self._bindAddress,
+                    )
+                if isinstance(eachAddress, IPv4Address):
+                    yield TCP4ClientEndpoint(
+                        self._reactor,
+                        eachAddress.host,
+                        eachAddress.port,
+                        self._timeout,
+                        self._bindAddress,
+                    )
+
+        iterd = resolved.addCallback(resolvedAddressesToEndpoints)
+        listd = iterd.addCallback(list)
+
+        def _canceller(cancelled: Deferred[IProtocol]) -> None:
+            # This canceller must remain defined outside of
+            # `startConnectionAttempts`, because Deferred should not
+            # participate in cycles with their cancellers; that would create a
+            # potentially problematic circular reference and possibly
+            # gc.garbage.
+            cancelled.errback(
+                error.ConnectingCancelledError(
+                    HostnameAddress(self._hostBytes, self._port)
+                )
+            )
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# Twisted `HostnameEndpoint.connect`: Full Source (3/4) ([github.com/twisted/twisted](https://github.com/twisted/twisted/blob/twisted-25.5.0/src/twisted/internet/endpoints.py#L989-L1159))
+
+```python
+        def startConnectionAttempts(
+            endpoints: list[TCP6ClientEndpoint | TCP4ClientEndpoint],
+        ) -> Deferred[IProtocol]:
+            """
+            Given a sequence of endpoints obtained via name resolution, start
+            connecting to a new one every C{self._attemptDelay} seconds until
+            one of the connections succeeds, all of them fail, or the attempt
+            is cancelled.
+
+            @param endpoints: a list of all the endpoints we might try to
+                connect to, as determined by name resolution.
+            @type endpoints: L{list} of L{IStreamServerEndpoint}
+
+            @return: a Deferred that fires with the result of the
+                C{endpoint.connect} method that completes the fastest, or fails
+                with the first connection error it encountered if none of them
+                succeed.
+            @rtype: L{Deferred} failing with L{error.ConnectingCancelledError}
+                or firing with L{IProtocol}
+            """
+            if not endpoints:
+                raise error.DNSLookupError(
+                    f"no results for hostname lookup: {self._hostText}"
+                )
+            iterEndpoints = iter(endpoints)
+            pending: list[defer.Deferred[IProtocol]] = []
+            failures: list[Failure] = []
+            winner: defer.Deferred[IProtocol] = defer.Deferred(canceller=_canceller)
+
+            checkDoneCompleted = False
+            checkDoneEndpointsLeft = True
+
+            def checkDone() -> None:
+                if pending or checkDoneCompleted or checkDoneEndpointsLeft:
+                    return
+                winner.errback(failures.pop())
+
+            @LoopingCall
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# Twisted `HostnameEndpoint.connect`: Full Source (4/4) ([github.com/twisted/twisted](https://github.com/twisted/twisted/blob/twisted-25.5.0/src/twisted/internet/endpoints.py#L989-L1159))
+
+```python
+            def iterateEndpoint() -> None:
+                nonlocal checkDoneEndpointsLeft
+                endpoint = next(iterEndpoints, None)
+                if endpoint is None:
+                    # The list of endpoints ends.
+                    checkDoneEndpointsLeft = False
+                    checkDone()
+                    return
+
+                eachAttempt = endpoint.connect(protocolFactory)
+                pending.append(eachAttempt)
+
+                def noLongerPending(result: IProtocol | Failure) -> IProtocol | Failure:
+                    pending.remove(eachAttempt)
+                    return result
+
+                successState = eachAttempt.addBoth(noLongerPending)
+
+                def succeeded(result: IProtocol) -> None:
+                    winner.callback(result)
+
+                successState.addCallback(succeeded)
+
+                def failed(reason):
+                    failures.append(reason)
+                    checkDone()
+
+                successState.addErrback(failed)
+
+            iterateEndpoint.clock = self._reactor
+            iterateEndpoint.start(self._attemptDelay)
+
+            def cancelRemainingPending(
+                result: IProtocol | Failure,
+            ) -> IProtocol | Failure:
+                nonlocal checkDoneCompleted
+                checkDoneCompleted = True
+                for remaining in pending[:]:
+                    remaining.cancel()
+                if iterateEndpoint.running:
+                    iterateEndpoint.stop()
+                return result
+
+            return winner.addBoth(cancelRemainingPending)
+
+        return listd.addCallback(startConnectionAttempts)
+
+    def _fallbackNameResolution(self, host, port):
+        """
+        Resolve the hostname string into a tuple containing the host
+        address.  This is method is only used when the reactor does
+        not provide L{IReactorPluggableNameResolver}.
+```
+
+---
 
 # Twisted (2013): Callbacks
 
@@ -195,17 +397,379 @@ iterateEndpoint.start(self._attemptDelay)  # 300ms — fixed interval
 return winner.addBoth(cancelRemainingPending)
 ```
 
-4 pieces of manual state · 5 nested closures · 1 `LoopingCall`
+4 pieces of manual state · 6 nested closures · 1 `LoopingCall`
 
 **Still shipping unchanged in 2026.**
 
-<!-- Twisted was genuinely ahead of its time implementing this in 2013. but look at the bookkeeping required. four pieces of state: a pending list, a failures list, and two booleans just to track whether you're done. a LoopingCall firing every 300ms. five nested closures. this is the inherent complexity of the callback model — you're manually managing a state machine. And this is still the code shipping in Twisted today. -->
+<!-- Twisted was genuinely ahead of its time implementing this in 2013. but look at the bookkeeping required. four pieces of state: a pending list, a failures list, and two booleans just to track whether you're done. a LoopingCall firing every 300ms. six nested closures. this is the inherent complexity of the callback model — you're manually managing a state machine. And this is still the code shipping in Twisted today. -->
 
 ---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# asyncio `staggered_race`: Full Source (1/4) ([github.com/python/cpython](https://github.com/python/cpython/blob/v3.12.0/Lib/asyncio/staggered.py))
+
+```python
+"""Support for running coroutines in parallel with staggered start times."""
+
+__all__ = 'staggered_race',
+
+import contextlib
+import typing
+
+from . import events
+from . import exceptions as exceptions_mod
+from . import locks
+from . import tasks
+
+
+async def staggered_race(
+        coro_fns: typing.Iterable[typing.Callable[[], typing.Awaitable]],
+        delay: typing.Optional[float],
+        *,
+        loop: events.AbstractEventLoop = None,
+) -> typing.Tuple[
+    typing.Any,
+    typing.Optional[int],
+    typing.List[typing.Optional[Exception]]
+]:
+    """Run coroutines with staggered start times and take the first to finish.
+
+    This method takes an iterable of coroutine functions. The first one is
+    started immediately. From then on, whenever the immediately preceding one
+    fails (raises an exception), or when *delay* seconds has passed, the next
+    coroutine is started. This continues until one of the coroutines complete
+    successfully, in which case all others are cancelled, or until all
+    coroutines fail.
+
+    The coroutines provided should be well-behaved in the following way:
+
+    * They should only ``return`` if completed successfully.
+
+    * They should always raise an exception if they did not complete
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# asyncio `staggered_race`: Full Source (2/4) ([github.com/python/cpython](https://github.com/python/cpython/blob/v3.12.0/Lib/asyncio/staggered.py))
+
+```python
+      successfully. In particular, if they handle cancellation, they should
+      probably reraise, like this::
+
+        try:
+            # do work
+        except asyncio.CancelledError:
+            # undo partially completed work
+            raise
+
+    Args:
+        coro_fns: an iterable of coroutine functions, i.e. callables that
+            return a coroutine object when called. Use ``functools.partial`` or
+            lambdas to pass arguments.
+
+        delay: amount of time, in seconds, between starting coroutines. If
+            ``None``, the coroutines will run sequentially.
+
+        loop: the event loop to use.
+
+    Returns:
+        tuple *(winner_result, winner_index, exceptions)* where
+
+        - *winner_result*: the result of the winning coroutine, or ``None``
+          if no coroutines won.
+
+        - *winner_index*: the index of the winning coroutine in
+          ``coro_fns``, or ``None`` if no coroutines won. If the winning
+          coroutine may return None on success, *winner_index* can be used
+          to definitively determine whether any coroutine won.
+
+        - *exceptions*: list of exceptions returned by the coroutines.
+          ``len(exceptions)`` is equal to the number of coroutines actually
+          started, and the order is the same as in ``coro_fns``. The winning
+          coroutine's entry is ``None``.
+
+    """
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# asyncio `staggered_race`: Full Source (3/4) ([github.com/python/cpython](https://github.com/python/cpython/blob/v3.12.0/Lib/asyncio/staggered.py))
+
+```python
+    # TODO: when we have aiter() and anext(), allow async iterables in coro_fns.
+    loop = loop or events.get_running_loop()
+    enum_coro_fns = enumerate(coro_fns)
+    winner_result = None
+    winner_index = None
+    exceptions = []
+    running_tasks = []
+
+    async def run_one_coro(
+            previous_failed: typing.Optional[locks.Event]) -> None:
+        # Wait for the previous task to finish, or for delay seconds
+        if previous_failed is not None:
+            with contextlib.suppress(exceptions_mod.TimeoutError):
+                # Use asyncio.wait_for() instead of asyncio.wait() here, so
+                # that if we get cancelled at this point, Event.wait() is also
+                # cancelled, otherwise there will be a "Task destroyed but it is
+                # pending" later.
+                await tasks.wait_for(previous_failed.wait(), delay)
+        # Get the next coroutine to run
+        try:
+            this_index, coro_fn = next(enum_coro_fns)
+        except StopIteration:
+            return
+        # Start task that will run the next coroutine
+        this_failed = locks.Event()
+        next_task = loop.create_task(run_one_coro(this_failed))
+        running_tasks.append(next_task)
+        assert len(running_tasks) == this_index + 2
+        # Prepare place to put this coroutine's exceptions if not won
+        exceptions.append(None)
+        assert len(exceptions) == this_index + 1
+
+        try:
+            result = await coro_fn()
+        except (SystemExit, KeyboardInterrupt):
+            raise
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# asyncio `staggered_race`: Full Source (4/4) ([github.com/python/cpython](https://github.com/python/cpython/blob/v3.12.0/Lib/asyncio/staggered.py))
+
+```python
+        except BaseException as e:
+            exceptions[this_index] = e
+            this_failed.set()  # Kickstart the next coroutine
+        else:
+            # Store winner's results
+            nonlocal winner_index, winner_result
+            assert winner_index is None
+            winner_index = this_index
+            winner_result = result
+            # Cancel all other tasks. We take care to not cancel the current
+            # task as well. If we do so, then since there is no `await` after
+            # here and CancelledError are usually thrown at one, we will
+            # encounter a curious corner case where the current task will end
+            # up as done() == True, cancelled() == False, exception() ==
+            # asyncio.CancelledError. This behavior is specified in
+            # https://bugs.python.org/issue30048
+            for i, t in enumerate(running_tasks):
+                if i != this_index:
+                    t.cancel()
+
+    first_task = loop.create_task(run_one_coro(None))
+    running_tasks.append(first_task)
+    try:
+        # Wait for a growing list of tasks to all finish: poor man's version of
+        # curio's TaskGroup or trio's nursery
+        done_count = 0
+        while done_count != len(running_tasks):
+            done, _ = await tasks.wait(running_tasks)
+            done_count = len(done)
+            # If run_one_coro raises an unhandled exception, it's probably a
+            # programming error, and I want to see it.
+            if __debug__:
+                for d in done:
+                    if d.done() and not d.cancelled() and d.exception():
+                        raise d.exception()
+        return winner_result, winner_index, exceptions
+    finally:
+        # Make sure no tasks are left running if we leave this function
+        for t in running_tasks:
+            t.cancel()
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# AnyIO `connect_tcp`: Full Source (1/4) ([github.com/agronholm/anyio](https://github.com/agronholm/anyio/blob/4.13.0/src/anyio/_core/_sockets.py#L131-L260))
+
+```python
+async def connect_tcp(
+    remote_host: IPAddressType,
+    remote_port: int,
+    *,
+    local_host: IPAddressType | None = None,
+    tls: bool = False,
+    ssl_context: ssl.SSLContext | None = None,
+    tls_standard_compatible: bool = True,
+    tls_hostname: str | None = None,
+    happy_eyeballs_delay: float = 0.25,
+) -> SocketStream | TLSStream:
+    """
+    Connect to a host using the TCP protocol.
+
+    This function implements the stateless version of the Happy Eyeballs algorithm (RFC
+    6555). If ``remote_host`` is a host name that resolves to multiple IP addresses,
+    each one is tried until one connection attempt succeeds. If the first attempt does
+    not connected within 250 milliseconds, a second attempt is started using the next
+    address in the list, and so on. On IPv6 enabled systems, an IPv6 address (if
+    available) is tried first.
+
+    When the connection has been established, a TLS handshake will be done if either
+    ``ssl_context`` or ``tls_hostname`` is not ``None``, or if ``tls`` is ``True``.
+
+    :param remote_host: the IP address or host name to connect to
+    :param remote_port: port on the target host to connect to
+    :param local_host: the interface address or name to bind the socket to before
+        connecting
+    :param tls: ``True`` to do a TLS handshake with the connected stream and return a
+        :class:`~anyio.streams.tls.TLSStream` instead
+    :param ssl_context: the SSL context object to use (if omitted, a default context is
+        created)
+    :param tls_standard_compatible: If ``True``, performs the TLS shutdown handshake
+        before closing the stream and requires that the server does this as well.
+        Otherwise, :exc:`~ssl.SSLEOFError` may be raised during reads from the stream.
+        Some protocols, such as HTTP, require this option to be ``False``.
+        See :meth:`~ssl.SSLContext.wrap_socket` for details.
+    :param tls_hostname: host name to check the server certificate against (defaults to
+        the value of ``remote_host``)
+    :param happy_eyeballs_delay: delay (in seconds) before starting the next connection
+        attempt
+    :return: a socket stream object if no TLS handshake was done, otherwise a TLS stream
+    :raises ConnectionFailed: if the connection fails
+
+    """
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# AnyIO `connect_tcp`: Full Source (2/4) ([github.com/agronholm/anyio](https://github.com/agronholm/anyio/blob/4.13.0/src/anyio/_core/_sockets.py#L131-L260))
+
+```python
+    # Placed here due to https://github.com/python/mypy/issues/7057
+    connected_stream: SocketStream | None = None
+
+    async def try_connect(remote_host: str, event: Event) -> None:
+        nonlocal connected_stream
+        try:
+            stream = await asynclib.connect_tcp(remote_host, remote_port, local_address)
+        except OSError as exc:
+            oserrors.append(exc)
+            return
+        else:
+            if connected_stream is None:
+                connected_stream = stream
+                tg.cancel_scope.cancel()
+            else:
+                await stream.aclose()
+        finally:
+            event.set()
+
+    asynclib = get_async_backend()
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# AnyIO `connect_tcp`: Full Source (3/4) ([github.com/agronholm/anyio](https://github.com/agronholm/anyio/blob/4.13.0/src/anyio/_core/_sockets.py#L131-L260))
+
+```python
+    local_address: IPSockAddrType | None = None
+    family = socket.AF_UNSPEC
+    if local_host:
+        gai_res = await getaddrinfo(str(local_host), None)
+        family, *_, local_address = gai_res[0]
+
+    target_host = str(remote_host)
+    try:
+        addr_obj = ip_address(remote_host)
+    except ValueError:
+        addr_obj = None
+
+    if addr_obj is not None:
+        if isinstance(addr_obj, IPv6Address):
+            target_addrs = [(socket.AF_INET6, addr_obj.compressed)]
+        else:
+            target_addrs = [(socket.AF_INET, addr_obj.compressed)]
+    else:
+        # getaddrinfo() will raise an exception if name resolution fails
+        gai_res = await getaddrinfo(
+            target_host, remote_port, family=family, type=socket.SOCK_STREAM
+        )
+
+        # Organize the list so that the first address is an IPv6 address (if available)
+        # and the second one is an IPv4 addresses. The rest can be in whatever order.
+        v6_found = v4_found = False
+        target_addrs = []
+        for af, *_, sa in gai_res:
+            if af == socket.AF_INET6 and not v6_found:
+                v6_found = True
+                target_addrs.insert(0, (af, sa[0]))
+            elif af == socket.AF_INET and not v4_found and v6_found:
+                v4_found = True
+                target_addrs.insert(1, (af, sa[0]))
+            else:
+                target_addrs.append((af, sa[0]))
+```
+
+---
+<style scoped>section { padding: 20px; } pre { font-size: 16px !important; line-height: 1.2 !important; margin: 0 !important; }</style>
+
+# AnyIO `connect_tcp`: Full Source (4/4) ([github.com/agronholm/anyio](https://github.com/agronholm/anyio/blob/4.13.0/src/anyio/_core/_sockets.py#L131-L260))
+
+```python
+    oserrors: list[OSError] = []
+    try:
+        async with create_task_group() as tg:
+            for _af, addr in target_addrs:
+                event = Event()
+                tg.start_soon(try_connect, addr, event)
+                with move_on_after(happy_eyeballs_delay):
+                    await event.wait()
+
+        if connected_stream is None:
+            cause = (
+                oserrors[0]
+                if len(oserrors) == 1
+                else ExceptionGroup("multiple connection attempts failed", oserrors)
+            )
+            raise OSError("All connection attempts failed") from cause
+    finally:
+        oserrors.clear()
+
+    if tls or tls_hostname or ssl_context:
+        try:
+            return await TLSStream.wrap(
+                connected_stream,
+                server_side=False,
+                hostname=tls_hostname or str(remote_host),
+                ssl_context=ssl_context,
+                standard_compatible=tls_standard_compatible,
+            )
+```
+
+---
+
+<style scoped>section { font-size: 14px; }</style>
 
 # AnyIO: Structured Concurrency
 
 ```python
+connected_stream: SocketStream | None = None
+
+async def try_connect(remote_host: str, event: Event) -> None:
+    nonlocal connected_stream
+    try:
+        stream = await asynclib.connect_tcp(remote_host, remote_port, local_address)
+    except OSError as exc:
+        oserrors.append(exc)
+        return
+    else:
+        if connected_stream is None:
+            connected_stream = stream
+            tg.cancel_scope.cancel()
+        else:
+            await stream.aclose()
+    finally:
+        event.set()
+
 async with create_task_group() as tg:
     for _af, addr in target_addrs:
         event = Event()
@@ -214,9 +778,9 @@ async with create_task_group() as tg:
             await event.wait()
 ```
 
-The task group handles: **cancellation · error propagation · cleanup**
+The task group handles: **cancellation · cleanup** — errors collected manually via `oserrors`
 
-<!-- Five lines. That's the entire concurrency logic. The task group handles cancellation — when one connection succeeds, the task group cancels all the others. Error propagation — if every connection fails, the exceptions are collected and re-raised. And cleanup — tasks can't leak, the with block won't exit until everything is done. All that state you saw in Twisted — the pending list, the failure list, the two booleans — you don't need any of it. The task group is your state machine. -->
+<!-- 1 closure, 2 pieces of state. try_connect captures connected_stream (nonlocal), oserrors, asynclib, remote_port, local_address, and tg from the outer scope — it is a closure. But compare: Twisted has 4 pieces of state, 6 closures, and a fixed-interval LoopingCall. AnyIO has 2 pieces of state, 1 closure, and adaptive timing. Errors are caught inside try_connect, appended to oserrors, and raised manually after the task group exits — the task group itself doesn't propagate them. What the task group does handle: cancelling all other tasks when one succeeds, and ensuring no tasks leak on exit. -->
 
 ---
 
@@ -232,7 +796,7 @@ async def try_connect(remote_host, event):
         stream = await connect(...)
         ...
     finally:
-        event.set()  # fires immediately on success or failure
+        event.set()  # signals completion on success or failure
 
 # main loop: wait up to 250ms, then move on regardless
 with move_on_after(happy_eyeballs_delay):
@@ -282,24 +846,9 @@ def _canceller(cancelled: Deferred[IProtocol]) -> None:
     ...
 ```
 
-AnyIO's task group handles cancellation — **no closures, no cycles, no comment needed**.
+AnyIO cancels via `tg.cancel_scope.cancel()` — **no Deferred-canceller cycle, no `gc.garbage` risk, no comment needed**.
 
 <!-- The Twisted code itself documents the footgun. Structured concurrency eliminates the whole class of problem. -->
-
----
-
-# Bonus: CPython asyncio had bugs
-
-asyncio also has Happy Eyeballs (`happy_eyeballs_delay` in `asyncio.open_connection`):
-
-- **Reference cycles** — failed-attempt exceptions were trapped by the implementation, preventing GC (Oct 2024)
-- **`staggered_race` task leaks** — tasks weren't cancelled on success, plus a `NameError` when logging unhandled errors
-
-I found and fixed both — merged across Python 3.12, 3.13, and `main`.
-
-AnyIO's structured approach avoids this whole class of bug.
-
-<!-- Finding bugs in the implementation you're replacing is a good way to validate that the replacement is better. Both bugs stem from manual bookkeeping that structured concurrency eliminates. -->
 
 ---
 
@@ -312,7 +861,7 @@ AnyIO's structured approach avoids this whole class of bug.
 - Still not submitted as a PR
 - Last commit: April 2026 — *"my eyes are starting to water looking at this"*
 
-The same adaptive-delay bug that #9345 describes is what AnyIO solves naturally — `move_on_after` fires immediately when the event is set.
+The same adaptive-delay bug that #9345 describes is what AnyIO solves naturally — `happy_eyeballs_delay` is a *maximum* wait between attempts; if the previous attempt finishes sooner, `event.wait()` returns and the loop moves on immediately.
 
 <!-- issue 9345 is still open with no comments and no fix. Glyph has been working on a rewrite for nearly a decade, producing multiple implementation files. even with coroutines available, the lack of structured concurrency means you still have to build the machinery yourself. -->
 
