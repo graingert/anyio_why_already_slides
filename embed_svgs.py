@@ -151,7 +151,7 @@ def embed_svgs(md_path: Path) -> None:
         # Identify which source SVG this came from via namespaced IDs
         replacement = None
         if svg_tag:
-            for prefix, svg_path in prefix_map.items():
+            for prefix, svg_path in sorted(prefix_map.items(), key=lambda x: -len(x[0])):
                 if svg_tag.find(id=lambda v: v and v.startswith(f'{prefix}-')):
                     width = svg_tag.get('width')
                     style = svg_tag.get('style')
